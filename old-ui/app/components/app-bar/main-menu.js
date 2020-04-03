@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Dropdown, DropdownMenuItem } from '../dropdown'
+import { Dropdown, DropdownMenuItemWithAvatar } from '../dropdown'
 import actions from '../../../../ui/app/actions'
+import rifActions from '../../../../ui/app/Rif/actions'
 import { connect } from 'react-redux'
 import { faMoneyBill, faAddressCard } from '@fortawesome/free-solid-svg-icons'
 
@@ -47,32 +48,32 @@ class MainMenu extends Component {
           overflow: 'hidden',
         }}
       >
-        <DropdownMenuItem
+        <DropdownMenuItemWithAvatar
           closeMenu={() => this.props.changeState(isMainMenuOpen)}
           onClick={() => { this.props.showConfigPage() }}
           title={'Settings'}
         />
 
-        <DropdownMenuItem
+        <DropdownMenuItemWithAvatar
           closeMenu={() => this.props.changeState(isMainMenuOpen)}
           onClick={() => { this.props.lockMetamask() }}
           title={'Log Out'}
         />
 
-        <DropdownMenuItem
+        <DropdownMenuItemWithAvatar
           closeMenu={() => this.props.changeState(isMainMenuOpen)}
           onClick={() => { this.props.showInfoPage() }}
           title={'Info/Help'}
         />
 
-        <DropdownMenuItem
+        <DropdownMenuItemWithAvatar
           closeMenu={() => this.props.changeState(isMainMenuOpen)}
           onClick={() => { this.props.showDomainsPage() }}
           title={'Your Domains'}
           icon={faAddressCard}
-        ></DropdownMenuItem>
+        />
 
-        <DropdownMenuItem
+        <DropdownMenuItemWithAvatar
           closeMenu={() => this.props.changeState(isMainMenuOpen)}
           onClick={() => { this.props.showPaymentsPage() }}
           title={'Payments'}
@@ -88,8 +89,8 @@ const mapDispatchToProps = dispatch => {
     showConfigPage: () => dispatch(actions.showConfigPage()),
     lockMetamask: () => dispatch(actions.lockMetamask()),
     showInfoPage: () => dispatch(actions.showInfoPage()),
-    showDomainsPage: () => dispatch(actions.showDomainsPage()),
-    showPaymentsPage: () => dispatch(actions.showPaymentsPage()),
+    showDomainsPage: () => dispatch(rifActions.showDomainsPage()),
+    showPaymentsPage: () => dispatch(rifActions.showPaymentsPage()),
   }
 }
 

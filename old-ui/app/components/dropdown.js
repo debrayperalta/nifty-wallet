@@ -84,6 +84,37 @@ class DropdownMenuItem extends Component {
   }
 
   render () {
+    const { onClick, closeMenu, children } = this.props
+    const style = Object.assign({
+      listStyle: 'none',
+      padding: (this.props.style && this.props.style.padding) ? this.props.style.padding : '15px 0px',
+      fontSize: '16px',
+      fontStyle: 'normal',
+      fontFamily: 'Nunito Regular',
+      cursor: 'pointer',
+      display: 'flex',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+    }, this.props.style)
+
+    return (
+      <li
+        className={classnames('dropdown-menu-item', this.props.className)}
+        onClick={() => {
+          onClick()
+          closeMenu()
+        }}
+        style={style}
+      >
+        {children}
+      </li>
+    )
+  }
+
+}
+
+class DropdownMenuItemWithAvatar extends Component {
+  render () {
     const { title, onClick, closeMenu, icon, children } = this.props
     const style = Object.assign({
       listStyle: 'none',
@@ -122,7 +153,18 @@ class DropdownMenuItem extends Component {
 
 }
 
+DropdownMenuItemWithAvatar.propTypes = {
+  title: PropTypes.string.isRequired,
+  closeMenu: PropTypes.func,
+  onClick: PropTypes.func.isRequired,
+  children: PropTypes.node,
+  style: PropTypes.object,
+  className: PropTypes.string,
+  icon: PropTypes.object
+}
+
 module.exports = {
   Dropdown,
   DropdownMenuItem,
+  DropdownMenuItemWithAvatar,
 }

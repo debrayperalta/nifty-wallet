@@ -365,11 +365,6 @@ var actions = {
 
   createCancelTransaction,
 
-  //RIF
-  SHOW_DOMAINS_PAGE: 'SHOW_DOMAINS_PAGE',
-  SHOW_PAYMENTS_PAGE: 'SHOW_PAYMENTS_PAGE',
-  showDomainsPage,
-  showPaymentsPage,
 }
 
 module.exports = actions
@@ -1791,18 +1786,6 @@ function showConfigPage (transitionForward = true) {
   return {
     type: actions.SHOW_CONFIG_PAGE,
     value: transitionForward,
-  }
-}
-
-function showDomainsPage () {
-  return {
-    type: actions.SHOW_DOMAINS_PAGE,
-  }
-}
-
-function showPaymentsPage () {
-  return {
-    type: actions.SHOW_PAYMENTS_PAGE,
   }
 }
 
