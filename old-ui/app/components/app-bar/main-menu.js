@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Dropdown, DropdownMenuItem } from '../dropdown'
 import actions from '../../../../ui/app/actions'
 import { connect } from 'react-redux'
-import { faMoneyBill, faAddressCard, faShoppingCart } from '@fortawesome/free-solid-svg-icons'
+import { faMoneyBill, faAddressCard } from '@fortawesome/free-solid-svg-icons'
 
 class MainMenu extends Component {
   static propTypes = {
@@ -14,7 +14,6 @@ class MainMenu extends Component {
     openMainMenu: PropTypes.func.isRequired,
     showDomainsPage: PropTypes.func.isRequired,
     showPaymentsPage: PropTypes.func.isRequired,
-    showMarketplacePage: PropTypes.func.isRequired,
     isMainMenuOpen: PropTypes.bool,
   }
 
@@ -79,13 +78,6 @@ class MainMenu extends Component {
           title={'Payments'}
           icon={faMoneyBill}
         />
-
-        <DropdownMenuItem
-          closeMenu={() => this.props.changeState(isMainMenuOpen)}
-          onClick={() => { this.props.showMarketplacePage() }}
-          title={'Marketplace'}
-          icon={faShoppingCart}
-        />
       </Dropdown>
     )
   }
@@ -98,7 +90,6 @@ const mapDispatchToProps = dispatch => {
     showInfoPage: () => dispatch(actions.showInfoPage()),
     showDomainsPage: () => dispatch(actions.showDomainsPage()),
     showPaymentsPage: () => dispatch(actions.showPaymentsPage()),
-    showMarketplacePage: () => dispatch(actions.showMarketplacePage()),
   }
 }
 

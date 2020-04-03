@@ -368,10 +368,8 @@ var actions = {
   //RIF
   SHOW_DOMAINS_PAGE: 'SHOW_DOMAINS_PAGE',
   SHOW_PAYMENTS_PAGE: 'SHOW_PAYMENTS_PAGE',
-  SHOW_MARKETPLACE_PAGE: 'SHOW_MARKETPLACE_PAGE',
   showDomainsPage,
   showPaymentsPage,
-  showMarketplacePage,
 }
 
 module.exports = actions
@@ -1805,12 +1803,6 @@ function showDomainsPage () {
 function showPaymentsPage () {
   return {
     type: actions.SHOW_PAYMENTS_PAGE,
-  }
-}
-
-function showMarketplacePage () {
-  return {
-    type: actions.SHOW_MARKETPLACE_PAGE,
   }
 }
 
