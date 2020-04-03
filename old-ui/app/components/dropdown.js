@@ -74,13 +74,11 @@ class Dropdown extends Component {
 
 class DropdownMenuItem extends Component {
   static propTypes = {
-    title: PropTypes.string.isRequired,
     closeMenu: PropTypes.func,
     onClick: PropTypes.func.isRequired,
     children: PropTypes.node,
     style: PropTypes.object,
     className: PropTypes.string,
-    icon: PropTypes.object
   }
 
   render () {

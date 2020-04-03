@@ -364,7 +364,6 @@ var actions = {
   confirmChangePassword,
 
   createCancelTransaction,
-
 }
 
 module.exports = actions
