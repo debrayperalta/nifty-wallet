@@ -326,5 +326,9 @@
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0",
     "watchify": "^3.11.1"
+  },
+  "engines": {
+    "node": "12.15.0",
+    "npm": "^6.13.4"
   }
 }
