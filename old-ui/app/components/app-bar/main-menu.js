@@ -43,7 +43,6 @@ class MainMenu extends Component {
           position: 'absolute',
           right: '2px',
           top: '38px',
-          //width: '190px',
           width: '12rem',
           maxHeight: isOpen ? '350px' : '0px',
           overflow: 'hidden',
