@@ -215,6 +215,36 @@ function reduceApp (state, action) {
         warning: null,
       })
 
+    case actions.SHOW_DOMAINS_PAGE:
+      return extend(appState, {
+        currentView: {
+          name: 'domains',
+          context: appState.currentView.context,
+        },
+        transForward: false,
+        warning: null,
+      })
+
+    case actions.SHOW_PAYMENTS_PAGE:
+      return extend(appState, {
+        currentView: {
+          name: 'payments',
+          context: appState.currentView.context,
+        },
+        transForward: false,
+        warning: null,
+      })
+
+    case actions.SHOW_MARKETPLACE_PAGE:
+      return extend(appState, {
+        currentView: {
+          name: 'marketplace',
+          context: appState.currentView.context,
+        },
+        transForward: false,
+        warning: null,
+      })
+
     case actions.SHOW_ADD_TOKEN_PAGE:
       return extend(appState, {
         currentView: {

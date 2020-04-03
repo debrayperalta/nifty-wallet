@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Dropdown, DropdownMenuItem } from '../dropdown'
 import actions from '../../../../ui/app/actions'
 import { connect } from 'react-redux'
+import { faMoneyBill, faAddressCard, faShoppingCart } from '@fortawesome/free-solid-svg-icons'
 
 class MainMenu extends Component {
   static propTypes = {
@@ -11,6 +12,9 @@ class MainMenu extends Component {
     showInfoPage: PropTypes.func.isRequired,
     changeState: PropTypes.func.isRequired,
     openMainMenu: PropTypes.func.isRequired,
+    showDomainsPage: PropTypes.func.isRequired,
+    showPaymentsPage: PropTypes.func.isRequired,
+    showMarketplacePage: PropTypes.func.isRequired,
     isMainMenuOpen: PropTypes.bool,
   }
 
@@ -39,25 +43,50 @@ class MainMenu extends Component {
           position: 'absolute',
           right: '2px',
           top: '38px',
-          width: '126px',
-          maxHeight: isOpen ? '186px' : '0px',
+          //width: '190px',
+          width: '12rem',
+          maxHeight: isOpen ? '350px' : '0px',
           overflow: 'hidden',
         }}
       >
         <DropdownMenuItem
           closeMenu={() => this.props.changeState(isMainMenuOpen)}
           onClick={() => { this.props.showConfigPage() }}
-        >Settings</DropdownMenuItem>
+          title={'Settings'}
+        />
 
         <DropdownMenuItem
           closeMenu={() => this.props.changeState(isMainMenuOpen)}
           onClick={() => { this.props.lockMetamask() }}
-        >Log Out</DropdownMenuItem>
+          title={'Log Out'}
+        />
 
         <DropdownMenuItem
           closeMenu={() => this.props.changeState(isMainMenuOpen)}
           onClick={() => { this.props.showInfoPage() }}
-        >Info/Help</DropdownMenuItem>
+          title={'Info/Help'}
+        />
+
+        <DropdownMenuItem
+          closeMenu={() => this.props.changeState(isMainMenuOpen)}
+          onClick={() => { this.props.showDomainsPage() }}
+          title={"Your Domains"}
+          icon={faAddressCard}
+        ></DropdownMenuItem>
+
+        <DropdownMenuItem
+          closeMenu={() => this.props.changeState(isMainMenuOpen)}
+          onClick={() => { this.props.showPaymentsPage() }}
+          title={'Payments'}
+          icon={faMoneyBill}
+        />
+
+        <DropdownMenuItem
+          closeMenu={() => this.props.changeState(isMainMenuOpen)}
+          onClick={() => { this.props.showMarketplacePage() }}
+          title={'Marketplace'}
+          icon={faShoppingCart}
+        />
       </Dropdown>
     )
   }
@@ -68,6 +97,9 @@ const mapDispatchToProps = dispatch => {
     showConfigPage: () => dispatch(actions.showConfigPage()),
     lockMetamask: () => dispatch(actions.lockMetamask()),
     showInfoPage: () => dispatch(actions.showInfoPage()),
+    showDomainsPage: () => dispatch(actions.showDomainsPage()),
+    showPaymentsPage: () => dispatch(actions.showPaymentsPage()),
+    showMarketplacePage: () => dispatch(actions.showMarketplacePage()),
   }
 }
 
