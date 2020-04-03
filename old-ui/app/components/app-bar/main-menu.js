@@ -69,7 +69,7 @@ class MainMenu extends Component {
         <DropdownMenuItem
           closeMenu={() => this.props.changeState(isMainMenuOpen)}
           onClick={() => { this.props.showDomainsPage() }}
-          title={"Your Domains"}
+          title={'Your Domains'}
           icon={faAddressCard}
         ></DropdownMenuItem>
 
