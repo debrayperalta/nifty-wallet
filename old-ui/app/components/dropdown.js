@@ -63,6 +63,7 @@ class Dropdown extends Component {
         {`
           li.dropdown-menu-item:hover { color:#ffffff; }
           li.dropdown-menu-item { color: rgba(255, 255, 255, 0.5); position: relative }
+          li.dropdown-menu-item div { padding-right: 0.3rem; }
         `}
         </style>
         {children}
