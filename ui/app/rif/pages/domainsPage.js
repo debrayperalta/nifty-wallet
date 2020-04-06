@@ -2,48 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import actions from '../../actions'
 
-const testStyle = {
-	body: {
-		width: '100%', 
-	},
-	chiplet: {
-		width: '90%',
-		height: '100px', 
-		fontSize: '14px',
-		color: '#242A30',
-		margin: '5px',
-		padding:'0.5rem',
-		title: {
-			color: 'black',
-			fontSize: '17px',
-			fontWeight: 'bold',
-		},
-		description: {
-			paddingLeft: '1.5rem',
-		},
-		body:{
-			width: '85%',
-			height: '100%',
-			float: 'left',
-			borderBottom: '2.5px solid #EEEEEE',
-		},
-		statusWrapper: {
-			width: '15%',
-			height: '100%', 
-			float: 'right',
-			position: 'relative',
-			backgroundColor: '#C0D6E4',
-			borderLeft: '5px solid black',
-		},
-		statusText: {
-			position: 'absolute',
-			top: '50%',
-  			left: '50%',
-			transform: 'translateX(-50%) translateY(-50%) rotate(-90deg)'
-		},
-	},
-  }
-
 const mockDomains = [
 	{
 		domain: 'domain1.rsk',
@@ -89,7 +47,6 @@ class DomainsScreen extends Component {
 	global.platform.openWindow({ url })
   }
   chiplet = (data) => {
-	  console.log("Data", data)
 	return <div id="chiplet" className={'chiplet'}>
 		<div className={'chiplet-body'}>
 			<div id="chipletTitle" className={'chiplet-title'}>
