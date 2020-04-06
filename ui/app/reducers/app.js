@@ -1,5 +1,6 @@
 const extend = require('xtend')
 const actions = require('../actions')
+const rifActions = require('../rif/actions')
 const txHelper = require('../../lib/tx-helper')
 const { customHdPaths } = require('../../../old-ui/app/components/connect-hardware/util.js')
 const log = require('loglevel')
@@ -212,6 +213,26 @@ function reduceApp (state, action) {
           context: appState.currentView.context,
         },
         transForward: action.value,
+        warning: null,
+      })
+
+    case rifActions.SHOW_DOMAINS_PAGE:
+      return extend(appState, {
+        currentView: {
+          name: 'domains',
+          context: appState.currentView.context,
+        },
+        transForward: false,
+        warning: null,
+      })
+
+    case rifActions.SHOW_PAYMENTS_PAGE:
+      return extend(appState, {
+        currentView: {
+          name: 'payments',
+          context: appState.currentView.context,
+        },
+        transForward: false,
         warning: null,
       })
 

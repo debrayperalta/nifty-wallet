@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import MenuDroppo from './menu-droppo'
 import extend from 'xtend'
 import classnames from 'classnames'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const noop = () => {}
 
@@ -62,6 +63,7 @@ class Dropdown extends Component {
         {`
           li.dropdown-menu-item:hover { color:#ffffff; }
           li.dropdown-menu-item { color: rgba(255, 255, 255, 0.5); position: relative }
+          li.dropdown-menu-item div { padding-right: 0.3rem; }
         `}
         </style>
         {children}
@@ -109,7 +111,58 @@ class DropdownMenuItem extends Component {
 
 }
 
+class DropdownMenuItemWithAvatar extends Component {
+  render () {
+    const { title, onClick, closeMenu, icon, children } = this.props
+    const style = Object.assign({
+      listStyle: 'none',
+      padding: (this.props.style && this.props.style.padding) ? this.props.style.padding : '15px 0px',
+      fontSize: '16px',
+      fontStyle: 'normal',
+      fontFamily: 'Nunito Regular',
+      cursor: 'pointer',
+      display: 'flex',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+    }, this.props.style)
+
+    return (
+      <li
+        className={classnames('dropdown-menu-item', this.props.className)}
+        onClick={() => {
+          onClick()
+          closeMenu()
+        }}
+        style={style}
+      >
+        {
+          icon &&
+          <div>
+            <FontAwesomeIcon icon={icon} />
+          </div>
+        }
+        <div>
+          {title}
+        </div>
+        {children}
+      </li>
+    )
+  }
+
+}
+
+DropdownMenuItemWithAvatar.propTypes = {
+  title: PropTypes.string.isRequired,
+  closeMenu: PropTypes.func,
+  onClick: PropTypes.func.isRequired,
+  children: PropTypes.node,
+  style: PropTypes.object,
+  className: PropTypes.string,
+  icon: PropTypes.object
+}
+
 module.exports = {
   Dropdown,
   DropdownMenuItem,
+  DropdownMenuItemWithAvatar,
 }

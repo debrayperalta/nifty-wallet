@@ -35,6 +35,8 @@ const Import = require('./accounts/import')
 const ForgetDeviceScreen = require('./components/connect-hardware/forget-screen')
 import ConnectHardwareForm from './components/connect-hardware/index'
 const InfoScreen = require('./info')
+const PaymentsScreen = require('../../ui/app/rif/pages/paymentsPage')
+const DomainsScreen = require('../../ui/app/rif/pages/domainsPage')
 const AppBar = require('./components/app-bar/app-bar.component')
 const Loading = require('./components/loading')
 const BuyView = require('./components/buy-button-subview')
@@ -303,6 +305,14 @@ App.prototype.renderPrimary = function () {
       log.debug('rendering info screen')
       return h(InfoScreen, {key: 'info'})
 
+      case 'payments':
+        log.debug('rendering payments screen')
+        return h(PaymentsScreen, {key: 'payments'})
+
+    case 'domains':
+      log.debug('rendering domains screen')
+      return h(DomainsScreen, {key: 'domains'})
+      
     case 'buyEth':
       log.debug('rendering buy ether screen')
       return h(BuyView, {key: 'buyEthView'})
