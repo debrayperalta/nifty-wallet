@@ -1,6 +1,6 @@
 const extend = require('xtend')
 const actions = require('../actions')
-const rifActions = require('../Rif/actions')
+const rifActions = require('../rif/actions')
 const txHelper = require('../../lib/tx-helper')
 const { customHdPaths } = require('../../../old-ui/app/components/connect-hardware/util.js')
 const log = require('loglevel')

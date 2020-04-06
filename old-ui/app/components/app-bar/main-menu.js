@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Dropdown, DropdownMenuItemWithAvatar } from '../dropdown'
 import actions from '../../../../ui/app/actions'
-import rifActions from '../../../../ui/app/Rif/actions'
+import rifActions from '../../../../ui/app/rif/actions'
 import { connect } from 'react-redux'
 import { faMoneyBill, faAddressCard } from '@fortawesome/free-solid-svg-icons'
 
