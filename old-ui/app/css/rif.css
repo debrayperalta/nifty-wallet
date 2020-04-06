@@ -1,0 +1,54 @@
+.body {
+    width: 100%; 
+}
+.chiplet {
+    width: 90%;
+    height: 100px;
+    font-size: 14px;
+    color: #242A30;
+    margin: 5px;
+    padding:0.5rem;
+}
+.chiplet-title {
+    color: black;
+    font-size: 18px;
+    font-weight: bold;
+}
+.chiplet-description {
+    padding-left: 1.5rem;
+}
+.chiplet-body {
+    width: 85%;
+    height: 100%;
+    float: left;
+    border-bottom: 2.5px solid #EEEEEE;
+}
+.chiplet-status-wrapper {
+    width: 15%;
+    height: 100%; 
+    float: right;
+    position: relative;
+}
+.chiplet-status-text {
+    position: absolute;
+    color: white;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+}
+.chiplet-status-active {
+    background-color: #008744;
+    border-left: 4px solid #7FC3A1;
+}
+.chiplet-status-pending {
+    background-color: #0057e7;
+    border-left: 4px solid #7FABF3;
+}
+.chiplet-status-expired {
+    background-color: #D62D20;
+    border-left: 4px solid #EA968F;
+}
+.chiplet-status-expiring {
+    background-color: #FFA700;
+    border-left: 4px solid #FFD37F;
+}
