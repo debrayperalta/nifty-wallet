@@ -16,6 +16,7 @@ const AccountDropdowns = require('./components/account-dropdowns/account-dropdow
 const CopyButton = require('./components/copy/copy-button')
 const ToastComponent = require('./components/toast')
 import { getMetaMaskAccounts } from '../../ui/app/selectors'
+const rifActions = require('../../ui/app/rif/actions')
 
 module.exports = connect(mapStateToProps)(AccountDetailScreen)
 
@@ -60,6 +61,17 @@ AccountDetailScreen.prototype.render = function () {
   }
 
   const currentKeyring = getCurrentKeyring(props.address, network, props.keyrings, props.identities)
+
+  const isDevelopment = true
+  let invokeContract = null
+  if (isDevelopment) {
+    invokeContract = h('button', {
+      onClick: () => {
+        return props.dispatch(rifActions.showInvokeContractPage({}))
+      },
+      style: { marginLeft: '10px' },
+    }, 'Invoke')
+  }
 
   return (
 
@@ -236,7 +248,7 @@ AccountDetailScreen.prototype.render = function () {
               }
             },
           }, ifContractAcc(currentKeyring) ? 'Execute methods' : 'Send'),
-
+          invokeContract,
         ]),
       ]),
 

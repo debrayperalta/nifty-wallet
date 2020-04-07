@@ -1,0 +1,598 @@
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import PersistentForm from '../../../lib/persistent-form'
+import SendProfile from './../../../../old-ui/app/components/send/send-profile'
+import SendHeader from './../../../../old-ui/app/components/send/send-header'
+import ErrorComponent from './../../../../old-ui/app/components/error'
+import ToastComponent from './../../../../old-ui/app/components/toast'
+import Select from 'react-select'
+import actions from '../../../../ui/app/actions'
+import abi from 'web3-eth-abi'
+import Web3 from 'web3'
+import copyToClipboard from 'copy-to-clipboard'
+import CopyButton from './../../../../old-ui/app/components/copy/copy-button'
+import { normalizeEthStringToWei } from '../../util'
+
+class InvokeContract extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      val: props.defaultValue,
+    }
+  }
+
+  static propTypes = {
+    placeholder: PropTypes.string,
+    defaultValue: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+      PropTypes.bool,
+    ]),
+    disabled: PropTypes.bool,
+    value: PropTypes.string,
+    onChange: PropTypes.func,
+  }
+
+  generateAttributes () {
+    return {
+      placeholder: this.props.placeholder,
+      value: this.state.val,
+      disabled: this.props.disabled,
+      onChange: (e) => {
+        this.setState({
+          val: e.target.value,
+        })
+        this.props.onChange(e.target.value)
+      },
+    }
+  }
+}
+
+class InvokeContractTextField extends InvokeContract {
+  render () {
+    return (
+      <input type="text"
+             {...this.generateAttributes()}
+             className="input large-input output"
+             style={{ marginTop: '5px' }}
+      />
+    )
+  }
+}
+
+class InvokeContractTextArea extends InvokeContract {
+  render () {
+    return (
+      <textarea
+        {...this.generateAttributes()}
+        style={{
+          marginTop: '5px',
+          width: '100%',
+          height: '50px',
+          padding: '10px',
+        }}
+      />
+    )
+  }
+}
+
+class InvokeContractInputSelect extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      val: props.defaultValue,
+    }
+  }
+
+  static propTypes = {
+    defaultValue: PropTypes.string,
+    value: PropTypes.string,
+    onChange: PropTypes.func,
+  }
+
+  render () {
+    return (
+      <Select
+        clearable={false}
+        value={this.state.val}
+        options={[{
+          label: 'false',
+          value: 'false',
+        }, {
+          label: 'true',
+          value: 'true',
+        }]}
+        onChange={(opt) => {
+          this.setState({
+            val: opt.value,
+          })
+          this.props.onChange(opt.value)
+        }
+        }
+        style={{ marginTop: '5px' }}
+      />
+    )
+  }
+}
+
+class InvokeContractScreen extends PersistentForm {
+  constructor (props) {
+    super(props)
+    this.state = {
+      web3: new Web3(global.ethereumProvider),
+      options: [],
+      abi: null,
+      contractJson: null,
+      contractAddress: null,
+      currentJsonString: null,
+      methodSelected: props.methodSelected,
+      methodABI: props.methodABI,
+      methodInputs: [],
+      methodOutputs: [],
+      methodInputsView: [],
+      methodOutputsView: [],
+      isConstantMethod: false,
+      inputValues: props.inputValues || {},
+      txValue: props.txValue || '0x',
+      outputValues: props.outputValues || {},
+      copyDisabled: true,
+    }
+
+    PersistentForm.call(this)
+  }
+
+  render () {
+    this.persistentFormParentId = 'invoke-contract-form'
+
+    const {
+      error,
+    } = this.props
+
+    const contractAddress = this.state.contractJson ? this.state.contractJson.networks['33'].address : null
+    const title = this.state.contractJson ? this.state.contractJson.contractName : 'Invoke Contract'
+    let jsonSection = (
+      <div>
+        <input placeholder="Contract Address (Needed for ABI JSON Array)"
+               value={this.state.contractAddress} onChange={(opt) => {
+                  this.setState({
+                    contractAddress: opt.target.value,
+                  })
+               }} style={{marginBottom: '10pt'}}/>
+        <textarea value={this.state.currentJsonString}
+                  style={{width: '100%', height: '200px', resize: 'vertical'}}
+                  onChange={(opt) => {
+                    this.setState({
+                      currentJsonString: opt.target.value,
+                    })
+                  }}>
+        </textarea>
+      </div>
+    )
+    let jsonButtonSection = (
+       <div>
+         <button
+           className="btn-violet"
+           style={{marginBottom: '10px'}}
+           onClick={() => this.parseContractJson()}>Parse Contract JSON
+         </button>
+         <button
+           className="btn-violet"
+           style={{marginBottom: '10px'}}
+           onClick={() => this.parseABIJsonArray()}>Parse ABI JSON Array
+         </button>
+       </div>
+    )
+
+    let contractButtons = null
+
+    if (this.state.contractJson || this.state.abi) {
+      jsonSection = (<Select
+           clearable={false}
+           value={this.state.methodSelected}
+           options={this.state.options}
+           style={{ marginBottom: '10px' }}
+           onChange={(opt) => {
+             const isConstantMethod = opt.metadata && (opt.metadata.constant || opt.metadata.stateMutability === 'view')
+             this.setState({
+               methodSelected: opt.value,
+               isConstantMethod: isConstantMethod,
+               methodABI: opt.metadata,
+               outputValues: {},
+               inputValues: {},
+               txValue: '0x',
+             }, () => {
+               this.generateMethodFieldsView(opt.metadata)
+             })
+           }}
+      />)
+      jsonButtonSection = null
+      contractButtons = (
+       <div style={{ padding: '0 30px', overflow: 'auto', 'maxHeight': '280px' }}>
+         {this.state.methodInputsView}
+         {this.state.isConstantMethod && this.methodOutput()}
+         {this.buttonsSection()}
+       </div>
+      )
+    }
+
+    return (
+      <div className="send-screen flex-column flex-grow">
+        <SendProfile />
+        <SendHeader title={title} subtitle={contractAddress} />
+        <ErrorComponent error={error} />
+        <ToastComponent isSuccess={true} />
+        <div style={{ padding: '0 30px' }}>
+          {jsonSection}
+          {jsonButtonSection}
+        </div>
+        {contractButtons}
+      </div>
+    )
+  }
+
+  componentDidMount () {
+    if (this.props.methodSelected) {
+      this.generateMethodFieldsView(this.props.methodABI)
+    }
+  }
+
+  parseContractJson () {
+    this.props.hideToast()
+    if (this.state.currentJsonString) {
+      const contract = JSON.parse(this.state.currentJsonString)
+      const abi = contract.abi
+      if (!abi) {
+        return this.props.displayWarning('Invalid contract json, perhaps you are using a ABI json instead?')
+      }
+      this.setState({
+        contractJson: contract,
+      })
+      this.getContractMethods(abi)
+    } else {
+      return this.props.displayWarning('You need to put the json text in the box first!')
+    }
+  }
+
+  parseABIJsonArray () {
+    this.props.hideToast()
+    if (this.state.currentJsonString) {
+      const abi = JSON.parse(this.state.currentJsonString)
+      if (!Array.isArray(abi)) {
+        return this.props.displayWarning('Invalid abi json, it needs to be a json array')
+      }
+      if (!this.state.contractAddress) {
+        return this.props.displayWarning('You need to specify the contract address for this ABI')
+      }
+      this.getContractMethods(abi)
+    } else {
+      return this.props.displayWarning('You need to put the json text in the box first!')
+    }
+  }
+
+  getContractMethods (abi) {
+    if (abi) {
+      const options = abi && Array.isArray(abi) && abi.reduce((filtered, obj) => {
+        if (obj.type === 'function') {
+          filtered.push({ label: obj.name, value: obj.name, metadata: obj })
+        }
+        return filtered
+      }, [])
+      options.sort((option1, option2) => (option1.label).localeCompare(option2.label))
+      this.setState({
+        options,
+        abi,
+      })
+    }
+  }
+
+  generateMethodField (params, ind, isInput) {
+    const { inputValues, outputValues, web3 } = this.state
+    const paramName = isInput ? 'Input' : 'Output'
+    const defaultInputValue = (inputValues && inputValues[ind]) || ''
+    const defaultOutputValue = params.type === 'bool' ? outputValues && outputValues[ind] : (outputValues && outputValues[ind]) || ''
+    let defaultValue = isInput ? defaultInputValue : defaultOutputValue
+    if (Array.isArray(defaultValue)) {
+      defaultValue = defaultValue.join(', ')
+    } else if ((params.type.startsWith('uint') || params.type.startsWith('int')) && !isNaN(Number(defaultValue)) && Number(defaultValue) > 0) {
+      defaultValue = web3.toBigNumber(defaultValue).toFixed()
+    } else if (defaultValue) {
+      defaultValue = defaultValue.toString()
+    }
+    const label = (
+      <h3
+        key={`method_label_${ind}`}
+        style={{ marginTop: '10px' }}
+      >
+        {params.name || `${paramName} ${ind + 1}`}
+        {!isInput ? <CopyButton
+          value={defaultValue}
+          style={{
+            display: 'inline-block',
+            marginLeft: '5px',
+          }}
+        /> : null}
+      </h3>
+    )
+    // bytes field is not mandatory to fill: 0x is by default
+    if (params.type.startsWith('bytes') && !Array.isArray(params.type) && isInput) {
+      const inputValues = this.props.inputValues || {}
+      if (!inputValues[ind]) {
+        inputValues[ind] = '0x'
+        this.setState({
+          inputValues,
+        })
+      }
+    }
+    let field
+    const allTypesProps = {
+      ind,
+      defaultValue,
+      disabled: !isInput,
+      onChange: val => isInput ? this.handleInputChange(val, params.type, ind) : null,
+    }
+    const textTypeProps = {
+      key: Math.random(),
+      placeholder: params.placeholder || params.type,
+    }
+    if (params.type === 'bool' && isInput) {
+      field = (
+        <InvokeContractInputSelect {...allTypesProps} />
+      )
+    } else if (params.type.includes('[]') && !isInput) {
+      field = (
+        <InvokeContractTextArea {...allTypesProps} {...textTypeProps} />
+      )
+    } else {
+      field = (
+        <InvokeContractTextField {...allTypesProps} {...textTypeProps} />
+      )
+    }
+    return (
+      <div key={`method_label_container_${ind}`}>
+        {label}
+        {field}
+      </div>
+    )
+  }
+
+  handleInputChange (val, type, ind) {
+    const { inputValues } = this.state
+    let { txValue } = this.state
+    if (val) {
+      if (type === 'bool') {
+        inputValues[ind] = (val === 'true')
+      } else if (type === 'value') {
+        const valWei = normalizeEthStringToWei(val)
+        txValue = '0x' + parseInt(valWei, 10).toString(16)
+      } else {
+        inputValues[ind] = val
+      }
+    } else {
+      delete inputValues[ind]
+      if (type === 'value') {
+        txValue = '0x'
+      }
+    }
+    this.setState({
+      inputValues,
+      txValue,
+    })
+  }
+
+  generateMethodFieldsView (metadata) {
+    this.setState({
+      methodInputs: [],
+      methodInputsView: [],
+      methodOutputs: [],
+      methodOutputsView: [],
+    })
+    const methodInputsView = []
+    const methodInputs = metadata && metadata.inputs
+    const methodOutputsView = []
+    const methodOutputs = metadata && metadata.outputs
+    if (metadata.stateMutability === 'payable') {
+      methodInputsView.push(this.generateMethodField({'name': 'tx value', 'type': 'value', 'placeholder': 'tx value in Ether' }, methodInputs.length, true))
+    }
+    methodInputs.forEach((input, ind) => {
+      methodInputsView.push(this.generateMethodField(input, ind, true))
+    })
+
+    methodOutputs.forEach((output, ind) => {
+      methodOutputsView.push(this.generateMethodField(output, ind, false))
+    })
+    this.setState({
+      methodInputs,
+      methodInputsView,
+      methodOutputs,
+      methodOutputsView,
+    })
+  }
+
+  updateOutputsView () {
+    const methodOutputsView = []
+    this.state.methodOutputs.forEach((output, ind) => {
+      methodOutputsView.push(this.generateMethodField(output, ind, false))
+    })
+    this.setState({
+      methodOutputsView,
+    })
+  }
+
+  methodOutput () {
+    return (
+      <div>
+        <h3
+          className="flex-center"
+          style={{ marginTop: '10px' }}
+        >Output data</h3>
+        {this.state.methodOutputsView}
+      </div>
+    )
+  }
+
+  buttonsSection () {
+    const { isConstantMethod } = this.state
+    const callButton = (
+      <button disabled={this.buttonDisabled()} onClick={() => this.callData()}>Call data</button>
+    )
+    const nextButton = (
+      <div>
+        <button
+          disabled={this.buttonDisabled()}
+          style={{ marginRight: '20px' }}
+          className="btn-violet"
+          onClick={() => this.copyAbiEncoded()}
+        >Copy ABI encoded
+        </button>
+        <button disabled={this.buttonDisabled()} onClick={() => this.onSubmit()}>Next</button>
+      </div>
+    )
+    const executeButton = isConstantMethod ? callButton : nextButton
+
+    return (
+      <div
+        className="section flex-row flex-right"
+        style={{ margin: '20px 0' }}
+      >
+        { executeButton }
+      </div>
+    )
+  }
+
+  buttonDisabled = () => {
+    const { methodSelected, methodInputs, inputValues } = this.state
+    return !methodSelected || (methodInputs.length !== Object.keys(inputValues).length)
+  }
+
+  callData = () => {
+    this.props.showLoadingIndication()
+    const { abi, methodSelected, inputValues, methodOutputs, methodOutputsView, web3 } = this.state
+    const contractAddress = this.state.contractJson ? this.state.contractJson.networks['33'].address : this.state.contractAddress
+
+    const inputValuesArray = Object.keys(inputValues).map(key => inputValues[key])
+    try {
+      const contract = web3.eth.contract(abi).at(contractAddress)
+      contract[methodSelected].call(...inputValuesArray, (err, output) => {
+        this.props.hideLoadingIndication()
+        if (err) {
+          this.props.hideToast()
+          return this.props.displayWarning(err)
+        }
+        const outputValues = {}
+        if (methodOutputsView.length > 1) {
+          output.forEach((val, ind) => {
+            const type = methodOutputs && methodOutputs[ind] && methodOutputs[ind].type
+            outputValues[ind] = this.setOutputValue(val, type)
+          })
+        } else {
+          const type = methodOutputs && methodOutputs[0] && methodOutputs[0].type
+          outputValues[0] = this.setOutputValue(output, type)
+        }
+        this.setState({
+          outputValues,
+        })
+        this.updateOutputsView()
+      })
+    } catch (e) {
+      this.props.hideToast()
+      return this.props.displayWarning(e)
+    }
+  }
+
+  setOutputValue = (val, type) => {
+    if (!type) {
+      return val || ''
+    }
+    if (!val) {
+      if (type === 'bool') {
+        return val
+      }
+      return ''
+    }
+    if ((type.startsWith('uint') || type.startsWith('int')) && !type.endsWith('[]')) {
+      return val.toFixed().toString()
+    }
+    return val
+  }
+
+  encodeFunctionCall = () => {
+    const { inputValues, methodABI } = this.state
+    const inputValuesArray = Object.keys(inputValues).map(key => inputValues[key])
+    let txData
+    try {
+      txData = abi.encodeFunctionCall(methodABI, inputValuesArray)
+      this.props.hideWarning()
+    } catch (e) {
+      this.props.hideToast()
+      this.props.displayWarning(e)
+    }
+
+    return txData
+  }
+
+  copyAbiEncoded = () => {
+    const txData = this.encodeFunctionCall()
+    if (txData) {
+      copyToClipboard(txData)
+      this.props.displayToast('Contract ABI encoded method call has been successfully copied to clipboard')
+    }
+  }
+
+  onSubmit = () => {
+    const { inputValues, txValue, methodABI, methodSelected } = this.state
+    const { address } = this.props
+    const txData = this.encodeFunctionCall()
+
+    if (txData) {
+      this.props.hideWarning()
+
+      const txParams = {
+        value: txValue,
+        data: txData,
+        to: address,
+      }
+
+      this.props.showChooseContractExecutorPage({methodSelected, methodABI, inputValues, txParams})
+    }
+  }
+}
+
+function mapStateToProps (state) {
+  const contractAcc = state.appState.contractAcc
+  const result = {
+    address: state.metamask.selectedAddress,
+    warning: state.appState.warning,
+    methodSelected: contractAcc && contractAcc.methodSelected,
+    methodABI: contractAcc && contractAcc.methodABI,
+    inputValues: contractAcc && contractAcc.inputValues,
+  }
+
+  result.error = result.warning && result.warning.message
+
+  return result
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    showLoadingIndication: () => dispatch(actions.showLoadingIndication()),
+    hideLoadingIndication: () => dispatch(actions.hideLoadingIndication()),
+    displayToast: (msg) => dispatch(actions.displayToast(msg)),
+    hideToast: () => dispatch(actions.hideToast()),
+    displayWarning: (msg) => dispatch(actions.displayWarning(msg)),
+    hideWarning: () => dispatch(actions.hideWarning()),
+    showChooseContractExecutorPage: ({
+                                       methodSelected,
+                                       methodABI,
+                                       inputValues,
+                                       txParams,
+                                     }) => dispatch(actions.showChooseContractExecutorPage({
+      methodSelected,
+      methodABI,
+      inputValues,
+      txParams,
+    })),
+  }
+}
+
+module.exports = connect(mapStateToProps, mapDispatchToProps)(InvokeContractScreen)

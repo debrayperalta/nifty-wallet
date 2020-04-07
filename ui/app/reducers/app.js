@@ -236,6 +236,21 @@ function reduceApp (state, action) {
         warning: null,
       })
 
+    case rifActions.SHOW_INVOKE_CONTRACT_PAGE:
+      return extend(appState, {
+        currentView: {
+          name: 'invokeContract',
+          context: appState.currentView.context,
+        },
+        transForward: true,
+        warning: null,
+        contractAcc: {
+          methodSelected: action.methodSelected,
+          methodABI: action.methodABI,
+          inputValues: action.inputValues,
+        },
+      })
+
     case actions.SHOW_ADD_TOKEN_PAGE:
       return extend(appState, {
         currentView: {

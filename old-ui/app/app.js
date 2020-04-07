@@ -37,6 +37,7 @@ import ConnectHardwareForm from './components/connect-hardware/index'
 const InfoScreen = require('./info')
 const PaymentsScreen = require('../../ui/app/rif/pages/paymentsPage')
 const DomainsScreen = require('../../ui/app/rif/pages/domainsPage')
+const InvokeContractScreen = require('../../ui/app/rif/pages/invokeContract')
 const AppBar = require('./components/app-bar/app-bar.component')
 const Loading = require('./components/loading')
 const BuyView = require('./components/buy-button-subview')
@@ -312,7 +313,11 @@ App.prototype.renderPrimary = function () {
     case 'domains':
       log.debug('rendering domains screen')
       return h(DomainsScreen, {key: 'domains'})
-      
+
+    case 'invokeContract':
+      log.debug('rendering invoke contract screen')
+      return h(InvokeContractScreen, {key: 'invokeContract'})
+
     case 'buyEth':
       log.debug('rendering buy ether screen')
       return h(BuyView, {key: 'buyEthView'})

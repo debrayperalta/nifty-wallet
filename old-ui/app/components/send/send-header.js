@@ -9,28 +9,40 @@ class SendHeader extends Component {
 		dispatch: PropTypes.func,
 		address: PropTypes.string,
 		title: PropTypes.string,
+    subtitle: PropTypes.string,
 	}
 
 	render () {
-		return (
-			<h3
-				className="flex-center send-header"
-				style={{
-					marginTop: '18px',
-					marginBottom: '14px',
-				}}
-			>
-				<i
-					className="fa fa-arrow-left fa-lg cursor-pointer"
-					style={{
-						position: 'absolute',
-						left: '30px',
-					}}
-					onClick={() => { this.props.back ? this.props.back() : this.back() }}
-				/>
-				{ this.props.title }
-			</h3>
-		)
+    const title = (
+      <h3
+        className="flex-center send-header"
+        style={{
+          marginTop: '18px',
+          marginBottom: '14px',
+        }}
+      >
+        <i
+          className="fa fa-arrow-left fa-lg cursor-pointer"
+          style={{
+            position: 'absolute',
+            left: '30px',
+          }}
+          onClick={() => { this.props.back ? this.props.back() : this.back() }}
+        />
+        { this.props.title }
+      </h3>
+    )
+    const subtitle = this.props.subtitle ? (<h5 className="flex-center send-header" style={{fontSize: '9pt'}}>{this.props.subtitle}</h5>) : null
+		if (subtitle) {
+      return (
+        <div>
+          {title}
+          {subtitle}
+        </div>
+      )
+    } else {
+      return title
+    }
 	}
 
 	back () {
