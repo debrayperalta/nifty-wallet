@@ -4,15 +4,16 @@
 .chiplet {
     width: 90%;
     height: 100px;
-    font-size: 14px;
+    font-size: 1rem;
     color: #242A30;
     margin: 5px;
     padding:0.5rem;
 }
 .chiplet-title {
     color: black;
-    font-size: 18px;
+    font-size: 1.25rem;
     font-weight: bold;
+    cursor: pointer;
 }
 .chiplet-description {
     padding-left: 1.5rem;
@@ -51,4 +52,34 @@
 .chiplet-status-expiring {
     background-color: #FFA700;
     border-left: 4px solid #FFD37F;
+}
+.domainName {
+    font-size: 1.5rem;
+    font-weight: bold;
+    width: 100%;
+    height: 50px;
+    margin-top: 15%;
+    padding: 10px;
+    background-color: #A8C5EE;
+}
+.domainName span {
+    margin-right: 15px;
+}
+.domainIcon {
+    margin-left: 8px;
+}
+.domainDescription {
+    font-size: 1rem;
+    font-weight: bold;
+    width: 90%;
+    background-color: #B1BAC6;
+    border-radius: 10px;
+    margin: 5%;
+    padding: 10px;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
+.domainDescription span {
+    font-weight: normal;
 }

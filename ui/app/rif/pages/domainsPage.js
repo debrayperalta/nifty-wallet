@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import actions from '../../actions'
+import rifActions from '../../rif/actions'
 
 const mockDomains = [
 	{
@@ -8,24 +9,44 @@ const mockDomains = [
 		expiration: '3030/03/02',
 		autoRenew: true,
 		status: 'active',
+		address: '0x123456789',
+		content: 'abcdefg1234abcd1234aaaabbbbddddd',
+		ownerAddress: '0x5F4df703Da966E12d3068E1aCbe930f2E363c732',
+		isLuminoNode: true,
+		isRifStorage: true,
 	},
 	{
 		domain: 'blockchain.rsk',
 		expiration: '2020/06/10',
 		autoRenew: true,
 		status: 'pending',
+		address: '0x123456789',
+		content: 'abcdefg1234abcd1234aaaabbbbddddd',
+		ownerAddress: '0x123456789',
+		isLuminoNode: true,
+		isRifStorage: true,
 	},
 	{
 		domain: 'charrua.rsk',
 		expiration: '2019/12/31',
 		autoRenew: false,
 		status: 'expired',
+		address: '0x123456789',
+		content: 'abcdefg1234abcd1234aaaabbbbddddd',
+		ownerAddress: '0x123456789',
+		isLuminoNode: true,
+		isRifStorage: true,
 	},
 	{
 		domain: 'lakers.rsk',
 		expiration: '2020/05/01',
 		autoRenew: false,
 		status: 'expiring',
+		address: '0x123456789',
+		content: 'abcdefg1234abcd1234aaaabbbbddddd',
+		ownerAddress: '0x123456789',
+		isLuminoNode: true,
+		isRifStorage: true,
 	},
 ]
 
@@ -46,18 +67,18 @@ class DomainsScreen extends Component {
   navigateTo (url) {
 	global.platform.openWindow({ url })
   }
-  chiplet = (data) => {
-	return <div id="chiplet" className={'chiplet'}>
+  chiplet = (data, id) => {
+	return <div id="chiplet" className={'chiplet'} key={id}>
 		<div className={'chiplet-body'}>
-			<div id="chipletTitle" className={'chiplet-title'}>
+			<div onClick={() => this.props.showDomainsDetailPage(data)} id="chipletTitle" className={'chiplet-title'}>
 				{data.domain}
 			</div>
 			<div id="chipletDescription" className={'chiplet-description'}>	
 				<div id="chipletExpiration">
-					Expiration: {data.expiration}
+					<span>Expires on: {data.expiration}</span>
 				</div>
 				<div id="chipletRenew">
-					Auto-renew: {data.autoRenew ? 'on' : 'off'}
+					<span>Auto-renew: {data.autoRenew ? 'on' : 'off'}</span>
 				</div>
 			</div>
 		</div>
@@ -71,14 +92,28 @@ class DomainsScreen extends Component {
   render () {
 	return (
 	  <div className={'body'}>
-		{mockDomains.map((item) => {
-			return this.chiplet(item)
+		{mockDomains.map((item, index) => {
+			return this.chiplet(item, index)
 		})}
 	  </div>
 	)
   }
 }
-function mapStateToProps (state) {
-  return {dispatch: state.dispatch}
+
+DomainsScreen.propTypes = {
+	showDomainsDetailPage: PropTypes.func.isRequired,
 }
-module.exports = connect(mapStateToProps)(DomainsScreen)
+
+function mapStateToProps (state) {
+  return {
+	  dispatch: state.dispatch,
+	}
+}
+
+const mapDispatchToProps = dispatch => {
+	return {
+		showDomainsDetailPage: (data) => dispatch(rifActions.showDomainsDetailPage(data)),
+	}
+  }
+
+module.exports = connect(mapStateToProps, mapDispatchToProps)(DomainsScreen)
