@@ -226,17 +226,6 @@ function reduceApp (state, action) {
         warning: null,
       })
 
-    case rifActions.SHOW_DOMAINS_DETAIL_PAGE:
-      return extend(appState, {
-        currentView: {
-          name: 'domainsDetail',
-          context: appState.currentView.context,
-          data: action.value,
-        },
-        transForward: false,
-        warning: null,
-      })
-
     case rifActions.SHOW_PAYMENTS_PAGE:
       return extend(appState, {
         currentView: {

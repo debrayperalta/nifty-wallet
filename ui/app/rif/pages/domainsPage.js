@@ -70,7 +70,7 @@ class DomainsScreen extends Component {
   chiplet = (data, id) => {
 	return <div id="chiplet" className={'chiplet'} key={id}>
 		<div className={'chiplet-body'}>
-			<div onClick={() => this.props.showDomainsDetailPage(data)} id="chipletTitle" className={'chiplet-title'}>
+			<div onClick={() => {this.props.showDomainsDetailPage(data)}} id="chipletTitle" className={'chiplet-title'}>
 				{data.domain}
 			</div>
 			<div id="chipletDescription" className={'chiplet-description'}>	
@@ -112,7 +112,7 @@ function mapStateToProps (state) {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		showDomainsDetailPage: (data) => dispatch(rifActions.showDomainsDetailPage(data)),
+		showDomainsDetailPage: (data) => {},
 	}
   }
 
