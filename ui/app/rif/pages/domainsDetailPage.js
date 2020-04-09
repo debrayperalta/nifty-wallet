@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheckCircle, faArchive, faNetworkWired } from '@fortawesome/free-solid-svg-icons'
+import { faCheckCircle, faArchive, faBolt } from '@fortawesome/free-solid-svg-icons'
 
 const testStyle = {
 	body: {
@@ -37,7 +37,7 @@ class DomainsDetailScreen extends Component {
 					<FontAwesomeIcon icon={faCheckCircle} color="#000080" className={'domainIcon'}/>
 				}
 				{isLuminoNode &&
-					<FontAwesomeIcon icon={faNetworkWired} color="#508871" className={'domainIcon'}/>
+					<FontAwesomeIcon icon={faBolt} color="#508871" className={'domainIcon'}/>
 				}
 				{isRifStorage &&
 					<FontAwesomeIcon icon={faArchive} color="#AD3232" className={'domainIcon'}/>
@@ -54,7 +54,7 @@ class DomainsDetailScreen extends Component {
 		}
 		{status !== 'active' && 
 			<div>
-				Domain detail page still in progress!
+				Domain detail page still in progress for this status!
 			</div>
 		}
 		
