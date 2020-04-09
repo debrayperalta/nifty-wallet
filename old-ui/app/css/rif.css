@@ -55,7 +55,11 @@
     background-color: #FFA700;
     border-left: 4px solid #FFD37F;
 }
-.domainName {
+.domain-detail-body {
+    width: 90%;
+    font-size: 1rem;
+}
+.domain-name {
     font-size: 1.5rem;
     font-weight: bold;
     width: 100%;
@@ -64,16 +68,15 @@
     padding: 10px;
     background-color: #A8C5EE;
 }
-.domainName span {
+.domain-name span {
     margin-right: 15px;
 }
-.domainIcon {
+.domain-icon {
     margin-left: 8px;
 }
-.domainDescription {
-    font-size: 1rem;
+.domain-description {
     font-weight: bold;
-    width: 90%;
+    width: 100%;
     background-color: #B1BAC6;
     border-radius: 10px;
     margin: 5%;
@@ -82,7 +85,7 @@
     overflow: hidden;
     text-overflow: ellipsis; 
 }
-.domainDescription span {
+.domain-description span {
     font-weight: normal;
 }
 .rif-back-button {
@@ -92,4 +95,67 @@
 .rif-back-button:hover {
     transform: scale(1.2);
     transition: all 0.2s;
+}
+.domain-detail-new-button {
+    cursor: pointer;
+    float: right;
+    width: 130px;
+    height: 40px;
+    color: #4280D9;
+    background-color: #C2D6F3;
+    border: 2px solid #4280D9;
+    border-radius: 5px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    position: relative;
+}
+.domain-detail-new-button span {
+    font-size: 1.2rem;
+    margin-left: 5px;
+}
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+.centerY {
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    transform: translateX(-50%) translateY(-50%);
+}
+.resolvers-body{
+    width: 100%;
+    margin: 5%;
+    padding: 10px;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.resolver-body-top {
+    width: 100%;
+}
+.resolver-network {
+    width: 100%;
+    margin-top: 20%;
+}
+.resolver-network-description {
+    font-size: 1.3rem;
+    margin-top: 15px;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    border-bottom: 1px solid #C0C0C0;
+}
+.resolver-network-description span {
+    margin-left: 5px;
+}
+.resolver-network-description-address {
+    font-size: 1rem;
+    margin-right: 5px;
+    float: right;
+}
+.custom-select{
+    float: left;
 }
