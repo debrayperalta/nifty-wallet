@@ -159,7 +159,7 @@ function mapStateToProps (state) {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		showDomainsDetailPage: (data) => {},
+		showDomainsDetailPage: (data) => dispatch(rifActions.showDomainsDetailPage(data)),
 		goHome: () => dispatch(actions.goHome()),
 	}
 }
