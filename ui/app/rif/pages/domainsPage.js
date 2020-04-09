@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import Select from "react-dropdown-select"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import actions from '../../actions'
 import rifActions from '../../rif/actions'
 
 const mockDomains = [
@@ -52,10 +53,21 @@ const mockDomains = [
 		isRifStorage: true,
 	},
 	{
-		domain: 'pepe.rsk',
-		expiration: '2020/05/01',
+		domain: 'jhon.rsk',
+		expiration: '2021/03/02',
 		autoRenew: false,
-		status: 'expiring',
+		status: 'active',
+		address: '0x123456789',
+		content: 'abcdefg1234abcd1234aaaabbbbddddd',
+		ownerAddress: '0x123456789',
+		isLuminoNode: true,
+		isRifStorage: true,
+	},
+	{
+		domain: 'doe.rsk',
+		expiration: '2021/03/02',
+		autoRenew: false,
+		status: 'active',
 		address: '0x123456789',
 		content: 'abcdefg1234abcd1234aaaabbbbddddd',
 		ownerAddress: '0x123456789',
@@ -114,7 +126,7 @@ class DomainsScreen extends Component {
   render () {
 	return (
 	  <div className={'body'}>
-		<FontAwesomeIcon icon={faChevronLeft} className={'backButton'}/>
+		<FontAwesomeIcon icon={faChevronLeft} className={'rif-back-button'} onClick={() => this.props.goHome()}/>
 		<Select 
 			options={mockDomains} 
 			searchBy={'domain'} 
@@ -135,6 +147,8 @@ class DomainsScreen extends Component {
 
 DomainsScreen.propTypes = {
 	showDomainsDetailPage: PropTypes.func.isRequired,
+	goHome: PropTypes.func.isRequired,
+
 }
 
 function mapStateToProps (state) {
@@ -146,6 +160,7 @@ function mapStateToProps (state) {
 const mapDispatchToProps = dispatch => {
 	return {
 		showDomainsDetailPage: (data) => {},
+		goHome: () => dispatch(actions.goHome()),
 	}
 }
 
