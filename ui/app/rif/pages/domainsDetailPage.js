@@ -4,18 +4,6 @@ import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle, faArchive, faBolt } from '@fortawesome/free-solid-svg-icons'
 
-const testStyle = {
-	body: {
-		width: '100%', 
-	},
-	domainName: {
-		fontSize: '1.3rem',
-		fontWeight: 'bold',
-		width: '100%',
-		backgroundColor: 'red',
-	},
-  }
-
 class DomainsDetailScreen extends Component {
   navigateTo (url) {
 	global.platform.openWindow({ url })
