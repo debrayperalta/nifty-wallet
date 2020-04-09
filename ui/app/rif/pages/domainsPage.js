@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import Select from "react-dropdown-select"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import rifActions from '../../rif/actions'
 
 const mockDomains = [
@@ -48,6 +51,17 @@ const mockDomains = [
 		isLuminoNode: true,
 		isRifStorage: true,
 	},
+	{
+		domain: 'pepe.rsk',
+		expiration: '2020/05/01',
+		autoRenew: false,
+		status: 'expiring',
+		address: '0x123456789',
+		content: 'abcdefg1234abcd1234aaaabbbbddddd',
+		ownerAddress: '0x123456789',
+		isLuminoNode: true,
+		isRifStorage: true,
+	},
 ]
 
 function statusStyle(status){
@@ -64,34 +78,53 @@ function statusStyle(status){
 }
 
 class DomainsScreen extends Component {
-  navigateTo (url) {
-	global.platform.openWindow({ url })
-  }
-  chiplet = (data, id) => {
-	return <div id="chiplet" className={'chiplet'} key={id}>
-		<div className={'chiplet-body'}>
-			<div onClick={() => {this.props.showDomainsDetailPage(data)}} id="chipletTitle" className={'chiplet-title'}>
-				{data.domain}
-			</div>
-			<div id="chipletDescription" className={'chiplet-description'}>	
-				<div id="chipletExpiration">
-					<span>Expires on: {data.expiration}</span>
+	state = {
+		selectValues: []
+	}
+
+	navigateTo (url) {
+		global.platform.openWindow({ url })
+	}
+
+	chiplet = (data, id) => {
+		return <div id="chiplet" className={'chiplet'} key={id}>
+			<div className={'chiplet-body'}>
+				<div onClick={() => {this.props.showDomainsDetailPage(data)}} id="chipletTitle" className={'chiplet-title'}>
+					{data.domain}
 				</div>
-				<div id="chipletRenew">
-					<span>Auto-renew: {data.autoRenew ? 'on' : 'off'}</span>
+				<div id="chipletDescription" className={'chiplet-description'}>	
+					<div id="chipletExpiration">
+						<span>Expires on: {data.expiration}</span>
+					</div>
+					<div id="chipletRenew">
+						<span>Auto-renew: {data.autoRenew ? 'on' : 'off'}</span>
+					</div>
+				</div>
+			</div>
+			<div className={'chiplet-status-wrapper ' + statusStyle(data.status)}>
+				<div id="chipletStatus" className={'chiplet-status-text'}>
+					{data.status}
 				</div>
 			</div>
 		</div>
-		<div className={'chiplet-status-wrapper ' + statusStyle(data.status)}>
-			<div id="chipletStatus" className={'chiplet-status-text'}>
-				{data.status}
-			</div>
-		</div>
-	</div>
-  }
+	}
+
+  	setValues = selectValues => this.setState({ selectValues });
+
   render () {
 	return (
 	  <div className={'body'}>
+		<FontAwesomeIcon icon={faChevronLeft} className={'backButton'}/>
+		<Select 
+			options={mockDomains} 
+			searchBy={'domain'} 
+			valueField={'domain'} 
+			labelField={'domain'} 
+			onChange={(values) => this.props.showDomainsDetailPage(values[0])} 
+			color={'#0074D9'}  
+			placeholder="Search for domains"
+			searchable={true}
+		/>
 		{mockDomains.map((item, index) => {
 			return this.chiplet(item, index)
 		})}
@@ -114,6 +147,6 @@ const mapDispatchToProps = dispatch => {
 	return {
 		showDomainsDetailPage: (data) => {},
 	}
-  }
+}
 
 module.exports = connect(mapStateToProps, mapDispatchToProps)(DomainsScreen)
