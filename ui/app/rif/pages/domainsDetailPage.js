@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle, faArchive, faBolt, faChevronLeft, faCoins, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
 import { faBitcoin, faEthereum } from '@fortawesome/free-brands-svg-icons'
 import rifActions from '../../rif/actions'
+import actions from '../../actions'
 
 class DomainsDetailScreen extends Component {
 	state = {
@@ -68,7 +69,7 @@ class DomainsDetailScreen extends Component {
 									//TODO
 									//This button will need to be moved to a component later
 								}
-								<div id='buttonNew' className={'domain-detail-new-button'}>
+								<div id='buttonNew' className={'domain-detail-new-button'} onClick={() => this.props.addNewNetwork()}>
 									<div id='buttonBody'>
 										<FontAwesomeIcon icon={faPlusCircle} color="#235BAC" className={'domain-icon centerY'}/>
 										<span className={'center'}>NEW</span>
@@ -118,6 +119,8 @@ function mapStateToProps (state) {
 	const data = state.appState.currentView.data.value
   	return {
 		dispatch: state.dispatch,
+		goBack: PropTypes.func.isRequired,
+		addNewNetwork: PropTypes.func.isRequired,
 		status: data.status,
 		domainName: data.domain,
 		address: data.address,
@@ -135,6 +138,7 @@ function mapStateToProps (state) {
 const mapDispatchToProps = dispatch => {
 	return {
 		goBack: () => dispatch(rifActions.showDomainsPage()),
+		addNewNetwork: () => dispatch(rifActions.showAddNewMulticryptoAddressPage())
 	}
 }
 
