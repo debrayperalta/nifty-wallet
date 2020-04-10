@@ -25,11 +25,14 @@ function showDomainsDetailPage (data) {
   }
 }
 
-function showAddNewMulticryptoAddressPage (data) {
+function showAddNewMulticryptoAddressPage (domain, selectedResolverIndex) {
   return {
     type: rifActions.SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE,
     value: {
-      value: data,
+      value: {
+        domain: domain,
+        selectedResolverIndex: selectedResolverIndex,
+      },
     }
   }
 }

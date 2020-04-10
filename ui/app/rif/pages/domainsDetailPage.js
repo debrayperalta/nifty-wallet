@@ -1,34 +1,28 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheckCircle, faArchive, faBolt, faChevronLeft, faCoins, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
-import { faBitcoin, faEthereum } from '@fortawesome/free-brands-svg-icons'
+import { faCheckCircle, faArchive, faBolt, faChevronLeft, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
+import { getIconForToken } from '../utils/utils'
+import { CustomButton } from '../components'
 import rifActions from '../../rif/actions'
-import actions from '../../actions'
 
 class DomainsDetailScreen extends Component {
-	state = {
-		resolvers: this.props.resolvers,
-		selectedResolverIndex: 0,
+	constructor(props) {
+		super(props);
+		let resolvers = []
+		Object.assign(resolvers, props.resolvers);
+		this.state = { 
+			resolvers: resolvers,
+			selectedResolverIndex: 0,
+		};
 	}
 	navigateTo (url) {
 		global.platform.openWindow({ url })
   	}
-	admitedCoins = (coin) => {
-		let value = faCoins
-		switch (coin.toLowerCase()){
-			case 'bitcoin':
-				value = faBitcoin
-			break
-			case 'ethereum':
-				value = faEthereum
-			break
-		}
-		return value
-	}
+
 	render () {
-		const { status, domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage } = this.props
+		const { status, domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, domain } = this.props
 		return (
 		<div className={'body'}>
 			<FontAwesomeIcon icon={faChevronLeft} className={'rif-back-button'} onClick={() => this.props.goBack()}/>
@@ -65,21 +59,23 @@ class DomainsDetailScreen extends Component {
 										}								
 									</select>
 								</div>
-								{
-									//TODO
-									//This button will need to be moved to a component later
-								}
-								<div id='buttonNew' className={'domain-detail-new-button'} onClick={() => this.props.addNewNetwork()}>
-									<div id='buttonBody'>
-										<FontAwesomeIcon icon={faPlusCircle} color="#235BAC" className={'domain-icon centerY'}/>
-										<span className={'center'}>NEW</span>
-									</div>
-								</div>
+								<CustomButton 
+									icon={faPlusCircle} 
+									text={'NEW'}
+									onClick={() => this.props.addNewNetwork(domain, this.state.selectedResolverIndex)} 
+									className={
+										{
+											button: 'domain-detail-new-button',
+											icon: 'domain-icon centerY',
+											text: 'center',
+										}
+									}
+								/>
 							</div>
 							<div id='resolverNetworksBody' className={'resolver-network'}>
 								{this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
 									return <div key={index} className={'resolver-network-description'}>
-											<FontAwesomeIcon icon={this.admitedCoins(network.networkIcon)} color="#000080" className={'domain-icon'}/>
+											<FontAwesomeIcon icon={getIconForToken(network.networkIcon)} color="#000080" className={'domain-icon'}/>
 											<span>{network.networkName}</span>
 											<span className={'resolver-network-description-address'}>{network.address}</span>
 										</div>
@@ -132,13 +128,14 @@ function mapStateToProps (state) {
 		isLuminoNode: data.isLuminoNode,
 		isRifStorage: data.isRifStorage,
 		resolvers: data.resolvers,
+		domain: data,
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
 		goBack: () => dispatch(rifActions.showDomainsPage()),
-		addNewNetwork: () => dispatch(rifActions.showAddNewMulticryptoAddressPage())
+		addNewNetwork: (domain, selectedResolverIndex) => dispatch(rifActions.showAddNewMulticryptoAddressPage(domain, selectedResolverIndex))
 	}
 }
 

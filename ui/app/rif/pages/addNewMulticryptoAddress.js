@@ -1,42 +1,124 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import { CustomButton } from '../components'
+import { getNameTokenForIcon } from '../utils/utils'
 import rifActions from '../../rif/actions'
 
 class AddNewMulticryptoAddressScreen extends Component {
 	state = {
-		selectValues: []
+		networks: [],
+		address: '',
+		network: '',
+	}
+	constructor(props) {
+		super(props);
+		let networks = []
+		Object.assign(networks, props.domain.resolvers[props.selectedResolver].network);
+		this.state = { 
+			networks: networks ,
+			network: networks[0].networkName,
+		};
 	}
 
 	navigateTo (url) {
 		global.platform.openWindow({ url })
 	}
-
-  render () {
-	return (
-	  <div className={'body'}>
-		<FontAwesomeIcon icon={faChevronLeft} className={'rif-back-button'} onClick={() => this.props.goHome()}/>
-	  </div>
-	)
-  }
+	addAddress = () => {
+		let domains = JSON.parse(localStorage.rnsDomains);
+		let myIndex = -1
+		let resolverIndex = this.props.selectedResolver
+		let selecteddomain = domains.find((domain, index) => {
+			if(domain.domain === this.props.domain.domain){
+				myIndex = index
+				return domain
+			}
+		})
+		if(myIndex !== -1 && resolverIndex !== -1){
+			let newNetwork = {
+				networkName: this.state.network,
+				networkIcon: getNameTokenForIcon(this.state.network),
+				address: this.state.address,
+			}
+			domains[myIndex].resolvers[resolverIndex].network.push(newNetwork)
+			localStorage.setItem('rnsDomains', JSON.stringify(domains))
+		}
+	}
+	_updateAddress = (e) => {
+		this.setState({address: e.target.value})
+	}
+	_updateNetwork = (e) => {
+		this.setState({network: e.target.value})
+	}
+	render () {
+		return (
+		<div className={'body'}>
+			<FontAwesomeIcon icon={faChevronLeft} className={'rif-back-button'} onClick={() => this.props.goBack(this.props.domain)}/>
+			<div style={{position: 'relative',}}>
+				<div id='title' className={'full-width add-new-multicrypto-title'}>
+					<span>Add new network</span>
+				</div>
+				<div id='comboNetworks' className={'full-width add-new-multicrypto-select'}>
+					<select id='comboNetworks' onChange={this._updateNetwork}>
+						{this.state.networks.map((network, index) => {
+								return <option key={index} value={network.networkName}>{network.networkName}</option>
+							})
+						}	
+					</select>
+				</div>
+				<div id='inputAddress' className={'full-width add-new-multicrypto-input'}>
+					<input type='text' onChange={this._updateAddress}/>
+				</div>
+				<div id='inputAddress' className={'full-width'}>
+					<div id='buttonCancel' className={'add-new-multicrypto-button-cancel'}>
+						<CustomButton 
+							text={'CANCEL'}
+							onClick={() => this.props.goBack(this.props.domain)} 
+							className={
+								{
+									button: 'custom-button-cancel center',
+									text: 'center',
+								}
+							}
+						/>
+					</div>
+					<div id='buttonSave' className={'add-new-multicrypto-button-save'}>
+						<CustomButton 
+							text={'SAVE'}
+							onClick={() => this.addAddress()} 
+							className={
+								{
+									button: 'custom-button-success center',
+									text: 'center',
+								}
+							}
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+		)
+	}
 }
 
 AddNewMulticryptoAddressScreen.propTypes = {
 	goBack: PropTypes.func.isRequired,
-
 }
 
 function mapStateToProps (state) {
-  return {
-	  dispatch: state.dispatch,
+	const data = state.appState.currentView.data.value
+	return {
+		dispatch: state.dispatch,
+		domain: data.domain,
+		selectedResolver: data.selectedResolverIndex
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
-		goBack: () => dispatch(rifActions.showDomainsPage()),
+		goBack: (data) => dispatch(rifActions.showDomainsDetailPage(data)),
 	}
 }
 

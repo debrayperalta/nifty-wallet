@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import Select from "react-dropdown-select"
@@ -205,6 +205,7 @@ class DomainsScreen extends Component {
   	setValues = selectValues => this.setState({ selectValues });
 
   render () {
+	  localStorage.setItem('rnsDomains', JSON.stringify(mockDomains))
 	return (
 	  <div className={'body'}>
 		<FontAwesomeIcon icon={faChevronLeft} className={'rif-back-button'} onClick={() => this.props.goHome()}/>
