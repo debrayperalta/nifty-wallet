@@ -44,6 +44,9 @@ class AddNewMulticryptoAddressScreen extends Component {
 			}
 			domains[myIndex].resolvers[resolverIndex].network.push(newNetwork)
 			localStorage.setItem('rnsDomains', JSON.stringify(domains))
+			//Sending back with localstorage rnsDomains (Here we try to get again localstorage so if it wasnt updated, we're going to show whats really saved)
+			domains = JSON.parse(localStorage.rnsDomains)
+			this.props.goBack(domains[myIndex])
 		}
 	}
 	_updateAddress = (e) => {
