@@ -61,7 +61,6 @@ class DomainsScreen extends Component {
 	}
 
   render () {
-	  localStorage.setItem('rnsDomains', JSON.stringify(mockDomains))
 	return (
 	  <div className={'body'}>
 		<FontAwesomeIcon icon={faChevronLeft} className={'rif-back-button'} onClick={() => this.props.goHome()}/>
