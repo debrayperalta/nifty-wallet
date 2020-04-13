@@ -28,6 +28,7 @@ class SearchDomains extends Component {
 			color={'#0074D9'}  
 			placeholder="Search for domains"
 			searchable={true}
+			className={'search-bar'}
 		/>
 	)
   }
