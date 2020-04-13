@@ -71,3 +71,8 @@
     transform: scale(1.2);
     transition: all 0.2s;
 }
+.search-bar {
+    border-top: 0px !important;
+    border-left: 0px !important;
+    border-right: 0px !important;
+}
