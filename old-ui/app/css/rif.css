@@ -2,6 +2,7 @@
     width: 100%; 
     height: 600px;
     overflow: scroll;
+    font-family: Nunito Regular;
 }
 .chiplet {
     width: 90%;
