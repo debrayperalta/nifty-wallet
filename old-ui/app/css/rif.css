@@ -20,6 +20,14 @@
 .chiplet-description {
     padding-left: 1.5rem;
 }
+.chiplet-description a {
+    color: #3399FF;
+    font-weight: normal;
+    cursor: pointer;
+}
+.chiplet-description a:hover {
+    color: #84C1FF;
+}
 .chiplet-body {
     width: 85%;
     height: 100%;
@@ -76,17 +84,47 @@
 }
 .domain-description {
     font-weight: bold;
+    float: left;
     width: 100%;
     background-color: #B1BAC6;
     border-radius: 10px;
     margin: 5%;
     padding: 10px;
-    white-space: nowrap; 
-    overflow: hidden;
-    text-overflow: ellipsis; 
+    padding-right: 10px;
+    white-space: nowrap;
 }
-.domain-description span {
+.domain-description-value {
+    font-weight: bold;
     font-weight: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    width: 75%;
+}
+.domain-description-field {
+    font-weight: bold;
+    overflow: hidden;
+    display: inline-block;
+}
+.domain-description a {
+    color: #3399FF;
+    font-weight: normal;
+    cursor: pointer;
+}
+.domain-description a:hover {
+    color: #84C1FF;
+}
+.domain-description-plus-button {
+    color: #4280D9;
+    font-size: 3.5rem;
+    float: right;
+    margin: 5%;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.domain-description-plus-button:hover {
+    transform: scale(1.1);
+    transition: all 0.2s;
 }
 .rif-back-button {
     font-size: 1rem;
@@ -143,14 +181,32 @@
 }
 .resolver-body-top {
     width: 100%;
+    background-color: blue;
 }
 .resolver-network {
     width: 100%;
     margin-top: 20%;
 }
+.custom-select{
+    width: 50%;
+    float: left;
+}
+.select-css {
+    background-color: white;
+	font-size: 16px;
+	line-height: 1.3;
+	padding: .6em 1.4em .5em .8em;
+	width: 100%;
+	max-width: 100%;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    outline: 0px;
+	appearance: none;
+}
 .resolver-network-description {
     font-size: 1.3rem;
-    margin-top: 15px;
+    margin-top: 25px;
     white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis; 
