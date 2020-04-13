@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import Select from "react-dropdown-select"
+import { SearchDomains } from '../components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import actions from '../../actions'
@@ -64,16 +64,7 @@ class DomainsScreen extends Component {
 	return (
 	  <div className={'body'}>
 		<FontAwesomeIcon icon={faChevronLeft} className={'rif-back-button'} onClick={() => this.props.goHome()}/>
-		<Select 
-			options={this.state.domains} 
-			searchBy={'domain'} 
-			valueField={'domain'} 
-			labelField={'domain'} 
-			onChange={(values) => this.props.showDomainsDetailPage(values[0])} 
-			color={'#0074D9'}  
-			placeholder="Search for domains"
-			searchable={true}
-		/>
+		<SearchDomains />
 		{this.state.domains.map((item, index) => {
 			return this.chiplet(item, index)
 		})}

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle, faArchive, faBolt, faChevronLeft, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
 import { getIconForToken } from '../utils/utils'
-import { CustomButton } from '../components'
+import { CustomButton, SearchDomains } from '../components'
 import rifActions from '../../rif/actions'
 
 class DomainsDetailScreen extends Component {
@@ -26,6 +26,7 @@ class DomainsDetailScreen extends Component {
 		return (
 		<div className={'body'}>
 			<FontAwesomeIcon icon={faChevronLeft} className={'rif-back-button'} onClick={() => this.props.goBack()}/>
+			<SearchDomains />
 			{status === 'active' && 
 			<div>
 				<div id='headerName' className={'domain-name'}>
@@ -42,35 +43,37 @@ class DomainsDetailScreen extends Component {
 				</div>
 				<div id='domainDetailBody' className={'domain-detail-body'}>
 					<div id='bodyDescription' className={'domain-description'}>
-						<div>Address: <span>{address}</span></div>
-						<div>Content: <span>{content}</span></div>
-						<div>Expires on: <span>{expirationDate}</span></div>
-						<div>Auto renew: <span>{autoRenew}</span></div>
-						<div>Owner: <span>{ownerAddress}</span></div>
+						<div><span className={'domain-description-field'}>Address:&nbsp;</span><span className={'domain-description-value'}>{address}</span></div>
+						<div><span className={'domain-description-field'}>Content:&nbsp;</span><span className={'domain-description-value'}>{content}</span></div>
+						<div><span className={'domain-description-field'}>Expires on:&nbsp;</span><span className={'domain-description-value'}>{expirationDate}</span></div>
+						<div><span className={'domain-description-field'}>Auto renew: <a href={this.props.setAutoRenew()}>{autoRenew ? "ON" : "OFF"}</a></span></div>
+						<div><span className={'domain-description-field'}>Owner:&nbsp;</span><span className={'domain-description-value'}>{ownerAddress}</span></div>
 					</div>
 					{isOwner &&
 						<div id='resolversBody' className={'resolvers-body'}>
 							<div className='resolver-body-top'>
 								<div id='selectResolver' className={'custom-select'}>
-									<select id='comboResolvers' onChange={(value) => this.setState({selectedResolverIndex:value.target.selectedIndex})}>
+									<select id='comboResolvers' className="select-css" onChange={(value) => this.setState({selectedResolverIndex:value.target.selectedIndex})}>
 										{this.state.resolvers.map((resolver, index) => {
 												return <option key={index} value={resolver.name}>{resolver.name}</option>
 											})
 										}								
 									</select>
 								</div>
-								<CustomButton 
-									icon={faPlusCircle} 
-									text={'NEW'}
-									onClick={() => this.props.addNewNetwork(domain, this.state.selectedResolverIndex)} 
-									className={
-										{
-											button: 'domain-detail-new-button',
-											icon: 'domain-icon centerY',
-											text: 'center',
+								<div id='buttonNew' className={'custom-select'}>
+									<CustomButton 
+										icon={faPlusCircle} 
+										text={'NEW'}
+										onClick={() => this.props.addNewNetwork(domain, this.state.selectedResolverIndex)} 
+										className={
+											{
+												button: 'domain-detail-new-button',
+												icon: 'domain-icon centerY',
+												text: 'center',
+											}
 										}
-									}
-								/>
+									/>
+								</div>
 							</div>
 							<div id='resolverNetworksBody' className={'resolver-network'}>
 								{this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
@@ -84,6 +87,7 @@ class DomainsDetailScreen extends Component {
 						</div>
 					}
 				</div>
+				<FontAwesomeIcon icon={faPlusCircle} className={'domain-description-plus-button'} onClick={() => {}}/>
 			</div>
 			}
 			{status !== 'active' && 
@@ -99,6 +103,9 @@ class DomainsDetailScreen extends Component {
 
 DomainsDetailScreen.propTypes = {
 	status: PropTypes.string.isRequired,
+	goBack: PropTypes.func.isRequired,
+	addNewNetwork: PropTypes.func.isRequired,
+	setAutoRenew: PropTypes.func.isRequired,
 	domainName: PropTypes.string.isRequired,
 	address: PropTypes.string.isRequired,
 	content: PropTypes.string.isRequired,
@@ -115,8 +122,6 @@ function mapStateToProps (state) {
 	const data = state.appState.currentView.data.value
   	return {
 		dispatch: state.dispatch,
-		goBack: PropTypes.func.isRequired,
-		addNewNetwork: PropTypes.func.isRequired,
 		status: data.status,
 		domainName: data.domain,
 		address: data.address,
@@ -135,7 +140,8 @@ function mapStateToProps (state) {
 const mapDispatchToProps = dispatch => {
 	return {
 		goBack: () => dispatch(rifActions.showDomainsPage()),
-		addNewNetwork: () => {}
+		addNewNetwork: () => {},
+		setAutoRenew: () => {},
 	}
 }
 
