@@ -20,6 +20,7 @@ var cssFiles = {
   'app-bar.css': fs.readFileSync(path.join(__dirname, '/app/css/app-bar.css'), 'utf8'),
   'rif-domain-page.css': fs.readFileSync(path.join(__dirname, '/app/css/rif/domain-page.css'), 'utf8'),
   'rif-domain-detail-page.css': fs.readFileSync(path.join(__dirname, '/app/css/rif/domain-detail-page.css'), 'utf8'),
+  'domain-add-new-network-page.css': fs.readFileSync(path.join(__dirname, '/app/css/rif/domain-add-new-network-page.css'), 'utf8'),
 }
 
 function bundleCss () {
