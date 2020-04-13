@@ -284,3 +284,8 @@
     float: left;
     position: relative;
 }
+.search-bar {
+    border-top: 0px !important;
+    border-left: 0px !important;
+    border-right: 0px !important;
+}
