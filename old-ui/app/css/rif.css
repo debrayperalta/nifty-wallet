@@ -20,6 +20,14 @@
 .chiplet-description {
     padding-left: 1.5rem;
 }
+.chiplet-description a {
+    color: #3399FF;
+    font-weight: normal;
+    cursor: pointer;
+}
+.chiplet-description a:hover {
+    color: #84C1FF;
+}
 .chiplet-body {
     width: 85%;
     height: 100%;

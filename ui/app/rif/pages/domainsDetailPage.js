@@ -46,7 +46,7 @@ class DomainsDetailScreen extends Component {
 						<div><span className={'domain-description-field'}>Address:&nbsp;</span><span className={'domain-description-value'}>{address}</span></div>
 						<div><span className={'domain-description-field'}>Content:&nbsp;</span><span className={'domain-description-value'}>{content}</span></div>
 						<div><span className={'domain-description-field'}>Expires on:&nbsp;</span><span className={'domain-description-value'}>{expirationDate}</span></div>
-						<div><span className={'domain-description-field'}>Auto renew: <a href={this.props.setAutoRenew()}>{autoRenew ? "ON" : "OFF"}</a></span></div>
+						<div><span className={'domain-description-field'}>Auto renew: <a href={this.props.setAutoRenew()}>{autoRenew ? "on" : "off"}</a></span></div>
 						<div><span className={'domain-description-field'}>Owner:&nbsp;</span><span className={'domain-description-value'}>{ownerAddress}</span></div>
 					</div>
 					{isOwner &&

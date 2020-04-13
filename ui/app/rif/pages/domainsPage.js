@@ -48,7 +48,7 @@ class DomainsScreen extends Component {
 						<span>Expires on: {data.expiration}</span>
 					</div>
 					<div id="chipletRenew">
-						<span>Auto-renew: {data.autoRenew ? 'on' : 'off'}</span>
+						<span>Auto-renew: <a href={this.props.setAutoRenew()}>{data.autoRenew ? "on" : "off"}</a></span>
 					</div>
 				</div>
 			</div>
@@ -75,6 +75,7 @@ class DomainsScreen extends Component {
 
 DomainsScreen.propTypes = {
 	showDomainsDetailPage: PropTypes.func.isRequired,
+	setAutoRenew: PropTypes.func.isRequired,
 	goHome: PropTypes.func.isRequired,
 
 }
@@ -88,6 +89,7 @@ function mapStateToProps (state) {
 const mapDispatchToProps = dispatch => {
 	return {
 		showDomainsDetailPage: (data) => dispatch(rifActions.showDomainsDetailPage(data)),
+		setAutoRenew: (data) => {},
 		goHome: () => dispatch(actions.goHome()),
 	}
 }
