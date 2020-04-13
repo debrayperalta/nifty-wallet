@@ -4,8 +4,9 @@ import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import { CustomButton } from '../components'
-import { getNameTokenForIcon } from '../utils/utils'
+import { getIconForToken } from '../utils/utils'
 import rifActions from '../../rif/actions'
+import { cryptos } from '../constants'
 
 class AddNewMulticryptoAddressScreen extends Component {
 	state = {
@@ -15,11 +16,19 @@ class AddNewMulticryptoAddressScreen extends Component {
 	}
 	constructor(props) {
 		super(props);
-		let networks = []
-		Object.assign(networks, props.domain.resolvers[props.selectedResolver].network);
+		let networks = new Set()
+		let selectFirst = true
+		let selected = ''
+		Object.keys(cryptos).forEach(function(key) {
+			networks.add(key)
+			if(selectFirst){
+				selected = key
+				selectFirst = false
+			}
+		});
 		this.state = { 
-			networks: networks ,
-			network: networks[0].networkName,
+			networks: [...networks],
+			network: selected,
 		};
 	}
 
@@ -39,7 +48,7 @@ class AddNewMulticryptoAddressScreen extends Component {
 		if(myIndex !== -1 && resolverIndex !== -1){
 			let newNetwork = {
 				networkName: this.state.network,
-				networkIcon: getNameTokenForIcon(this.state.network),
+				networkIcon:this.state.network,
 				address: this.state.address,
 			}
 			domains[myIndex].resolvers[resolverIndex].network.push(newNetwork)
@@ -66,7 +75,7 @@ class AddNewMulticryptoAddressScreen extends Component {
 				<div id='comboNetworks' className={'full-width add-new-multicrypto-select'}>
 					<select id='comboNetworks' onChange={this._updateNetwork}>
 						{this.state.networks.map((network, index) => {
-								return <option key={index} value={network.networkName}>{network.networkName}</option>
+								return <option key={index} value={network}>{network}</option>
 							})
 						}	
 					</select>
