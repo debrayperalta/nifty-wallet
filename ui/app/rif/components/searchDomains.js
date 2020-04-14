@@ -1,47 +1,38 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import Select from "react-dropdown-select"
 import rifActions from '../../rif/actions'
 
 class SearchDomains extends Component {
-	state = {
-		domains: [],
-	}
-	constructor(props) {
-		super(props);
-		if(localStorage.rnsDomains){
+	_handleKeyDown = (e) => {
+		if (e.key === 'Enter') {
 			let domains = JSON.parse(localStorage.rnsDomains);
-			this.state = { 
-				domains: domains,
-			}
-		}	
-	}
-  render () {
-	return (
-		<Select 
-			options={this.state.domains} 
-			searchBy={'domain'} 
-			valueField={'domain'} 
-			labelField={'domain'} 
-			onChange={(values) => this.props.showDomainsDetailPage(values[0])} 
-			color={'#0074D9'}  
-			placeholder="Search for domains"
-			searchable={true}
-			className={'search-bar'}
-		/>
-	)
-  }
-}
+			let existDomain = domains.find(domain => domain.domain === e.target.value.toLowerCase())
+			if(existDomain)
+				return this.props.showDomainsDetailPage(existDomain)
 
-SearchDomains.propTypes = {
-	showDomainsDetailPage: PropTypes.func.isRequired,
+			//Here goes the logic to search domains that are not in localstorage
+		}
+	}
+	render () {
+		return (
+			<input 
+				placeholder="Search for domains"
+				className={'search-bar'}
+				onKeyDown={this._handleKeyDown}
+			/>
+		)
+	}
 }
 
 function mapStateToProps (state) {
   return {
 	  dispatch: state.dispatch,
 	}
+}
+
+SearchDomains.propTypes = {
+	showDomainsDetailPage: PropTypes.func.isRequired,
 }
 
 const mapDispatchToProps = dispatch => {
