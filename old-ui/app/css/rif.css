@@ -1,68 +1,104 @@
-.body {
-    width: 100%; 
-    height: 600px;
-    overflow: scroll;
-    font-family: Nunito Regular;
+.confirmation-message {
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
 }
-.chiplet {
-    width: 90%;
-    height: 100px;
-    font-size: 1rem;
-    color: #242A30;
-    margin: 5px;
-    padding:0.5rem;
+
+.confirmation-message>h1 {
+  font-weight: bold;
+  font-size: 1em;
+  text-transform: uppercase;
+  margin-bottom: 1em;
 }
-.chiplet-title {
-    color: black;
-    font-size: 1.25rem;
-    font-weight: bold;
-    cursor: pointer;
+
+.confirmation-message>p {
+  margin: 1em;
 }
-.chiplet-description {
-    padding-left: 1.5rem;
+
+.confirmation-buttons {
+  display: flex;
+  padding: 0.5em;
 }
-.chiplet-description a {
-    color: #3399FF;
-    font-weight: normal;
-    cursor: pointer;
+
+.confirmation-buttons>button {
+  margin: 0.5em;
 }
-.chiplet-description a:hover {
-    color: #84C1FF;
+
+.confirmation-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 90%;
+  background: white;
+  padding: 1em;
 }
-.chiplet-body {
-    width: 85%;
-    height: 100%;
+
+.custom-select{
     float: left;
-    border-bottom: 2.5px solid #EEEEEE;
 }
-.chiplet-status-wrapper {
-    width: 15%;
-    height: 100%; 
-    float: right;
+.custom-button-success {
+    cursor: pointer;
+    width: 130px;
+    height: 40px;
+    color: #38D238;
+    background-color: #B4EEB4;
+    border: 2px solid #38D238;
+    border-radius: 5px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    position: relative;
+    transition: all 0.2s;
+}
+.custom-button-success:hover {
+    transition: all 0.2s;
+    background-color: #DEF7DE;
+}
+.custom-button-cancel {
+    cursor: pointer;
+    width: 130px;
+    height: 40px;
+    color: #E52525;
+    background-color: #F08080;
+    border: 2px solid #E52525;
+    border-radius: 5px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    position: relative;
+    transition: all 0.2s;
+}
+.custom-button-cancel:hover {
+    transition: all 0.2s;
+    background-color: #F7BEBE;
+}
+.full-width {
+    width: 100%;
     position: relative;
 }
-.chiplet-status-text {
-    position: absolute;
-    color: white;
-    top: 50%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+.add-new-multicrypto-title {
+    text-align: center;
+    font-size: 1.5rem;
 }
-.chiplet-status-active {
-    background-color: #008744;
-    border-left: 4px solid #7FC3A1;
+.add-new-multicrypto-select {
+    text-align: center;
+    margin-top: 20px;
 }
-.chiplet-status-pending {
-    background-color: #0057e7;
-    border-left: 4px solid #7FABF3;
+.add-new-multicrypto-input {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 70px;
 }
-.chiplet-status-expired {
-    background-color: #D62D20;
-    border-left: 4px solid #EA968F;
+.add-new-multicrypto-button-cancel {
+    width: 50%;
+    float: left;
+    position: relative;
 }
-.chiplet-status-expiring {
-    background-color: #FFA700;
-    border-left: 4px solid #FFD37F;
+.add-new-multicrypto-button-save {
+    width: 50%;
+    float: left;
+    position: relative;
 }
 .domain-detail-body {
     width: 90%;
@@ -125,15 +161,6 @@
 }
 .domain-description-plus-button:hover {
     transform: scale(1.1);
-    transition: all 0.2s;
-}
-.rif-back-button {
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.rif-back-button:hover {
-    transform: scale(1.2);
     transition: all 0.2s;
 }
 .domain-detail-new-button {
@@ -221,72 +248,85 @@
     margin-right: 5px;
     float: right;
 }
-.custom-select{
-    float: left;
+.body {
+    width: 100%; 
+    height: 600px;
+    overflow: scroll;
+    font-family: Nunito Regular;
 }
-.custom-button-success {
-    cursor: pointer;
-    width: 130px;
-    height: 40px;
-    color: #38D238;
-    background-color: #B4EEB4;
-    border: 2px solid #38D238;
-    border-radius: 5px;
-    font-size: 1.5rem;
+.chiplet {
+    width: 90%;
+    height: 100px;
+    font-size: 1rem;
+    color: #242A30;
+    margin: 5px;
+    padding:0.5rem;
+}
+.chiplet-title {
+    color: black;
+    font-size: 1.25rem;
     font-weight: bold;
-    position: relative;
-    transition: all 0.2s;
-}
-.custom-button-success:hover {
-    transition: all 0.2s;
-    background-color: #DEF7DE;
-}
-.custom-button-cancel {
     cursor: pointer;
-    width: 130px;
-    height: 40px;
-    color: #E52525;
-    background-color: #F08080;
-    border: 2px solid #E52525;
-    border-radius: 5px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    position: relative;
-    transition: all 0.2s;
 }
-.custom-button-cancel:hover {
-    transition: all 0.2s;
-    background-color: #F7BEBE;
+.chiplet-description {
+    padding-left: 1.5rem;
 }
-.full-width {
-    width: 100%;
-    position: relative;
+.chiplet-description a {
+    color: #3399FF;
+    font-weight: normal;
+    cursor: pointer;
 }
-.add-new-multicrypto-title {
-    text-align: center;
-    font-size: 1.5rem;
+.chiplet-description a:hover {
+    color: #84C1FF;
 }
-.add-new-multicrypto-select {
-    text-align: center;
-    margin-top: 20px;
-}
-.add-new-multicrypto-input {
-    text-align: center;
-    margin-top: 20px;
-    margin-bottom: 70px;
-}
-.add-new-multicrypto-button-cancel {
-    width: 50%;
+.chiplet-body {
+    width: 85%;
+    height: 100%;
     float: left;
+    border-bottom: 2.5px solid #EEEEEE;
+}
+.chiplet-status-wrapper {
+    width: 15%;
+    height: 100%; 
+    float: right;
     position: relative;
 }
-.add-new-multicrypto-button-save {
-    width: 50%;
-    float: left;
-    position: relative;
+.chiplet-status-text {
+    position: absolute;
+    color: white;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+}
+.chiplet-status-active {
+    background-color: #008744;
+    border-left: 4px solid #7FC3A1;
+}
+.chiplet-status-pending {
+    background-color: #0057e7;
+    border-left: 4px solid #7FABF3;
+}
+.chiplet-status-expired {
+    background-color: #D62D20;
+    border-left: 4px solid #EA968F;
+}
+.chiplet-status-expiring {
+    background-color: #FFA700;
+    border-left: 4px solid #FFD37F;
+}
+.rif-back-button {
+    font-size: 1rem;
+    cursor: pointer;
+}
+.rif-back-button:hover {
+    transform: scale(1.2);
+    transition: all 0.2s;
 }
 .search-bar {
-    border-top: 0px !important;
-    border-left: 0px !important;
-    border-right: 0px !important;
+    width: 90%;
+    margin: 5%;
+    font-size: 1rem;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
 }
