@@ -180,7 +180,6 @@
     "raven-js": "^3.24.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "react-dropdown-select": "^4.3.0",
     "react-hyperscript": "^3.0.0",
     "react-inspector": "^2.3.0",
     "react-markdown": "^3.0.0",
