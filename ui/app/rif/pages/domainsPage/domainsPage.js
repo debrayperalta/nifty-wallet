@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { SearchDomains } from '../components'
+import { SearchDomains } from '../../components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
-import actions from '../../actions'
-import rifActions from '../../rif/actions'
+import actions from '../../../actions'
+import rifActions from '../../actions'
 
 function statusStyle(status){
 	switch(status){
