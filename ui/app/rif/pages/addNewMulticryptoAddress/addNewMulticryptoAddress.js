@@ -3,10 +3,10 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
-import { CustomButton } from '../components'
-import { getIconForToken } from '../utils/utils'
-import rifActions from '../../rif/actions'
-import { cryptos } from '../constants'
+import { CustomButton } from '../../components'
+import { getIconForToken } from '../../utils/utils'
+import rifActions from '../../actions'
+import { cryptos } from '../../constants'
 
 class AddNewMulticryptoAddressScreen extends Component {
 	state = {

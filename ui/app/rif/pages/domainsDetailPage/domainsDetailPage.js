@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle, faArchive, faBolt, faChevronLeft, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
-import { getIconForToken } from '../utils/utils'
-import { CustomButton, SearchDomains } from '../components'
-import rifActions from '../../rif/actions'
+import { getIconForToken } from '../../utils/utils'
+import { CustomButton, SearchDomains } from '../../components'
+import rifActions from '../../actions'
 
 class DomainsDetailScreen extends Component {
 	constructor(props) {
