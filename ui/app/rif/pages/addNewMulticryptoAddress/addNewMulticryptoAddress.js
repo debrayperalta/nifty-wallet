@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import { CustomButton } from '../../components'
-import { getIconForToken } from '../../utils/utils'
 import rifActions from '../../actions'
 import { cryptos } from '../../constants'
 
@@ -73,7 +72,7 @@ class AddNewMulticryptoAddressScreen extends Component {
 					<span>Add new network</span>
 				</div>
 				<div id='comboNetworks' className={'full-width add-new-multicrypto-select'}>
-					<select id='comboNetworks' onChange={this._updateNetwork}>
+					<select id='comboNetworks' className="select-css" onChange={this._updateNetwork}>
 						{this.state.networks.map((network, index) => {
 								return <option key={index} value={network}>{network}</option>
 							})
@@ -81,9 +80,9 @@ class AddNewMulticryptoAddressScreen extends Component {
 					</select>
 				</div>
 				<div id='inputAddress' className={'full-width add-new-multicrypto-input'}>
-					<input type='text' onChange={this._updateAddress}/>
+					<input type='text' placeholder="value" onChange={this._updateAddress}/>
 				</div>
-				<div id='inputAddress' className={'full-width'}>
+				<div id='bottomForm' className={'full-width add-new-multicrypto-bottom'}>
 					<div id='buttonCancel' className={'add-new-multicrypto-button-cancel'}>
 						<CustomButton 
 							text={'CANCEL'}
