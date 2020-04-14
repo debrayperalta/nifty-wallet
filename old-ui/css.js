@@ -18,7 +18,7 @@ var cssFiles = {
   'react-css': fs.readFileSync(path.join(__dirname, '..', 'node_modules', 'react-select', 'dist', 'react-select.css'), 'utf8'),
   'dropdowns.css': fs.readFileSync(path.join(__dirname, '/app/css/dropdowns.css'), 'utf8'),
   'app-bar.css': fs.readFileSync(path.join(__dirname, '/app/css/app-bar.css'), 'utf8'),
-  'rif-domain-page.css': fs.readFileSync(path.join(__dirname, '/app/css/rif/domain-page.css'), 'utf8'),
+  'rif.css': fs.readFileSync(path.join(__dirname, '/app/css/rif.css'), 'utf8'),
 }
 
 function bundleCss () {
