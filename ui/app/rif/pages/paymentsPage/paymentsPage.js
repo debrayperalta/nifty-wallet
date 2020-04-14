@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import h from 'react-hyperscript'
 import { connect } from 'react-redux'
-import actions from '../../actions'
+import actions from '../../../actions'
 
 class PaymentsScreen extends Component {
   navigateTo (url) {

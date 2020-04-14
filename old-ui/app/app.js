@@ -35,9 +35,7 @@ const Import = require('./accounts/import')
 const ForgetDeviceScreen = require('./components/connect-hardware/forget-screen')
 import ConnectHardwareForm from './components/connect-hardware/index'
 const InfoScreen = require('./info')
-const PaymentsScreen = require('../../ui/app/rif/pages/paymentsPage')
-const DomainsScreen = require('../../ui/app/rif/pages/domainsPage')
-const DomainsDetailScreen = require('../../ui/app/rif/pages/domainsDetailPage')
+import { PaymentsScreen, DomainsScreen, DomainsDetailScreen } from '../../ui/app/rif/pages'
 const AppBar = require('./components/app-bar/app-bar.component')
 const Loading = require('./components/loading')
 const BuyView = require('./components/buy-button-subview')
