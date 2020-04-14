@@ -23,6 +23,7 @@ const uglify = require('gulp-uglify-es').default
 const pify = require('pify')
 const gulpMultiProcess = require('gulp-multi-process')
 const endOfStream = pify(require('end-of-stream'))
+const concat = require('gulp-concat')
 
 function gulpParallel (...args) {
   return function spawnGulpChildProcess (cb) {
@@ -321,6 +322,8 @@ gulp.task('zip', gulp.parallel('zip:chrome', 'zip:firefox', 'zip:edge', 'zip:ope
 
 // high level tasks
 
+gulp.task('rifCss', watchRifCss)
+
 gulp.task('dev',
   gulp.series(
     'clean',
@@ -336,6 +339,7 @@ gulp.task('dev',
 gulp.task('dev:extension',
   gulp.series(
     'clean',
+    'rifCss',
     gulp.parallel(
       'dev:extension:js',
       'dev:copy',
@@ -358,6 +362,7 @@ gulp.task('dev:mascara',
 gulp.task('build',
   gulp.series(
     'clean',
+    'rifCss',
     gulpParallel(
       'build:extension:js',
       'build:mascara:js',
@@ -520,4 +525,18 @@ function bundleTask (opts) {
 
 function beep () {
   process.stdout.write('\x07')
+}
+
+function watchRifCss () {
+  watch('ui/app/rif/**/**.css', (event) => {
+    livereload.changed(event.path)
+    rifCss()
+  })
+  return rifCss()
+}
+
+function rifCss () {
+  return gulp.src('ui/app/rif/**/**.css')
+    .pipe(concat('rif.css'))
+    .pipe(gulp.dest('old-ui/app/css'))
 }

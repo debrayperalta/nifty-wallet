@@ -247,6 +247,22 @@ function reduceApp (state, action) {
         warning: null,
       })
 
+    case rifActions.SHOW_CONFIRMATION_MESSAGE:
+      return extend(appState, {
+        confirmationMessage: {
+          message: action.message,
+        },
+        transForward: false,
+        warning: null,
+      })
+
+    case rifActions.HIDE_CONFIRMATION_MESSAGE:
+      return extend(appState, {
+        confirmationMessage: null,
+        transForward: false,
+        warning: null,
+      })
+
     case actions.SHOW_ADD_TOKEN_PAGE:
       return extend(appState, {
         currentView: {
