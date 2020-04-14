@@ -49,6 +49,7 @@ const ConfirmChangePassword = require('./components/confirm-change-password')
 const ethNetProps = require('eth-net-props')
 const { getMetaMaskAccounts } = require('../../ui/app/selectors')
 const { getNetworkID } = require('./util')
+const ConfirmationMessageComponent = require('../../ui/app/rif/components/confirmationMessage/confirmationMessage')
 
 module.exports = compose(
   withRouter,
@@ -98,6 +99,7 @@ function mapStateToProps (state) {
     frequentRpcList: state.metamask.frequentRpcList || [],
     featureFlags,
     suggestedTokens: state.metamask.suggestedTokens,
+    confirmationMessage: state.appState.confirmationMessage,
 
     // state needed to get account dropdown temporarily rendering from app bar
     identities,
@@ -107,7 +109,7 @@ function mapStateToProps (state) {
 }
 
 App.prototype.render = function () {
-  var props = this.props
+  const props = this.props
   const {
     currentView,
     isLoading,
@@ -123,6 +125,12 @@ App.prototype.render = function () {
   log.debug('Main ui render function')
 
   const confirmMsgTx = (props.currentView.name === 'confTx' && Object.keys(props.unapprovedTxs).length === 0)
+
+  let confirmationMessage = null
+
+  if (props.confirmationMessage) {
+    confirmationMessage = this.renderModal()
+  }
 
   return (
     h('.flex-column.full-height', {
@@ -147,9 +155,15 @@ App.prototype.render = function () {
         },
       }, [
         this.renderPrimary(),
+        confirmationMessage,
       ]),
     ])
   )
+}
+
+App.prototype.renderModal = function () {
+  log.debug('rendering confirmationMessage modal')
+  return h(ConfirmationMessageComponent, {key: 'confirmationMessage', message: this.props.confirmationMessage.message})
 }
 
 App.prototype.renderLoadingIndicator = function ({ isLoading, isLoadingNetwork, loadMessage }) {
@@ -305,14 +319,6 @@ App.prototype.renderPrimary = function () {
       log.debug('rendering info screen')
       return h(InfoScreen, {key: 'info'})
 
-      case 'payments':
-        log.debug('rendering payments screen')
-        return h(PaymentsScreen, {key: 'payments'})
-
-    case 'domains':
-      log.debug('rendering domains screen')
-      return h(DomainsScreen, {key: 'domains'})
-      
     case 'buyEth':
       log.debug('rendering buy ether screen')
       return h(BuyView, {key: 'buyEthView'})
@@ -365,6 +371,16 @@ App.prototype.renderPrimary = function () {
     case 'confirm-change-password':
       log.debug('rendering confirm password changing screen')
       return h(ConfirmChangePassword, {key: 'confirm-change-password'})
+
+    // RIF SECTION
+    case 'payments':
+      log.debug('rendering payments screen')
+      return h(PaymentsScreen, {key: 'payments'})
+
+    case 'domains':
+      log.debug('rendering domains screen')
+      return h(DomainsScreen, {key: 'domains'})
+
     default:
       log.debug('rendering default, account detail screen')
       return h(AccountDetailScreen, {key: 'account-detail'})
