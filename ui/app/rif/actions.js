@@ -1,9 +1,11 @@
 const rifActions = {
   SHOW_DOMAINS_PAGE: 'SHOW_DOMAINS_PAGE',
   SHOW_PAYMENTS_PAGE: 'SHOW_PAYMENTS_PAGE',
+  SHOW_DOMAINS_DETAIL_PAGE: 'SHOW_DOMAINS_DETAIL_PAGE',
   SHOW_CONFIRMATION_MESSAGE: 'SHOW_CONFIRMATION_MESSAGE',
   HIDE_CONFIRMATION_MESSAGE: 'HIDE_CONFIRMATION_MESSAGE',
   showDomainsPage,
+  showDomainsDetailPage,
   showPaymentsPage,
   showConfirmationMessage,
   hideConfirmationMessage,
@@ -15,6 +17,15 @@ function showDomainsPage () {
   }
 }
 
+function showDomainsDetailPage (data) {
+  return {
+    type: rifActions.SHOW_DOMAINS_DETAIL_PAGE,
+    value: {
+      value: data,
+    }
+  }
+}
+  
 function showPaymentsPage () {
   return {
     type: rifActions.SHOW_PAYMENTS_PAGE,
