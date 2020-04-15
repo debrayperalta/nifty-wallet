@@ -61,6 +61,7 @@ class AddNewMulticryptoAddressScreen extends Component {
 		this.setState({address: e.target.value})
 	}
 	_updateNetwork = (e) => {
+		console.log("e.target.value", e.target.value)
 		this.setState({network: e.target.value})
 	}
 	render () {
@@ -71,10 +72,10 @@ class AddNewMulticryptoAddressScreen extends Component {
 				<div id='title' className={'full-width add-new-multicrypto-title'}>
 					<span>Add new network</span>
 				</div>
-				<div id='comboNetworks' className={'full-width add-new-multicrypto-select'}>
+				<div id='comboNetworks' className={'add-new-multicrypto-select'}>
 					<select id='comboNetworks' className="select-css" onChange={this._updateNetwork}>
 						{this.state.networks.map((network, index) => {
-								return <option key={index} value={network}>{network}</option>
+								return <option key={index} value={network}>{network.toUpperCase()}</option>
 							})
 						}	
 					</select>
