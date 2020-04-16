@@ -1,4 +1,4 @@
-.confirmation-message {
+.rif-modal-message {
   display: flex;
   flex-flow: column;
   justify-content: space-between;
@@ -6,27 +6,27 @@
   text-align: center;
 }
 
-.confirmation-message>h1 {
+.rif-modal-message>h1 {
   font-weight: bold;
   font-size: 1em;
   text-transform: uppercase;
   margin-bottom: 1em;
 }
 
-.confirmation-message>p {
+.rif-modal-message>p {
   margin: 1em;
 }
 
-.confirmation-buttons {
+.rif-modal-buttons {
   display: flex;
   padding: 0.5em;
 }
 
-.confirmation-buttons>button {
+.rif-modal-buttons>button {
   margin: 0.5em;
 }
 
-.confirmation-modal {
+.rif-modal {
   position: fixed;
   top: 50%;
   left: 50%;

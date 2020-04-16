@@ -13,6 +13,9 @@ class AddNewMulticryptoAddressScreen extends Component {
 		address: '',
 		network: '',
 	}
+	propTypes = {
+		goBack: PropTypes.func.isRequired,
+	}
 	constructor(props) {
 		super(props);
 		let networks = new Set()
@@ -29,10 +32,6 @@ class AddNewMulticryptoAddressScreen extends Component {
 			networks: [...networks],
 			network: selected,
 		};
-	}
-
-	navigateTo (url) {
-		global.platform.openWindow({ url })
 	}
 	addAddress = () => {
 		let domains = JSON.parse(localStorage.rnsDomains);
@@ -113,10 +112,6 @@ class AddNewMulticryptoAddressScreen extends Component {
 		</div>
 		)
 	}
-}
-
-AddNewMulticryptoAddressScreen.propTypes = {
-	goBack: PropTypes.func.isRequired,
 }
 
 function mapStateToProps (state) {

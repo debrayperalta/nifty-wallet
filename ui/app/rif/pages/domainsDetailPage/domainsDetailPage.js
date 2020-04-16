@@ -6,8 +6,24 @@ import { faCheckCircle, faArchive, faBolt, faChevronLeft, faPlusCircle } from '@
 import { getIconForToken } from '../../utils/utils'
 import { CustomButton, SearchDomains } from '../../components'
 import rifActions from '../../actions'
+import { cryptos } from '../../constants'
 
 class DomainsDetailScreen extends Component {
+	static propTypes = {
+		status: PropTypes.string.isRequired,
+		goBack: PropTypes.func.isRequired,
+		addNewNetwork: PropTypes.func.isRequired,
+		setAutoRenew: PropTypes.func.isRequired,
+		domainName: PropTypes.string.isRequired,
+		address: PropTypes.string.isRequired,
+		content: PropTypes.string.isRequired, 
+		expirationDate: PropTypes.string.isRequired,
+		autoRenew: PropTypes.bool.isRequired,
+		ownerAddress: PropTypes.string.isRequired,
+		isOwner: PropTypes.bool,
+		isLuminoNode: PropTypes.bool,
+		isRifStorage: PropTypes.bool,
+	}
 	constructor(props) {
 		super(props);
 		let resolvers = []
@@ -15,12 +31,76 @@ class DomainsDetailScreen extends Component {
 		this.state = { 
 			resolvers: resolvers,
 			selectedResolverIndex: 0,
+			selectedNetwork: '',
+			insertedAddress: '',
 		};
 	}
-	navigateTo (url) {
-		global.platform.openWindow({ url })
-  	}
+	_updateNetwork = (e) => {
+		this.setState({ selectedNetwork: e.target.value })
+	}
+	_updateAddress = (e) => {
+		this.setState({ insertedAddress: e.target.value })
+	}
+	_addAddress = () => {
+		let domains = JSON.parse(localStorage.rnsDomains);
+		let myIndex = -1
+		let resolverIndex = this.state.selectedResolverIndex
+		let selecteddomain = domains.find((domain, index) => {
+			if(domain.domain === this.props.domain.domain){
+				myIndex = index
+				return domain
+			}
+		})
 
+		if(myIndex !== -1 && resolverIndex !== -1){
+			let newNetwork = {
+				networkName: this.state.selectedNetwork,
+				networkIcon:this.state.selectedNetwork,
+				address: this.state.insertedAddress,
+			}
+			domains[myIndex].resolvers[resolverIndex].network.push(newNetwork)
+			localStorage.setItem('rnsDomains', JSON.stringify(domains))
+		}
+	}
+	showModalAddNetworkAddress = () => {
+		let networks = new Set()
+		let selectFirst = true
+		let selected = ''
+		Object.keys(cryptos).forEach(function(key) {
+			networks.add(key)
+			if(selectFirst){
+				selected = key
+				selectFirst = false
+			}
+		});
+		this.setState({ selectedNetwork: selected })
+		let message = {
+			title: 'Add new network',
+			body: { 
+				elements: <div>
+					<div id='comboNetworks' className={'add-new-multicrypto-select'}>
+						<select id='comboNetworks' className="select-css" onChange={this._updateNetwork}>
+							{[...networks].map((network, index) => {
+									return <option key={index} value={network}>{network.toUpperCase()}</option>
+								})
+							}	
+						</select>
+					</div>
+					<div id='inputAddress' className={'full-width add-new-multicrypto-input'}>
+						<input type='text' placeholder="value" onChange={this._updateAddress}/>
+					</div>
+				</div>
+			},
+			confirmLabel: 'SAVE',
+			cancelLabel: 'CANCEL',
+			confirmCallback: () => {
+				this._addAddress()
+			},
+			cancelCallback: () => {
+			},
+		}
+		this.props.addNewNetwork(message)
+	}
 	render () {
 		const { status, domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, domain } = this.props
 		return (
@@ -64,7 +144,7 @@ class DomainsDetailScreen extends Component {
 									<CustomButton 
 										icon={faPlusCircle} 
 										text={'NEW'}
-										onClick={() => this.props.addNewNetwork(domain, this.state.selectedResolverIndex)} 
+										onClick={() => this.showModalAddNetworkAddress()} 
 										className={
 											{
 												button: 'domain-detail-new-button',
@@ -95,28 +175,10 @@ class DomainsDetailScreen extends Component {
 					Domain detail page still in progress for this status!
 				</div>
 			}
-			
 		</div>
 		)
 	}
 }
-
-DomainsDetailScreen.propTypes = {
-	status: PropTypes.string.isRequired,
-	goBack: PropTypes.func.isRequired,
-	addNewNetwork: PropTypes.func.isRequired,
-	setAutoRenew: PropTypes.func.isRequired,
-	domainName: PropTypes.string.isRequired,
-	address: PropTypes.string.isRequired,
-	content: PropTypes.string.isRequired,
-	expirationDate: PropTypes.string.isRequired,
-	autoRenew: PropTypes.bool.isRequired,
-	ownerAddress: PropTypes.string.isRequired,
-	isOwner: PropTypes.bool,
-	isLuminoNode: PropTypes.bool,
-	isRifStorage: PropTypes.bool,
-}
-
 
 function mapStateToProps (state) {
 	const data = state.appState.currentView.data.value
@@ -140,7 +202,8 @@ function mapStateToProps (state) {
 const mapDispatchToProps = dispatch => {
 	return {
 		goBack: () => dispatch(rifActions.showDomainsPage()),
-		addNewNetwork: (domain, selectedResolverIndex) => dispatch(rifActions.showAddNewMulticryptoAddressPage(domain, selectedResolverIndex)),
+		//addNewNetwork: (domain, selectedResolverIndex) => dispatch(rifActions.showAddNewMulticryptoAddressPage(domain, selectedResolverIndex)),
+		addNewNetwork: (message) => dispatch(rifActions.showRifModal(message)),
 		setAutoRenew: () => {},
 	}
 }

@@ -3,14 +3,14 @@ const rifActions = {
   SHOW_PAYMENTS_PAGE: 'SHOW_PAYMENTS_PAGE',
   SHOW_DOMAINS_DETAIL_PAGE: 'SHOW_DOMAINS_DETAIL_PAGE',
   SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE: 'SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE',
-  SHOW_CONFIRMATION_MESSAGE: 'SHOW_CONFIRMATION_MESSAGE',
-  HIDE_CONFIRMATION_MESSAGE: 'HIDE_CONFIRMATION_MESSAGE',
+  SHOW_RIF_MODAL: 'SHOW_RIF_MODAL',
+  HIDE_RIF_MODAL: 'HIDE_RIF_MODAL',
   showDomainsPage,
   showDomainsDetailPage,
   showPaymentsPage,
   showAddNewMulticryptoAddressPage,
-  showConfirmationMessage,
-  hideConfirmationMessage,
+  showRifModal,
+  hideRifModal,
 }
 
 function showDomainsPage () {
@@ -46,16 +46,16 @@ function showPaymentsPage () {
   }
 }
 
-function showConfirmationMessage (message) {
+function showRifModal (message) {
   return {
-    type: rifActions.SHOW_CONFIRMATION_MESSAGE,
+    type: rifActions.SHOW_RIF_MODAL,
     message: message,
   }
 }
 
-function hideConfirmationMessage () {
+function hideRifModal () {
   return {
-    type: rifActions.HIDE_CONFIRMATION_MESSAGE,
+    type: rifActions.HIDE_RIF_MODAL,
   }
 }
 
