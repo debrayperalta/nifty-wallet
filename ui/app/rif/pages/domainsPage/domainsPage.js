@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import actions from '../../../actions'
 import rifActions from '../../actions'
+import { mockDomains } from '../../test/mocks'
 
 function statusStyle(status){
 	switch(status){
@@ -26,6 +27,8 @@ class DomainsScreen extends Component {
 	}
 	constructor(props) {
 		super(props);
+		//Mocking data
+		localStorage.setItem('rnsDomains', JSON.stringify(mockDomains))
 		if(localStorage.rnsDomains){
 			let domains = JSON.parse(localStorage.rnsDomains);
 			this.state = { 

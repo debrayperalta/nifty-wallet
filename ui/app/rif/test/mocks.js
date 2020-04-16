@@ -38,6 +38,82 @@ const mockDomains = [
 		],
 	},
 	{
+		domain: 'pixel.rsk',
+		expiration: '2021/03/02',
+		autoRenew: true,
+		status: 'active',
+		address: '0x12345678979797',
+		content: 'abcdefg1234abcd1234aaaabbbbddddd',
+		ownerAddress: '0x1502FbdE93D0EB7642aD0358e969a835840513dB',
+		isLuminoNode: true,
+		isRifStorage: true,
+		resolvers: [
+			{
+				name: "MultiCrypto",
+				network: [
+					{
+						networkName: 'Bitcoin',
+						networkIcon: 'bitcoin',
+						address: '0x00000000000000',
+					},
+					{
+						networkName: 'RSK',
+						networkIcon: 'rsk',
+						address: '0x00000000000000',
+					},
+				],
+			},
+			{
+				name: "AnotherResolver",
+				network: [
+					{
+						networkName: 'Ethereum',
+						networkIcon: 'ethereum',
+						address: '0x00000000000000',
+					},
+				],
+			},
+		],
+	},
+	{
+		domain: 'infuy.rsk',
+		expiration: '2021/03/02',
+		autoRenew: true,
+		status: 'pending',
+		address: '0x12345678979797',
+		content: 'abcdefg1234abcd1234aaaabbbbddddd',
+		ownerAddress: '0x1502FbdE93D0EB7642aD0358e969a835840513dB',
+		isLuminoNode: true,
+		isRifStorage: true,
+		resolvers: [
+			{
+				name: "MultiCrypto",
+				network: [
+					{
+						networkName: 'Bitcoin',
+						networkIcon: 'bitcoin',
+						address: '0x00000000000000',
+					},
+					{
+						networkName: 'RSK',
+						networkIcon: 'rsk',
+						address: '0x00000000000000',
+					},
+				],
+			},
+			{
+				name: "AnotherResolver",
+				network: [
+					{
+						networkName: 'Ethereum',
+						networkIcon: 'ethereum',
+						address: '0x00000000000000',
+					},
+				],
+			},
+		],
+	},
+	{
 		domain: 'blockchain.rsk',
 		expiration: '2020/06/10',
 		autoRenew: true,
@@ -147,3 +223,7 @@ const mockDomains = [
 		],
 	},
 ]
+
+export {
+	mockDomains
+}
