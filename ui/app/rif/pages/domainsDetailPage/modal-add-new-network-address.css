@@ -1,0 +1,43 @@
+.custom-select{
+    float: left;
+}
+.full-width {
+    width: 100%;
+    position: relative;
+}
+.add-new-multicrypto-title {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #3399FF;
+}
+.add-new-multicrypto-select {
+    text-align: center;
+    width: 90%;
+    margin-left: 5%;
+    margin-top: 1rem;
+}
+.add-new-multicrypto-input {
+    margin-top: 1rem;
+    margin-bottom: 4rem;
+}
+.add-new-multicrypto-input input{
+    width: 90%;
+    margin: 5%;
+    font-size: 1rem;
+    border-top: 0rem;
+    border-left: 0rem;
+    border-right: 0rem;
+}
+.add-new-multicrypto-bottom {
+    display: flex;
+}
+.add-new-multicrypto-button-cancel {
+    width: 50%;
+    float: left;
+    position: relative;
+}
+.add-new-multicrypto-button-save {
+    width: 50%;
+    float: left;
+    position: relative;
+}
