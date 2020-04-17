@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { cryptos } from '../../../constants'
 import Select from 'react-select'
 
 class AddNewTokenNetworkAddress extends Component {
