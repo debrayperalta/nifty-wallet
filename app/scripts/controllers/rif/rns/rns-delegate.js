@@ -8,5 +8,8 @@ export default class RnsDelegate {
     this.selectedAccount = props.selectedAccount
     this.initialize()
   }
+
   initialize () {}
+
+  getApi () {}
 }

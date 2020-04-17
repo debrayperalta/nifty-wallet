@@ -38,4 +38,12 @@ export default class RnsResolver extends RnsDelegate {
         .catch(error => reject(error))
     })
   }
+
+  getApi () {
+    return {
+      getOwner: this.getOwner,
+      available: this.available,
+      isOwner: this.isOwner,
+    }
+  }
 }

@@ -21,16 +21,16 @@ export default class RnsManager {
     const preferencesController = this.props.preferencesController
     const networkController = this.props.networkController
 
-    if (!props.web3Instance) {
+    if (!props.web3) {
       this.web3 = new Web3(global.ethereumProvider)
     } else {
-      this.web3 = props.web3Instance
+      this.web3 = props.web3
     }
 
     this.preferencesController = preferencesController
     this.networkController = networkController
 
-    this.preferencesController.store.subscribe(this.onPreferencesUpdated)
+    this.preferencesController.store.subscribe(this.preferencesUpdated)
     this.selectedAccount = this.preferencesController.store.getState().selectedAccount
     this.rifConfig = rifConfig
     this.rnsContractInstance = new this.web3.eth.Contract(RNS, this.rifConfig.rns.contracts.rns)
@@ -74,5 +74,13 @@ export default class RnsManager {
     this.rnsRegister.selectedAccount = selectedAccount
     this.rnsResolver.selectedAccount = selectedAccount
     this.rnsTransfer.selectedAccount = selectedAccount
+  }
+
+  getApi () {
+    return {
+      ...this.rnsRegister.getApi(),
+      ...this.rnsTransfer.getApi(),
+      ...this.rnsResolver.getApi(),
+    }
   }
 }

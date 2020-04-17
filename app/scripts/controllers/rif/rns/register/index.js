@@ -58,4 +58,12 @@ export default class RnsRegister extends RnsDelegate {
         .catch(error => reject(error))
     })
   }
+
+  getApi () {
+    return {
+      requestRegistration: this.requestRegistration,
+      finishRegistration: this.finishRegistration,
+      createSubdomain: this.createSubdomain,
+    }
+  }
 }
