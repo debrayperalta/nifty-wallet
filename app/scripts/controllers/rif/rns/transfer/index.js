@@ -1,3 +1,5 @@
-export default class RnsTransfer {
-  constructor (props) {}
-}
+import RnsDelegate from '../rns-delegate'
+
+export default class RnsTransfer extends RnsDelegate {}
+
+
