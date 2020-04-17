@@ -28,7 +28,8 @@ class DomainsScreen extends Component {
 	constructor(props) {
 		super(props);
 		//Mocking data
-		localStorage.setItem('rnsDomains', JSON.stringify(mockDomains))
+		if(!localStorage.rnsDomains)
+			localStorage.setItem('rnsDomains', JSON.stringify(mockDomains))
 		if(localStorage.rnsDomains){
 			let domains = JSON.parse(localStorage.rnsDomains);
 			this.state = { 

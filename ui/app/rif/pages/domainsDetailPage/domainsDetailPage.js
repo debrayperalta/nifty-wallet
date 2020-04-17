@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle, faArchive, faBolt, faChevronLeft, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
 import { getIconForToken } from '../../utils/utils'
-import { CustomButton, SearchDomains } from '../../components'
+import { CustomButton, SearchDomains, AddNewTokenNetworkAddress } from '../../components'
 import rifActions from '../../actions'
 import { cryptos } from '../../constants'
 
@@ -25,24 +25,36 @@ class DomainsDetailScreen extends Component {
 		isRifStorage: PropTypes.bool,
 	}
 	constructor(props) {
-		super(props);
+		super(props)
 		let resolvers = []
-		Object.assign(resolvers, props.resolvers);
+		let networks = []
+		Object.assign(resolvers, props.resolvers)
+		Object.keys(cryptos).forEach(function(key) {
+			let crypto = cryptos[key]
+			let network = {
+				value: key,
+				label: crypto.name,
+				icon: crypto.icon,
+				color: crypto.color,
+			}
+			networks.push(network)
+		});
 		this.state = { 
 			resolvers: resolvers,
 			selectedResolverIndex: 0,
-			selectedNetwork: '',
+			networks: networks,
+			selectedNetwork: networks[0].value,
 			insertedAddress: '',
-		};
+		}
 	}
-	_updateNetwork = (e) => {
-		this.setState({ selectedNetwork: e.target.value })
+	_updateNetwork = (selectedOption) => {
+		this.setState({ selectedNetwork: selectedOption.value })
 	}
-	_updateAddress = (e) => {
-		this.setState({ insertedAddress: e.target.value })
+	_updateAddress = (address) => {
+		this.setState({ insertedAddress: address })
 	}
 	_addAddress = () => {
-		let domains = JSON.parse(localStorage.rnsDomains);
+		let domains = JSON.parse(localStorage.rnsDomains)
 		let myIndex = -1
 		let resolverIndex = this.state.selectedResolverIndex
 		let selecteddomain = domains.find((domain, index) => {
@@ -61,38 +73,23 @@ class DomainsDetailScreen extends Component {
 			domains[myIndex].resolvers[resolverIndex].network.push(newNetwork)
 			localStorage.setItem('rnsDomains', JSON.stringify(domains))
 			//Sending back with localstorage rnsDomains (Here we try to get again localstorage so if it wasnt updated, we're going to show whats really saved)
-			//domains = JSON.parse(localStorage.rnsDomains)
-			//this.props.goBack(domains[myIndex])
+			domains = JSON.parse(localStorage.rnsDomains)
+			this.setState({
+				resolvers: domains[myIndex].resolvers
+			})
 		}
 	}
 	showModalAddNetworkAddress = () => {
-		let networks = new Set()
-		let selectFirst = true
-		let selected = ''
-		Object.keys(cryptos).forEach(function(key) {
-			networks.add(key)
-			if(selectFirst){
-				selected = key
-				selectFirst = false
-			}
-		});
-		this.setState({ selectedNetwork: selected })
+		let elements = []
+		elements.push(<AddNewTokenNetworkAddress 
+			updateNetwork={this._updateNetwork.bind(this)}
+			updateAddress={this._updateAddress.bind(this)}
+			networks={this.state.networks}
+		/>)
 		let message = {
 			title: 'Add new network',
 			body: { 
-				elements: <div>
-					<div id='comboNetworks' className={'add-new-multicrypto-select'}>
-						<select id='comboNetworks' className="select-css" onChange={this._updateNetwork}>
-							{[...networks].map((network, index) => {
-									return <option key={index} value={network}>{network.toUpperCase()}</option>
-								})
-							}	
-						</select>
-					</div>
-					<div id='inputAddress' className={'full-width add-new-multicrypto-input'}>
-						<input type='text' placeholder="value" onChange={this._updateAddress}/>
-					</div>
-				</div>
+				elements: elements
 			},
 			confirmLabel: 'SAVE',
 			cancelLabel: 'CANCEL',
@@ -105,7 +102,14 @@ class DomainsDetailScreen extends Component {
 		this.props.addNewNetwork(message)
 	}
 	render () {
-		const { status, domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, domain } = this.props
+		const { status, domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage } = this.props
+		let networks = this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
+			return <div key={index} className={'resolver-network-description'}>
+					<FontAwesomeIcon icon={getIconForToken(network.networkIcon).icon} color={getIconForToken(network.networkIcon).color} className={'domain-icon'}/>
+					<span>{network.networkName}</span>
+					<span className={'resolver-network-description-address'}>{network.address}</span>
+				</div>
+			})
 		return (
 		<div className={'body'}>
 			<FontAwesomeIcon icon={faChevronLeft} className={'rif-back-button'} onClick={() => this.props.goBack()}/>
@@ -159,13 +163,7 @@ class DomainsDetailScreen extends Component {
 								</div>
 							</div>
 							<div id='resolverNetworksBody' className={'resolver-network'}>
-								{this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
-									return <div key={index} className={'resolver-network-description'}>
-											<FontAwesomeIcon icon={getIconForToken(network.networkIcon)} color="#000080" className={'domain-icon'}/>
-											<span>{network.networkName}</span>
-											<span className={'resolver-network-description-address'}>{network.address}</span>
-										</div>
-								})}
+								{networks}
 							</div>
 						</div>
 					}

@@ -247,17 +247,6 @@ function reduceApp (state, action) {
         warning: null,
       })
 
-    case rifActions.SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE:
-      return extend(appState, {
-        currentView: {
-          name: 'addNewMulticryptoAddress',
-          context: appState.currentView.context,
-          data: action.value,
-        },
-        transForward: false,
-        warning: null,
-      })
-
     case rifActions.SHOW_RIF_MODAL:
       return extend(appState, {
         modalMessage: {

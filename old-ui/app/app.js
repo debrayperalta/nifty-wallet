@@ -384,10 +384,6 @@ App.prototype.renderPrimary = function () {
       log.debug('rendering domains detail screen')
       return h(DomainsDetailScreen, {key: 'domainsDetail'})
 
-    case 'addNewMulticryptoAddress':
-      log.debug('rendering add new multicrypto address screen')
-      return h(AddNewMulticryptoAddressScreen, {key: 'addNewMulticryptoAddress'})
-
     default:
       log.debug('rendering default, account detail screen')
       return h(AccountDetailScreen, {key: 'account-detail'})

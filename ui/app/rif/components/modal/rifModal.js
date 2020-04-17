@@ -34,8 +34,12 @@ class RifModal extends Component {
     let body = null
     if (this.props.message.body.text)
         body = (<p>{this.props.message.body.text}</p>)
-    else if (this.props.message.body.elements)
-        body = (<div>{this.props.message.body.elements}</div>)
+    else if (this.props.message.body.elements){
+      body = []
+      this.props.message.body.elements.map((element, index) => {
+        body.push(<div key={index}>{element}</div>)
+      });
+    }
     return (
       <Modal
         isOpen={true}

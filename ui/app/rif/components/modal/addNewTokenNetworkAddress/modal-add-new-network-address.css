@@ -1,3 +1,6 @@
+.add-new-multicrypto-modal {
+    width: 17.5rem;
+}
 .custom-select{
     float: left;
 }
@@ -11,10 +14,25 @@
     color: #3399FF;
 }
 .add-new-multicrypto-select {
-    text-align: center;
+    text-align: left;
+    font-size: 1rem;
     width: 90%;
     margin-left: 5%;
     margin-top: 1rem;
+}
+.add-new-multicrypto-select .Select-control {
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+}
+.add-new-multicrypto-select .Select-input {
+    display: none !important;
+}
+.add-new-multicrypto-select-value-icon {
+    margin-left: 5%;
+}
+.add-new-multicrypto-select-value-text {
+    margin-left: 5%;
 }
 .add-new-multicrypto-input {
     margin-top: 1rem;
