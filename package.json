@@ -279,6 +279,7 @@
     "gulp-watch": "^5.0.1",
     "gulp-zip": "^4.0.0",
     "http-server": "^0.12.1",
+    "husky": "^4.2.5",
     "image-size": "^0.6.2",
     "isomorphic-fetch": "^2.2.1",
     "jsdoc": "^3.6.3",
