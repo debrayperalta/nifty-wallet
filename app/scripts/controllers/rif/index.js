@@ -1,4 +1,5 @@
 import RnsManager from './rns'
+import Web3 from 'web3'
 
 export default class RifController {
   constructor (props) {
@@ -8,10 +9,6 @@ export default class RifController {
 
     if (!props.networkController) {
       throw new Error('NetworkController has to be present');
-    }
-
-    if (!props.web3) {
-      throw new Error('Web3 has to be present');
     }
 
     if (!props.metamaskStore) {
@@ -26,7 +23,7 @@ export default class RifController {
     this.memoryStore = props.memoryStore;
     this.preferencesController = props.preferencesController;
     this.networkController = props.networkController;
-    this.web3 = props.web3;
+    this.web3 = new Web3(this.networkController._provider);
 
     this.rnsManager = new RnsManager({
       preferencesController: this.preferencesController,

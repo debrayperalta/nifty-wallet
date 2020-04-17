@@ -330,7 +330,6 @@ module.exports = class MetamaskController extends EventEmitter {
     this.rifController = new RifController({
       preferencesController: this.preferencesController,
       networkController: this.networkController,
-      web3: new Web3(global.ethereumProvider),
       memoryStore: this.memStore,
       metamaskStore: this.store,
     });
@@ -554,7 +553,7 @@ module.exports = class MetamaskController extends EventEmitter {
       // handleNewAccountSelected: nodeify(this.handleNewAccountSelected, this),
 
       // RIF
-      rif: this.rifController,
+      rif: this.rifController.getApi(),
     }
   }
 

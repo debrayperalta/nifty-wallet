@@ -20,7 +20,7 @@ export default class RnsManager {
     this.preferencesController.store.subscribe(this.preferencesUpdated);
     this.selectedAccount = this.preferencesController.store.getState().selectedAccount;
     this.rifConfig = rifConfig;
-    this.rnsContractInstance = new this.web3.eth.contract(RNS, this.rifConfig.rns.contracts.rns);
+    this.rnsContractInstance = this.web3.eth.contract(RNS).at(this.rifConfig.rns.contracts.rns);
     this.store = new ObservableStore({
       register: {},
       resolver: {},

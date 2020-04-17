@@ -1,3 +1,5 @@
+const actions = require('../actions')
+
 const rifActions = {
   SHOW_DOMAINS_PAGE: 'SHOW_DOMAINS_PAGE',
   SHOW_PAYMENTS_PAGE: 'SHOW_PAYMENTS_PAGE',
@@ -10,6 +12,8 @@ const rifActions = {
   showConfirmationMessage,
   hideConfirmationMessage,
   setBackgroundConnection,
+  // RNS
+  checkDomainAvailable,
 }
 
 let background = null;
@@ -49,6 +53,22 @@ function showConfirmationMessage (message) {
 function hideConfirmationMessage () {
   return {
     type: rifActions.HIDE_CONFIRMATION_MESSAGE,
+  }
+}
+
+function checkDomainAvailable (domainName) {
+  return dispatch => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      background.rif.rns.available(domainName, (error, available) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        dispatch(actions.hideLoadingIndication());
+        return resolve(available);
+      });
+    });
   }
 }
 

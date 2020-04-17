@@ -5,12 +5,13 @@ import RnsDelegate from '../rns-delegate'
 export default class RnsResolver extends RnsDelegate {
   getOwner (domainName) {
     return new Promise((resolve, reject) => {
-      this.rnsContractInstance.methods.owner(namehash.hash(domainName + '.rsk'))
-        .call({})
-        .then(address => {
+      this.rnsContractInstance.owner(namehash.hash(domainName), (error, address) => {
+          if (error) {
+            reject(error);
+          }
           console.debug('Owner Address', address);
           resolve(address);
-        }).catch(error => reject(error));
+      });
     });
   }
 
