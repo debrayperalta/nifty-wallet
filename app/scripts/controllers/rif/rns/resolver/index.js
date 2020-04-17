@@ -1,1 +1,3 @@
-export default class RnsResolver {}
+export default class RnsResolver {
+  constructor (props) {}
+}

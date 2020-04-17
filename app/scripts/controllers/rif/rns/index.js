@@ -2,13 +2,22 @@ import RnsRegister from './register'
 import RnsResolver from './resolver'
 import RnsTransfer from './transfer'
 import Web3 from 'web3'
+import rifConfig from '/rif.config'
+import RNS from './abis/RNS.json'
 
 export default class RnsManager {
   constructor (props) {
 
-    if (!props.preferenceStore) {
-      throw new Error('PreferencesStore has to be present')
+    if (!props.preferencesController) {
+      throw new Error('PreferencesController has to be present')
     }
+
+    if (!props.networkController) {
+      throw new Error('NetworkController has to be present')
+    }
+
+    const preferencesController = this.props.preferencesController
+    const networkController = this.props.networkController
 
     if (!props.web3Instance) {
       this.web3 = new Web3(global.ethereumProvider)
@@ -16,12 +25,35 @@ export default class RnsManager {
       this.web3 = props.web3Instance
     }
 
-    this.props.preferenceStore.subscribe(this.onPreferencesUpdated)
-    this.selectedAccount = this.props.preferenceStore.getState().selectedAccount
+    this.preferencesController = preferencesController
+    this.networkController = networkController
 
-    this.rnsRegister = new RnsRegister()
-    this.rnsResolver = new RnsResolver()
-    this.rnsTransfer = new RnsTransfer()
+    this.preferencesController.store.subscribe(this.onPreferencesUpdated)
+    this.selectedAccount = this.preferencesController.store.getState().selectedAccount
+    this.rifConfig = rifConfig
+    this.rnsContractInstance = new this.web3.eth.Contract(RNS, this.rifConfig.rns.contracts.rns)
+
+    this.rnsRegister = new RnsRegister({
+      web3: this.web3,
+      preferencesController,
+      networkController,
+      rifConfig,
+      rnsContractInstance: this.rnsContractInstance,
+    })
+    this.rnsResolver = new RnsResolver({
+      web3: this.web3,
+      preferencesController,
+      networkController,
+      rifConfig,
+      rnsContractInstance: this.rnsContractInstance,
+    })
+    this.rnsTransfer = new RnsTransfer({
+      web3: this.web3,
+      preferencesController,
+      networkController,
+      rifConfig,
+      rnsContractInstance: this.rnsContractInstance,
+    })
   }
 
   preferencesUpdated (preferences) {

@@ -1,1 +1,3 @@
-export default class RnsTransfer {}
+export default class RnsTransfer {
+  constructor (props) {}
+}
