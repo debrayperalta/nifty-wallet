@@ -9,6 +9,13 @@ const rifActions = {
   showPaymentsPage,
   showConfirmationMessage,
   hideConfirmationMessage,
+  setBackgroundConnection,
+}
+
+let background = null;
+
+function setBackgroundConnection (backgroundConnection) {
+  background = backgroundConnection;
 }
 
 function showDomainsPage () {
@@ -22,10 +29,10 @@ function showDomainsDetailPage (data) {
     type: rifActions.SHOW_DOMAINS_DETAIL_PAGE,
     value: {
       value: data,
-    }
+    },
   }
 }
-  
+
 function showPaymentsPage () {
   return {
     type: rifActions.SHOW_PAYMENTS_PAGE,
