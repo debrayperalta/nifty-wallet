@@ -554,7 +554,7 @@ module.exports = class MetamaskController extends EventEmitter {
       // handleNewAccountSelected: nodeify(this.handleNewAccountSelected, this),
 
       // RIF
-      ...this.rifController.getApi(),
+      rif: this.rifController,
     }
   }
 

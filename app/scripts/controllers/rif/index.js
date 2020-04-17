@@ -48,7 +48,7 @@ export default class RifController {
 
   getApi () {
     return {
-      ...this.rnsManager.getApi(),
+      rns: this.rnsManager.getApi(),
     }
   }
 }
