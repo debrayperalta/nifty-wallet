@@ -203,7 +203,6 @@ function mapStateToProps (state) {
 const mapDispatchToProps = dispatch => {
 	return {
 		goBack: () => dispatch(rifActions.showDomainsPage()),
-		//addNewNetwork: (domain, selectedResolverIndex) => dispatch(rifActions.showAddNewMulticryptoAddressPage(domain, selectedResolverIndex)),
 		addNewNetwork: (message) => dispatch(rifActions.showRifModal(message)),
 		setAutoRenew: () => {},
 	}
