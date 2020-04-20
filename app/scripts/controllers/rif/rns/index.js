@@ -1,12 +1,17 @@
-import RnsRegister from './register'
-import RnsResolver from './resolver'
-import RnsTransfer from './transfer'
-import rifConfig from './../../../../../rif.config'
-import RNS from './abis/RNS.json'
-import ObservableStore from 'obs-store'
+import RnsRegister from './register';
+import RnsResolver from './resolver';
+import RnsTransfer from './transfer';
+import rifConfig from './../../../../../rif.config';
+import RNS from './abis/RNS.json';
+import ObservableStore from 'obs-store';
 
-export const DEFAULT_ADDRESS = '0x0000000000000000000000000000000000000000'
-
+/**
+ * This class encapsulates all the RNS operations, it initializes and call to all the delegates and exposes their operations.
+ *
+ * Props:
+ *   preferenceController and networkController: this is passed only to have more access on the delegates to the config.
+ *   web3: a web3 instance to make the contract calls.
+ */
 export default class RnsManager {
   constructor (props) {
     const preferencesController = props.preferencesController;
@@ -18,7 +23,7 @@ export default class RnsManager {
     this.networkController = networkController;
 
     this.preferencesController.store.subscribe(this.preferencesUpdated);
-    this.selectedAccount = this.preferencesController.store.getState().selectedAccount;
+    this.address = this.preferencesController.store.getState().selectedAccount;
     this.rifConfig = rifConfig;
     this.rnsContractInstance = this.web3.eth.contract(RNS).at(this.rifConfig.rns.contracts.rns);
     this.store = new ObservableStore({
@@ -33,7 +38,7 @@ export default class RnsManager {
       networkController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
-      selectedAccount: this.selectedAccount,
+      address: this.address,
       store: this.store,
     });
     this.rnsResolver = new RnsResolver({
@@ -42,7 +47,7 @@ export default class RnsManager {
       networkController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
-      selectedAccount: this.selectedAccount,
+      address: this.address,
       store: this.store,
     });
     this.rnsTransfer = new RnsTransfer({
@@ -51,31 +56,44 @@ export default class RnsManager {
       networkController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
-      selectedAccount: this.selectedAccount,
+      address: this.address,
       store: this.store,
     });
   }
 
+  /**
+   * When the preferences are updated and the account has changed this operation is called to update the selected
+   * address.
+   * @param preferences the updated preferences.
+   */
   preferencesUpdated (preferences) {
     // check if the account was changed and update the rns domains to show
-    if (this.selectedAccount !== preferences.selectedAccount) {
+    if (this.address !== preferences.selectedAccount) {
       // update
       this.updateAccount(preferences.selectedAccount);
     }
   }
 
-  updateAccount (selectedAccount) {
-    this.selectedAccount = selectedAccount;
-    this.rnsRegister.selectedAccount = selectedAccount;
-    this.rnsResolver.selectedAccount = selectedAccount;
-    this.rnsTransfer.selectedAccount = selectedAccount;
+  /**
+   * This updates all the addresses used by the manager and it's delegates.
+   * @param address the new address.
+   */
+  updateAccount (address) {
+    this.address = address;
+    this.rnsRegister.address = address;
+    this.rnsResolver.address = address;
+    this.rnsTransfer.address = address;
   }
 
-  getApi () {
+  /**
+   * It binds all the operations to be accessed from the outside.
+   * @returns an object like { operationName: function bind}
+   */
+  bindApi () {
     return {
-      ...this.rnsRegister.getApi(),
-      ...this.rnsTransfer.getApi(),
-      ...this.rnsResolver.getApi(),
+      ...this.rnsRegister.buildApi(),
+      ...this.rnsTransfer.buildApi(),
+      ...this.rnsResolver.buildApi(),
     }
   }
 }

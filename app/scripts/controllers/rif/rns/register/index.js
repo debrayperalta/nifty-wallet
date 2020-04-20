@@ -1,19 +1,35 @@
 import FIFSRegistrar from '../abis/FIFSRegistrar.json'
-import RnsDelegate from '../rns-delegate'
-import * as namehash from 'eth-ens-namehash'
+import RnsJsDelegate from '../rnsjs-delegate'
 
-export default class RnsRegister extends RnsDelegate {
+/**
+ * This is a delegate to manage all the RNS register operations.
+ */
+export default class RnsRegister extends RnsJsDelegate {
 
   initialize () {
     this.fifsContractInstance = this.web3.eth.contract(FIFSRegistrar).at(this.rifConfig.rns.contracts.fifsRegistrar);
   }
 
+  buildApi () {
+    const rnsJsApi = super.buildApi();
+    return {
+      requestRegistration: this.requestRegistration.bind(this),
+      finishRegistration: this.finishRegistration.bind(this),
+      ...rnsJsApi,
+    }
+  }
+
+  /**
+   * Make a request for registration on the domainName.
+   * @param domainName the Domain to register.
+   * @returns {Promise<string>} commitHash to use on the finishRegistration operation.
+   */
   requestRegistration (domainName) {
     const domainHash = this.web3.utils.sha3(domainName);
     const secret = this.web3.utils.sha3('0x00');
     return new Promise((resolve, reject) => {
       this.fifsContractInstance['makeCommitment']
-        .call(domainHash, this.selectedAccount, secret, (error, commitment) => {
+        .call(domainHash, this.address, secret, (error, commitment) => {
           if (error) {
             reject(error);
           }
@@ -32,10 +48,17 @@ export default class RnsRegister extends RnsDelegate {
     });
   }
 
+  /**
+   * Finish the domain registration using the hash from the requestRegistration operation.
+   * @param domainName the Domain to be registered.
+   * @param commitHash the commit hash from the first request.
+   * @param yearsToRegister the amount of years to register the domain.
+   * @returns {Promise<void>}
+   */
   finishRegistration (domainName, commitHash, yearsToRegister) {
     return new Promise((resolve, reject) => {
       this.fifsContractInstance['register']
-        .send(domainName, this.selectedAccount, commitHash, yearsToRegister, (error, hash) => {
+        .send(domainName, this.address, commitHash, yearsToRegister, (error, hash) => {
           if (error) {
             reject(error);
           }
@@ -46,24 +69,4 @@ export default class RnsRegister extends RnsDelegate {
     });
   }
 
-  createSubdomain (domainName, subdomain, subdomainOwnerAddress) {
-    return new Promise((resolve, reject) => {
-      this.rnsContractInstance['setSubnodeOwner']
-        .send(namehash.hash(domainName), this.web3.utils.sha3(subdomain), subdomainOwnerAddress, (error, result) => {
-          if (error) {
-            reject(error);
-          }
-          console.debug('Subdomain Created' + result);
-          resolve(result);
-      });
-    });
-  }
-
-  getApi () {
-    return {
-      requestRegistration: this.requestRegistration.bind(this),
-      finishRegistration: this.finishRegistration.bind(this),
-      createSubdomain: this.createSubdomain.bind(this),
-    }
-  }
 }

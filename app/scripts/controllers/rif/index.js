@@ -1,6 +1,18 @@
-import RnsManager from './rns'
-import Web3 from 'web3'
+import RnsManager from './rns';
+import Web3 from 'web3';
 
+/**
+ * RIF Controller
+ *
+ * This controller hold's all the business logic for RIF
+ * Any operation related to RIF like rns contracts should be here.
+ *
+ * Props:
+ *   preferenceController: the preference controller that has all the preferences of the user
+ *   networkController: this is needed to create a new instance of web3 and get all the network info
+ *   metamaskStore and memoryStore: this 2 stores holds all the stores on the app, this is to register the RIF store into the application stores.
+ *
+ */
 export default class RifController {
   constructor (props) {
     if (!props.preferencesController) {
@@ -33,7 +45,7 @@ export default class RifController {
 
     const metamaskStoreConfig = {
       ...this.metamaskStore.config,
-      RnsManager: this.rnsManager.store,
+      RifController: this.rnsManager.store,
     };
     const memoryStoreConfig = {
       ...this.memoryStore.config,
@@ -43,9 +55,14 @@ export default class RifController {
     this.memoryStore.updateStructure(memoryStoreConfig);
   }
 
-  getApi () {
+  /**
+   * This method publishes all the operations available to call from the ui for RifController
+   * and all it's members.
+   * @returns an object like { operationName: functionBind, }
+   */
+  exposeApi () {
     return {
-      rns: this.rnsManager.getApi(),
+      rns: this.rnsManager.bindApi(),
     }
   }
 }
