@@ -92,8 +92,8 @@ export default class RnsManager {
   bindApi () {
     return {
       ...this.rnsRegister.buildApi(),
-      ...this.rnsTransfer.buildApi(),
       ...this.rnsResolver.buildApi(),
+      ...this.rnsTransfer.buildApi(),
     }
   }
 }

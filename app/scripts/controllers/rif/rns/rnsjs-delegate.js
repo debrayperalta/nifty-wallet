@@ -1,5 +1,6 @@
 import RnsDelegate from './rns-delegate'
 import RNS from '@rsksmart/rns'
+import rifConfig from './../../../../../rif.config';
 
 /**
  * This class encapsulates all the RNSJS logic, it initializes rnsjs library and uses it as a wrapper.
@@ -7,7 +8,20 @@ import RNS from '@rsksmart/rns'
 export default class RnsJsDelegate extends RnsDelegate {
   constructor (props) {
     super(props);
-    this.rnsJs = new RNS(this.web3);
+    this.rnsJs = new RNS(this.web3, this.getRNSOptions());
+  }
+
+  /**
+   * Gets the options for the RNS object needed to use rnsjs library
+   * @returns an object like {{networkId: (() => number) | number, contractAddresses: {registry: string}}}
+   */
+  getRNSOptions () {
+    return {
+      networkId: this.networkController.store.getState().networkId,
+      contractAddresses: {
+        registry: rifConfig.rns.contracts.rns,
+      },
+    };
   }
 
   /**
