@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheckCircle, faArchive, faBolt, faChevronLeft, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
+import { faArchive, faBolt, faChevronLeft, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
 import { getIconForToken } from '../../../utils/utils'
-import { CustomButton, AddNewTokenNetworkAddress } from '../../../components'
+import { CustomButton, AddNewTokenNetworkAddress, DomainIcon, LuminoNodeIcon, RifStorageIcon } from '../../../components'
 import rifActions from '../../../actions'
 import { cryptos } from '../../../constants'
 
@@ -45,43 +45,43 @@ class DomainsDetailActiveScreen extends Component {
 			insertedAddress: '',
 		}
 	}
-	_updateNetwork = (selectedOption) => {
+	updateNetwork = (selectedOption) => {
 		this.setState({ selectedNetwork: selectedOption.value })
 	}
-	_updateAddress = (address) => {
+	updateAddress = (address) => {
 		this.setState({ insertedAddress: address })
 	}
-	_addAddress = () => {
+	addAddress = () => {
 		let domains = JSON.parse(localStorage.rnsDomains)
-		let myIndex = -1
+		let networkIndex = -1
 		let resolverIndex = this.state.selectedResolverIndex
 		let selecteddomain = domains.find((domain, index) => {
 			if(domain.domain === this.props.domain.domain){
-				myIndex = index
+				networkIndex = index
 				return domain
 			}
 		})
 
-		if(myIndex !== -1 && resolverIndex !== -1){
+		if(networkIndex !== -1 && resolverIndex !== -1){
 			let newNetwork = {
 				networkName: this.state.selectedNetwork,
 				networkIcon:this.state.selectedNetwork,
 				address: this.state.insertedAddress,
 			}
-			domains[myIndex].resolvers[resolverIndex].network.push(newNetwork)
+			domains[networkIndex].resolvers[resolverIndex].network.push(newNetwork)
 			localStorage.setItem('rnsDomains', JSON.stringify(domains))
 			//Sending back with localstorage rnsDomains (Here we try to get again localstorage so if it wasnt updated, we're going to show whats really saved)
 			domains = JSON.parse(localStorage.rnsDomains)
 			this.setState({
-				resolvers: domains[myIndex].resolvers
+				resolvers: domains[networkIndex].resolvers
 			})
 		}
 	}
 	showModalAddNetworkAddress = () => {
 		let elements = []
 		elements.push(<AddNewTokenNetworkAddress 
-			updateNetwork={this._updateNetwork.bind(this)}
-			updateAddress={this._updateAddress.bind(this)}
+			updateNetwork={this.updateNetwork.bind(this)}
+			updateAddress={this.updateAddress.bind(this)}
 			networks={this.state.networks}
 		/>)
 		let message = {
@@ -92,7 +92,7 @@ class DomainsDetailActiveScreen extends Component {
 			confirmLabel: 'SAVE',
 			cancelLabel: 'CANCEL',
 			confirmCallback: () => {
-				this._addAddress()
+				this.addAddress()
 			},
 			cancelCallback: () => {
 			},
@@ -113,22 +113,22 @@ class DomainsDetailActiveScreen extends Component {
             <div id='headerName' className={'domain-name'}>
                 <span>{domainName}</span>
                 {isOwner &&
-                    <FontAwesomeIcon icon={faCheckCircle} color="#000080" className={'domain-icon'}/>
+                    <DomainIcon className={'domain-icon'}/>
                 }
                 {isLuminoNode &&
-                    <FontAwesomeIcon icon={faBolt} color="#508871" className={'domain-icon'}/>
+                    <LuminoNodeIcon className={'domain-icon'}/>
                 }
                 {isRifStorage &&
-                    <FontAwesomeIcon icon={faArchive} color="#AD3232" className={'domain-icon'}/>
+                    <RifStorageIcon className={'domain-icon'}/>
                 }
             </div>
             <div id='domainDetailBody' className={'domain-detail-body'}>
                 <div id='bodyDescription' className={'domain-description'}>
-                    <div><span className={'domain-description-field'}>Address:&nbsp;</span><span className={'domain-description-value'}>{address}</span></div>
-                    <div><span className={'domain-description-field'}>Content:&nbsp;</span><span className={'domain-description-value'}>{content}</span></div>
-                    <div><span className={'domain-description-field'}>Expires on:&nbsp;</span><span className={'domain-description-value'}>{expirationDate}</span></div>
+                    <div><span className={'domain-description-field'}>Address:</span><span className={'domain-description-value label-spacing-left'}>{address}</span></div>
+                    <div><span className={'domain-description-field'}>Content:</span><span className={'domain-description-value label-spacing-left'}>{content}</span></div>
+                    <div><span className={'domain-description-field'}>Expires on:</span><span className={'domain-description-value label-spacing-left'}>{expirationDate}</span></div>
                     <div><span className={'domain-description-field'}>Auto renew: <a href={this.props.setAutoRenew()}>{autoRenew ? "on" : "off"}</a></span></div>
-                    <div><span className={'domain-description-field'}>Owner:&nbsp;</span><span className={'domain-description-value'}>{ownerAddress}</span></div>
+                    <div><span className={'domain-description-field'}>Owner:</span><span className={'domain-description-value label-spacing-left'}>{ownerAddress}</span></div>
                 </div>
                 {isOwner &&
                     <div id='resolversBody' className={'resolvers-body'}>
@@ -189,7 +189,7 @@ function mapStateToProps (state) {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		addNewNetwork: (message) => dispatch(rifActions.showRifModal(message)),
+		addNewNetwork: (message) => dispatch(rifActions.showModal(message)),
 		setAutoRenew: () => {},
 	}
 }

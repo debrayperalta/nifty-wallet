@@ -20,11 +20,11 @@ class AddNewTokenNetworkAddress extends Component {
 			insertedAddress: '',
 		};
 	}
-	_updateNetwork = (selectedOption) => {
+	updateNetwork = (selectedOption) => {
 		this.setState({ selectedNetwork: selectedOption })
 		this.props.updateNetwork(selectedOption)
 	}
-	_updateAddress = (e) => {
+	updateAddress = (e) => {
 		this.setState({ insertedAddress: e.target.value })
 		this.props.updateAddress(e.target.value)
 	}
@@ -56,7 +56,7 @@ class AddNewTokenNetworkAddress extends Component {
 					}}
 				>
 					<FontAwesomeIcon className={'add-new-multicrypto-select-value-icon'} icon={option.icon} color={option.color}/>
-					<span>&nbsp;{option.label}</span>
+					<span className={'label-spacing-left'}>{option.label}</span>
 				</div>
 			)}
 		return (
@@ -64,8 +64,8 @@ class AddNewTokenNetworkAddress extends Component {
 			<div id='comboNetworks' className={'add-new-multicrypto-select'}>
                 <Select
 					searchable={false}
-                    arrowRenderer={() => <span>&#9660;</span>}
-                    onChange={this._updateNetwork}
+                    arrowRenderer={() => <div className={'combo-selector-triangle'}></div>}
+                    onChange={this.updateNetwork}
                     optionComponent={selectOption}
 					options={this.state.networks}
 					clearable={false}
@@ -74,7 +74,7 @@ class AddNewTokenNetworkAddress extends Component {
                 />
             </div>
             <div id='inputAddress' className={'full-width add-new-multicrypto-input'}>
-                <input type='text' placeholder="value" onChange={this._updateAddress}/>
+                <input type='text' placeholder="value" onChange={this.updateAddress}/>
             </div>
 		</div>
 		)

@@ -3,14 +3,13 @@ const rifActions = {
   SHOW_PAYMENTS_PAGE: 'SHOW_PAYMENTS_PAGE',
   SHOW_DOMAINS_DETAIL_PAGE: 'SHOW_DOMAINS_DETAIL_PAGE',
   SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE: 'SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE',
-  SHOW_RIF_MODAL: 'SHOW_RIF_MODAL',
-  HIDE_RIF_MODAL: 'HIDE_RIF_MODAL',
+  SHOW_MODAL: 'SHOW_MODAL',
+  HIDE_MODAL: 'HIDE_MODAL',
   showDomainsPage,
   showDomainsDetailPage,
   showPaymentsPage,
-  showAddNewMulticryptoAddressPage,
-  showRifModal,
-  hideRifModal,
+  showModal,
+  hideModal,
 }
 
 function showDomainsPage () {
@@ -27,18 +26,6 @@ function showDomainsDetailPage (data) {
     }
   }
 }
-
-function showAddNewMulticryptoAddressPage (domain, selectedResolverIndex) {
-  return {
-    type: rifActions.SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE,
-    value: {
-      value: {
-        domain: domain,
-        selectedResolverIndex: selectedResolverIndex,
-      },
-    }
-  }
-}
   
 function showPaymentsPage () {
   return {
@@ -46,16 +33,16 @@ function showPaymentsPage () {
   }
 }
 
-function showRifModal (message) {
+function showModal (message) {
   return {
-    type: rifActions.SHOW_RIF_MODAL,
+    type: rifActions.SHOW_MODAL,
     message: message,
   }
 }
 
-function hideRifModal () {
+function hideModal () {
   return {
-    type: rifActions.HIDE_RIF_MODAL,
+    type: rifActions.HIDE_MODAL,
   }
 }
 

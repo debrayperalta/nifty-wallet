@@ -247,7 +247,7 @@ function reduceApp (state, action) {
         warning: null,
       })
 
-    case rifActions.SHOW_RIF_MODAL:
+    case rifActions.SHOW_MODAL:
       return extend(appState, {
         modalMessage: {
           message: action.message,
@@ -256,7 +256,7 @@ function reduceApp (state, action) {
         warning: null,
       })
 
-    case rifActions.HIDE_RIF_MODAL:
+    case rifActions.HIDE_MODAL:
       return extend(appState, {
         modalMessage: null,
         transForward: false,

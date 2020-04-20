@@ -4,7 +4,7 @@ import Modal from 'react-modal'
 import PropTypes from 'prop-types'
 import rifActions from '../../actions'
 
-class RifModal extends Component {
+class CustomModal extends Component {
 
   static propTypes = {
     message: PropTypes.object,
@@ -17,7 +17,7 @@ class RifModal extends Component {
   }
 
   closeModal () {
-    this.props.dispatch(rifActions.hideRifModal())
+    this.props.dispatch(rifActions.hideModal())
   }
 
   cancel () {
@@ -45,11 +45,11 @@ class RifModal extends Component {
         isOpen={true}
         onAfterOpen={this.afterOpenModal}
         onRequestClose={this.closeModal}
-        className="rif-modal">
-        <div className="rif-modal-message">
+        className="modal">
+        <div className="modal-message">
           <h1>{this.props.message.title}</h1>
           {body}
-          <div className="rif-modal-buttons">
+          <div className="modal-buttons">
             <button onClick={this.cancel.bind(this)}>{this.props.message.cancelLabel}</button>
             <button onClick={this.confirm.bind(this)}>{this.props.message.confirmLabel}</button>
           </div>
@@ -63,4 +63,4 @@ function mapStateToProps (state) {
     dispatch: state.dispatch,
   }
 }
-module.exports = connect(mapStateToProps)(RifModal)
+module.exports = connect(mapStateToProps)(CustomModal)

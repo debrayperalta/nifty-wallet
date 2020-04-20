@@ -48,7 +48,7 @@ const ConfirmChangePassword = require('./components/confirm-change-password')
 const ethNetProps = require('eth-net-props')
 const { getMetaMaskAccounts } = require('../../ui/app/selectors')
 const { getNetworkID } = require('./util')
-const RifModal = require('../../ui/app/rif/components/modal/rifModal')
+const modal = require('../../ui/app/rif/components/modal/modal')
 
 module.exports = compose(
   withRouter,
@@ -161,8 +161,8 @@ App.prototype.render = function () {
 }
 
 App.prototype.renderModal = function () {
-  log.debug('rendering rif modal')
-  return h(RifModal, {key: 'modalMessage', message: this.props.modalMessage.message})
+  log.debug('rendering modal')
+  return h(modal, {key: 'modalMessage', message: this.props.modalMessage.message})
 }
 
 App.prototype.renderLoadingIndicator = function ({ isLoading, isLoadingNetwork, loadMessage }) {
