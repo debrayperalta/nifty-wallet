@@ -24,9 +24,8 @@ class DomainsDetailActiveScreen extends Component {
 	}
 	constructor(props) {
 		super(props)
-		let resolvers = []
 		let networks = []
-		Object.assign(resolvers, props.resolvers)
+		const resolvers = [...props.resolvers]
 		Object.keys(cryptos).forEach(function(key) {
 			let crypto = cryptos[key]
 			let network = {
@@ -141,20 +140,18 @@ class DomainsDetailActiveScreen extends Component {
                                     }								
                                 </select>
                             </div>
-                            <div id='buttonNew' className={'custom-select'}>
-                                <CustomButton 
-                                    icon={faPlusCircle} 
-                                    text={'NEW'}
-                                    onClick={() => this.showModalAddNetworkAddress()} 
-                                    className={
-                                        {
-                                            button: 'domain-detail-new-button',
-                                            icon: 'domain-icon centerY',
-                                            text: 'center',
-                                        }
-                                    }
-                                />
-                            </div>
+							<CustomButton 
+								icon={faPlusCircle} 
+								text={'NEW'}
+								onClick={() => this.showModalAddNetworkAddress()} 
+								className={
+									{
+										button: 'domain-detail-new-button',
+										icon: 'domain-icon centerY',
+										text: 'center',
+									}
+								}
+							/>
                         </div>
                         <div id='resolverNetworksBody' className={'resolver-network'}>
                             {networks}

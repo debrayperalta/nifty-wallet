@@ -12,8 +12,7 @@ class AddNewTokenNetworkAddress extends Component {
 	}
     constructor(props) {
         super(props);
-		let networks = []
-		Object.assign(networks, props.networks)
+		const networks = [...props.networks]
 		this.state = { 
             networks: networks,
 			selectedNetwork: networks[0],
@@ -30,7 +29,6 @@ class AddNewTokenNetworkAddress extends Component {
 	}
 	
 	render () {
-        const {  } = this.props
         const selectValue = ({value}) => {
 			return(
 			<div className={'add-new-multicrypto-select-value'}>
@@ -41,18 +39,18 @@ class AddNewTokenNetworkAddress extends Component {
 			</div>
 		)}
 		const selectOption = (props) => {
-			let option = props.option
+			const { option } = props
 			return(
 				<div
 					onMouseDown={(event) => {
 						event.preventDefault();
 						event.stopPropagation();	
-						props.onSelect(props.option, event)
+						props.onSelect(option, event)
 					}}
-					onMouseEnter={(event) => props.onFocus(props.option, event)}
+					onMouseEnter={(event) => props.onFocus(option, event)}
 					onMouseMove={(event) => {
 							if (props.isFocused) return;
-							props.onFocus(props.option, event)
+							props.onFocus(option, event)
 					}}
 				>
 					<FontAwesomeIcon className={'add-new-multicrypto-select-value-icon'} icon={option.icon} color={option.color}/>
