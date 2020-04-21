@@ -247,18 +247,18 @@ function reduceApp (state, action) {
         warning: null,
       })
 
-    case rifActions.SHOW_CONFIRMATION_MESSAGE:
+    case rifActions.SHOW_MODAL:
       return extend(appState, {
-        confirmationMessage: {
+        modalMessage: {
           message: action.message,
         },
         transForward: false,
         warning: null,
       })
 
-    case rifActions.HIDE_CONFIRMATION_MESSAGE:
+    case rifActions.HIDE_MODAL:
       return extend(appState, {
-        confirmationMessage: null,
+        modalMessage: null,
         transForward: false,
         warning: null,
       })

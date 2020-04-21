@@ -4,7 +4,7 @@ import Modal from 'react-modal'
 import PropTypes from 'prop-types'
 import rifActions from '../../actions'
 
-class ConfirmationMessage extends Component {
+class CustomModal extends Component {
 
   static propTypes = {
     message: PropTypes.object,
@@ -17,7 +17,7 @@ class ConfirmationMessage extends Component {
   }
 
   closeModal () {
-    this.props.dispatch(rifActions.hideConfirmationMessage())
+    this.props.dispatch(rifActions.hideModal())
   }
 
   cancel () {
@@ -31,16 +31,25 @@ class ConfirmationMessage extends Component {
   }
 
   render () {
+    let body = null
+    if (this.props.message.body.text)
+        body = (<p>{this.props.message.body.text}</p>)
+    else if (this.props.message.body.elements){
+      body = []
+      this.props.message.body.elements.map((element, index) => {
+        body.push(<div key={index}>{element}</div>)
+      });
+    }
     return (
       <Modal
         isOpen={true}
         onAfterOpen={this.afterOpenModal}
         onRequestClose={this.closeModal}
-        className="confirmation-modal">
-        <div className="confirmation-message">
+        className="modal">
+        <div className="modal-message">
           <h1>{this.props.message.title}</h1>
-          <p>{this.props.message.body}</p>
-          <div className="confirmation-buttons">
+          {body}
+          <div className="modal-buttons">
             <button onClick={this.cancel.bind(this)}>{this.props.message.cancelLabel}</button>
             <button onClick={this.confirm.bind(this)}>{this.props.message.confirmLabel}</button>
           </div>
@@ -54,4 +63,4 @@ function mapStateToProps (state) {
     dispatch: state.dispatch,
   }
 }
-module.exports = connect(mapStateToProps)(ConfirmationMessage)
+module.exports = connect(mapStateToProps)(CustomModal)
