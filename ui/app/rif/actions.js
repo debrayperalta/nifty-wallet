@@ -4,13 +4,14 @@ const rifActions = {
   SHOW_DOMAINS_PAGE: 'SHOW_DOMAINS_PAGE',
   SHOW_PAYMENTS_PAGE: 'SHOW_PAYMENTS_PAGE',
   SHOW_DOMAINS_DETAIL_PAGE: 'SHOW_DOMAINS_DETAIL_PAGE',
-  SHOW_CONFIRMATION_MESSAGE: 'SHOW_CONFIRMATION_MESSAGE',
-  HIDE_CONFIRMATION_MESSAGE: 'HIDE_CONFIRMATION_MESSAGE',
+  SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE: 'SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE',
+  SHOW_MODAL: 'SHOW_MODAL',
+  HIDE_MODAL: 'HIDE_MODAL',
   showDomainsPage,
   showDomainsDetailPage,
   showPaymentsPage,
-  showConfirmationMessage,
-  hideConfirmationMessage,
+  showModal,
+  hideModal,
   setBackgroundConnection,
   // RNS
   checkDomainAvailable,
@@ -43,16 +44,16 @@ function showPaymentsPage () {
   }
 }
 
-function showConfirmationMessage (message) {
+function showModal (message) {
   return {
-    type: rifActions.SHOW_CONFIRMATION_MESSAGE,
+    type: rifActions.SHOW_MODAL,
     message: message,
   }
 }
 
-function hideConfirmationMessage () {
+function hideModal () {
   return {
-    type: rifActions.HIDE_CONFIRMATION_MESSAGE,
+    type: rifActions.HIDE_MODAL,
   }
 }
 

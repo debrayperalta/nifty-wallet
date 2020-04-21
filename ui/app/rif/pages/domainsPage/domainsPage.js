@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { SearchDomains } from '../../components'
@@ -28,7 +28,8 @@ class DomainsScreen extends Component {
 	constructor(props) {
 		super(props);
 		//Mocking data
-		localStorage.setItem('rnsDomains', JSON.stringify(mockDomains))
+		if(!localStorage.rnsDomains)
+			localStorage.setItem('rnsDomains', JSON.stringify(mockDomains))
 		if(localStorage.rnsDomains){
 			let domains = JSON.parse(localStorage.rnsDomains);
 			this.state = { 

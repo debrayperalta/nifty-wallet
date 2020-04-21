@@ -35,7 +35,7 @@ const Import = require('./accounts/import')
 const ForgetDeviceScreen = require('./components/connect-hardware/forget-screen')
 import ConnectHardwareForm from './components/connect-hardware/index'
 const InfoScreen = require('./info')
-import { PaymentsScreen, DomainsScreen, DomainsDetailScreen } from '../../ui/app/rif/pages'
+import { PaymentsScreen, DomainsScreen, DomainsDetailScreen, AddNewMulticryptoAddressScreen } from '../../ui/app/rif/pages'
 const AppBar = require('./components/app-bar/app-bar.component')
 const Loading = require('./components/loading')
 const BuyView = require('./components/buy-button-subview')
@@ -48,7 +48,7 @@ const ConfirmChangePassword = require('./components/confirm-change-password')
 const ethNetProps = require('eth-net-props')
 const { getMetaMaskAccounts } = require('../../ui/app/selectors')
 const { getNetworkID } = require('./util')
-const ConfirmationMessageComponent = require('../../ui/app/rif/components/confirmationMessage/confirmationMessage')
+const modal = require('../../ui/app/rif/components/modal/modal')
 
 module.exports = compose(
   withRouter,
@@ -98,7 +98,7 @@ function mapStateToProps (state) {
     frequentRpcList: state.metamask.frequentRpcList || [],
     featureFlags,
     suggestedTokens: state.metamask.suggestedTokens,
-    confirmationMessage: state.appState.confirmationMessage,
+    modalMessage: state.appState.modalMessage,
 
     // state needed to get account dropdown temporarily rendering from app bar
     identities,
@@ -125,10 +125,10 @@ App.prototype.render = function () {
 
   const confirmMsgTx = (props.currentView.name === 'confTx' && Object.keys(props.unapprovedTxs).length === 0)
 
-  let confirmationMessage = null
+  let modalMessage = null
 
-  if (props.confirmationMessage) {
-    confirmationMessage = this.renderModal()
+  if (props.modalMessage) {
+    modalMessage = this.renderModal()
   }
 
   return (
@@ -154,15 +154,15 @@ App.prototype.render = function () {
         },
       }, [
         this.renderPrimary(),
-        confirmationMessage,
+        modalMessage,
       ]),
     ])
   )
 }
 
 App.prototype.renderModal = function () {
-  log.debug('rendering confirmationMessage modal')
-  return h(ConfirmationMessageComponent, {key: 'confirmationMessage', message: this.props.confirmationMessage.message})
+  log.debug('rendering modal')
+  return h(modal, {key: 'modalMessage', message: this.props.modalMessage.message})
 }
 
 App.prototype.renderLoadingIndicator = function ({ isLoading, isLoadingNetwork, loadMessage }) {
