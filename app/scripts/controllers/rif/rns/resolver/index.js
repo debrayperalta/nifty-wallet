@@ -8,8 +8,8 @@ export default class RnsResolver extends RnsJsDelegate {
   buildApi () {
     const rnsJsApi = super.buildApi();
     return {
-      getOwner: this.getOwner.bind(this),
-      isOwner: this.isOwner.bind(this),
+      getOwner: this.bindOperation(this.getOwner, this),
+      isOwner: this.bindOperation(this.isOwner, this),
       ...rnsJsApi,
     }
   }

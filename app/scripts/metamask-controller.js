@@ -557,7 +557,6 @@ module.exports = class MetamaskController extends EventEmitter {
     }
   }
 
-
 //=============================================================================
 // VAULT / KEYRING RELATED METHODS
 //=============================================================================

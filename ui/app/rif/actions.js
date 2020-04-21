@@ -1,4 +1,4 @@
-const actions = require('../actions')
+const actions = require('../actions');
 
 const rifActions = {
   SHOW_DOMAINS_PAGE: 'SHOW_DOMAINS_PAGE',
@@ -57,10 +57,10 @@ function hideConfirmationMessage () {
 }
 
 function checkDomainAvailable (domainName) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve, reject) => {
-      background.rif.rns.available(domainName, (error, available) => {
+      background.rif.rns.resolver.isDomainAvailable(domainName, (error, available) => {
         if (error) {
           dispatch(actions.displayWarning(error));
           return reject(error);
@@ -68,7 +68,7 @@ function checkDomainAvailable (domainName) {
         dispatch(actions.hideLoadingIndication());
         return resolve(available);
       });
-    });
+    })
   }
 }
 

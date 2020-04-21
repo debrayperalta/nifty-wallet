@@ -1,3 +1,5 @@
+const nodeify = require('../../../lib/nodeify')
+
 /**
  * Delegate class to encapsulate all the logic related to delegates.
  */
@@ -22,9 +24,22 @@ export default class RnsDelegate {
    * This method is meant to expose operations to the ui. Basically here we have an object returned that contains keys
    * with the method names and the binding to the implementation on the values. This must be overwritten by the child.
    *
+   * NOTE: all the operations have to return a Promise, if the operation doesn't return anything you can use
+   * Promise.resolve() or Promise.reject()
+   *
    * Example: {
-   *   doSomething: this.doSomething.bind(this),
+   *   doSomething: this.bindOperation(this.doSomething, this),
    * }
    */
   buildApi () {}
+
+  /**
+   * Makes the operation callback available
+   * @param operation the function reference
+   * @param member the function container
+   * @returns {function(...[*]=)}
+   */
+  bindOperation (operation, member) {
+    return nodeify(operation, member);
+  }
 }

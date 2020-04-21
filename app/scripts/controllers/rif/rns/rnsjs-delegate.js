@@ -11,6 +11,19 @@ export default class RnsJsDelegate extends RnsDelegate {
     this.rnsJs = new RNS(this.web3, this.getRNSOptions());
   }
 
+  buildApi () {
+    return {
+      getDomainAddress: this.bindOperation(this.getDomainAddress, this),
+      getAddressDomain: this.bindOperation(this.getAddressDomain, this),
+      setAddressToDomain: this.bindOperation(this.setAddressToDomain, this),
+      setDomainResolver: this.bindOperation(this.setDomainResolver, this),
+      isDomainAvailable: this.bindOperation(this.isDomainAvailable, this),
+      isSubdomainAvailable: this.bindOperation(this.isSubdomainAvailable, this),
+      setSubdomainOwner: this.bindOperation(this.setSubdomainOwner, this),
+      createSubdomain: this.bindOperation(this.createSubdomain, this),
+    }
+  }
+
   /**
    * Gets the options for the RNS object needed to use rnsjs library
    * @returns an object like {{networkId: (() => number) | number, contractAddresses: {registry: string}}}
@@ -113,17 +126,20 @@ export default class RnsJsDelegate extends RnsDelegate {
     return this.rnsJs.subdomains.create(domainName, subdomain, ownerAddress, parentOwnerAddress);
   }
 
-  buildApi () {
-    return {
-      getDomainAddress: this.getDomainAddress.bind(this),
-      getAddressDomain: this.getAddressDomain.bind(this),
-      setAddressToDomain: this.setAddressToDomain.bind(this),
-      setDomainResolver: this.setDomainResolver.bind(this),
-      isDomainAvailable: this.isDomainAvailable.bind(this),
-      isSubdomainAvailable: this.isSubdomainAvailable.bind(this),
-      setSubdomainOwner: this.setSubdomainOwner.bind(this),
-      createSubdomain: this.createSubdomain.bind(this),
-    }
+  /**
+   * Updates the store state
+   * @param newState
+   */
+  updateStoreState (newState) {
+    this.store.putState(newState);
+  }
+
+  /**
+   * Gets the store state
+   * @returns the current state
+   */
+  getStoreState () {
+    return this.store.getState();
   }
 
 }
