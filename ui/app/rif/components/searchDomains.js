@@ -10,8 +10,13 @@ class SearchDomains extends Component {
 			let existDomain = domains.find(domain => domain.domain === e.target.value.toLowerCase())
 			if(existDomain)
 				return this.props.showDomainsDetailPage(existDomain)
-
-			//Here goes the logic to search domains that are not in localstorage
+			//Checks if the domain is available, so if it is, it need to render a screen so the user can register it
+			this.props.checkDomainAvailable(e.target.value.toLowerCase()).then(ret => {
+				if(ret.length > 0)
+					this.props.showDomainRegisterPage(ret)
+				//We need to put an else here, so we can redirect to details page, remember that the localstorage part of code, will not be anymore here
+				
+			})
 		}
 	}
 	render () {
@@ -38,6 +43,8 @@ SearchDomains.propTypes = {
 const mapDispatchToProps = dispatch => {
 	return {
 		showDomainsDetailPage: (data) => dispatch(rifActions.showDomainsDetailPage(data)),
+		showDomainRegisterPage: (domainName) => dispatch(rifActions.showDomainRegisterPage(domainName)),
+		checkDomainAvailable: (domainName) => dispatch(rifActions.checkDomainAvailable(domainName))
 	}
 }
 

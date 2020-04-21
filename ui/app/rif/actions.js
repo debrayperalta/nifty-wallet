@@ -4,11 +4,13 @@ const rifActions = {
   SHOW_DOMAINS_PAGE: 'SHOW_DOMAINS_PAGE',
   SHOW_PAYMENTS_PAGE: 'SHOW_PAYMENTS_PAGE',
   SHOW_DOMAINS_DETAIL_PAGE: 'SHOW_DOMAINS_DETAIL_PAGE',
+  SHOW_DOMAIN_REGISTER_PAGE: 'SHOW_DOMAIN_REGISTER_PAGE',
   SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE: 'SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE',
   SHOW_MODAL: 'SHOW_MODAL',
   HIDE_MODAL: 'HIDE_MODAL',
   showDomainsPage,
   showDomainsDetailPage,
+  showDomainRegisterPage,
   showPaymentsPage,
   showModal,
   hideModal,
@@ -34,6 +36,15 @@ function showDomainsDetailPage (data) {
     type: rifActions.SHOW_DOMAINS_DETAIL_PAGE,
     value: {
       value: data,
+    },
+  }
+}
+
+function showDomainRegisterPage (domainName) {
+  return {
+    type: rifActions.SHOW_DOMAIN_REGISTER_PAGE,
+    value: {
+      domainName: domainName,
     },
   }
 }
