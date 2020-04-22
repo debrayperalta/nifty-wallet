@@ -53,7 +53,6 @@ const mapDispatchToProps = dispatch => {
 		showDomainsDetailPage: (data) => dispatch(rifActions.showDomainsDetailPage(data)),
 		showDomainRegisterPage: (domainName) => dispatch(rifActions.showDomainRegisterPage(domainName)),
 		checkDomainAvailable: (domainName) => dispatch(rifActions.checkDomainAvailable(domainName)),
-		getDomainDetails: (domainName) => dispatch(rifActions.getDomainDetails(domainName)),
 		displayWarning: (message) => dispatch(actions.displayWarning(message)),
 	}
 }
