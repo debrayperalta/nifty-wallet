@@ -10,6 +10,7 @@ export default class RnsDelegate {
     this.networkController = props.networkController;
     this.rifConfig = props.rifConfig;
     this.rnsContractInstance = props.rnsContractInstance;
+    this.rskOwnerContractInstance = props.rskOwnerContractInstance;
     this.address = props.address;
     this.store = props.store;
     this.initialize();

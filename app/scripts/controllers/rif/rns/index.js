@@ -3,6 +3,9 @@ import RnsResolver from './resolver';
 import RnsTransfer from './transfer';
 import rifConfig from './../../../../../rif.config';
 import RNS from './abis/RNS.json';
+import RSKOwner from './abis/RSKOwner.json';
+import { keccak_256 as sha3 } from 'js-sha3';
+
 import ObservableStore from 'obs-store';
 
 /**
@@ -26,6 +29,7 @@ export default class RnsManager {
     this.address = this.preferencesController.store.getState().selectedAccount;
     this.rifConfig = rifConfig;
     this.rnsContractInstance = this.web3.eth.contract(RNS).at(this.rifConfig.rns.contracts.rns);
+    this.rskOwnerContractInstance = this.web3.eth.contract(RSKOwner).at(this.rifConfig.rns.contracts.rskOwner);
     this.store = new ObservableStore({
       register: {},
       resolver: {},
@@ -38,6 +42,7 @@ export default class RnsManager {
       networkController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
+      rskOwnerContractInstance: this.rskOwnerContractInstance,
       address: this.address,
       store: this.store,
     });
@@ -47,6 +52,7 @@ export default class RnsManager {
       networkController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
+      rskOwnerContractInstance: this.rskOwnerContractInstance,
       address: this.address,
       store: this.store,
     });
@@ -56,6 +62,7 @@ export default class RnsManager {
       networkController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
+      rskOwnerContractInstance: this.rskOwnerContractInstance,
       address: this.address,
       store: this.store,
     });
