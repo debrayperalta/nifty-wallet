@@ -22,8 +22,8 @@ export default class RnsManager {
     this.preferencesController = preferencesController;
     this.networkController = networkController;
 
-    this.preferencesController.store.subscribe(this.preferencesUpdated);
-    this.address = this.preferencesController.store.getState().selectedAccount;
+    this.preferencesController.store.subscribe(updatedPreferences => this.preferencesUpdated(updatedPreferences));
+    this.address = this.preferencesController.store.getState().selectedAddress;
     this.rifConfig = rifConfig;
     this.rnsContractInstance = this.web3.eth.contract(RNS).at(this.rifConfig.rns.contracts.rns);
     this.store = new ObservableStore({
@@ -68,9 +68,9 @@ export default class RnsManager {
    */
   preferencesUpdated (preferences) {
     // check if the account was changed and update the rns domains to show
-    if (this.address !== preferences.selectedAccount) {
+    if (this.address !== preferences.selectedAddress) {
       // update
-      this.updateAccount(preferences.selectedAccount);
+      this.updateAccount(preferences.selectedAddress);
     }
   }
 
