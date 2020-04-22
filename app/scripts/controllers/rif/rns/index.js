@@ -4,7 +4,6 @@ import RnsTransfer from './transfer';
 import rifConfig from './../../../../../rif.config';
 import RNS from './abis/RNS.json';
 import RSKOwner from './abis/RSKOwner.json';
-import { keccak_256 as sha3 } from 'js-sha3';
 
 import ObservableStore from 'obs-store';
 

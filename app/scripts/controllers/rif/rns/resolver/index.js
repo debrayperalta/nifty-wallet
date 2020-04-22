@@ -51,14 +51,18 @@ export default class RnsResolver extends RnsJsDelegate {
     });
   }
   
-  getDomainDetails(domainName, address) {
+  getDomainDetails(domainName) {
+    const domainNameResolver = domainName + ".rsk";
     return new Promise((resolve, reject) => {
-      this.checkIfSubdomainAndGetExpirationRemaining(domainName).then(remainingDays => { 
+      this.checkIfSubdomainAndGetExpirationRemaining(domainNameResolver).then(remainingDays => { 
         //Here i have the expiration in remainingDays
-        this.getOwner(domainName)
+        this.getOwner(domainNameResolver)
         .then(ownerAddress => {
-          //Here i have the owner address
-          resolve(new DomainDetails('0x0', '0xabcd', remainingDays, false, ownerAddress));
+          //Here i have the owner address in ownerAddress
+          this.getDomainAddress(domainNameResolver).then(domainAddress => {
+            //Here i have the domain address in domainAddress
+            resolve(new DomainDetails(domainAddress, '0xabcd', remainingDays, false, ownerAddress));
+          }).catch(error => reject(error));        
         }).catch(error => reject(error));        
       }).catch(error => reject(error));
     });

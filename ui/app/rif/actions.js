@@ -89,12 +89,12 @@ function getDomainDetails (domainName) {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve, reject) => {
-        background.rif.rns.resolver.getDomainDetails(domainName, "0x0000000", (error, details) => {
+        background.rif.rns.resolver.getDomainDetails(domainName, (error, details) => {
+          console.log("This are the details bringed", details)
           if (error) {
             dispatch(actions.displayWarning(error));
             return reject(error);
           }
-          console.log("DAFAK I'm HERE", details)
           dispatch(actions.hideLoadingIndication());
           return resolve(domainDescription);
         })      
