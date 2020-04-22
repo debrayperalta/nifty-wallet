@@ -8,6 +8,7 @@ export default class RnsDelegate {
     this.web3 = props.web3;
     this.preferencesController = props.preferencesController;
     this.networkController = props.networkController;
+    this.transactionController = props.transactionController;
     this.rifConfig = props.rifConfig;
     this.rnsContractInstance = props.rnsContractInstance;
     this.address = props.address;

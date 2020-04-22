@@ -16,11 +16,13 @@ export default class RnsManager {
   constructor (props) {
     const preferencesController = props.preferencesController;
     const networkController = props.networkController;
+    const transactionController = props.transactionController;
 
     this.web3 = props.web3;
 
     this.preferencesController = preferencesController;
     this.networkController = networkController;
+    this.transactionController = transactionController;
 
     this.preferencesController.store.subscribe(updatedPreferences => this.preferencesUpdated(updatedPreferences));
     this.address = this.preferencesController.store.getState().selectedAddress;
@@ -36,6 +38,7 @@ export default class RnsManager {
       web3: this.web3,
       preferencesController,
       networkController,
+      transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
       address: this.address,
@@ -45,6 +48,7 @@ export default class RnsManager {
       web3: this.web3,
       preferencesController,
       networkController,
+      transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
       address: this.address,
@@ -54,6 +58,7 @@ export default class RnsManager {
       web3: this.web3,
       preferencesController,
       networkController,
+      transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
       address: this.address,

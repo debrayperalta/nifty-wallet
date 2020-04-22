@@ -1,5 +1,7 @@
 import FIFSRegistrar from '../abis/FIFSRegistrar.json'
 import RnsJsDelegate from '../rnsjs-delegate'
+import web3Utils from 'web3-utils';
+import {generateDataHash, generateRandomSecret} from '../../utils/rns'
 
 /**
  * This is a delegate to manage all the RNS register operations.
@@ -26,10 +28,8 @@ export default class RnsRegister extends RnsJsDelegate {
    * @returns {Promise<string>} commitHash to use on the finishRegistration operation.
    */
   requestRegistration (domainName, yearsToRegister) {
-    const domainHash = this.web3.utils.sha3(domainName);
-    const randomBytes = window.crypto.getRandomValues(new Uint8Array(32));
-    const strSalt = Array.from(randomBytes).map(byte => byte.toString(16)).join('');
-    const secret = `0x${strSalt.padEnd(64, '0')}`;
+    const domainHash = web3Utils.sha3(domainName);
+    const secret = generateRandomSecret();
 
     return new Promise((resolve, reject) => {
       this.fifsContractInstance['makeCommitment']
@@ -38,25 +38,39 @@ export default class RnsRegister extends RnsJsDelegate {
             reject(error);
           }
           console.debug('Commitment: ' + commitment);
-          this.fifsContractInstance['commit'].send({
-            commitment: commitment,
-          }, (error, commitHash) => {
-            if (error) {
-              reject(error);
-            }
-            console.debug('Commitment committed, wait 1 minute before reveal');
-            console.debug(commitHash);
-            const state = this.getStoreState();
-            state.register[this.address].domainRegister = {
-              domainName,
-              secret,
-              yearsToRegister,
-            }
-            this.updateStoreState(state);
-            resolve(commitHash);
-          });
+
+          const transaction = {
+            from: this.address,
+            to: this.rifConfig.rns.contracts.registrar,
+            gas: '200000',
+            data: generateDataHash('commit(bytes32)', [commitment]),
+          };
+
+          this.transactionController.newUnapprovedTransaction(transaction);
+
+          resolve(secret);
       });
     });
+  }
+
+  /**
+   * Calculates the rif cost for a domain
+   * It uses the formula here: https://github.com/rnsdomains/rns-rskregistrar#name-price
+   * @param yearsToRegister
+   */
+  getDomainCost (yearsToRegister) {
+    if (yearsToRegister && yearsToRegister > 0) {
+      if (yearsToRegister === 1) {
+        return 2;
+      } else if (yearsToRegister === 2) {
+        return 4;
+      } else {
+        const kMember = yearsToRegister - 2;
+        return 4 + kMember;
+      }
+    } else {
+      return -1;
+    }
   }
 
   /**

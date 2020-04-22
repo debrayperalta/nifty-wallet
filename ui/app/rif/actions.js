@@ -15,6 +15,7 @@ const rifActions = {
   setBackgroundConnection,
   // RNS
   checkDomainAvailable,
+  registerDomain,
 }
 
 let background = null;
@@ -68,6 +69,22 @@ function checkDomainAvailable (domainName) {
         }
         dispatch(actions.hideLoadingIndication());
         return resolve(available);
+      });
+    })
+  }
+}
+
+function registerDomain (domainName, yearsToRegister) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      background.rif.rns.register.requestRegistration(domainName, yearsToRegister, (error, secret) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        dispatch(actions.hideLoadingIndication());
+        return resolve(secret);
       });
     })
   }
