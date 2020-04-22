@@ -96,7 +96,7 @@ function getDomainDetails (domainName) {
             return reject(error);
           }
           dispatch(actions.hideLoadingIndication());
-          return resolve(domainDescription);
+          return resolve(details);
         })      
     })
   }

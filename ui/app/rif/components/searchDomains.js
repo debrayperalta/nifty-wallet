@@ -7,23 +7,23 @@ import actions from '../../actions'
 class SearchDomains extends Component {
 	_handleKeyDown = (e) => {
 		if (e.key === 'Enter') {
-			let domain = e.target.value.toLowerCase()
+			let insertedDomain = e.target.value.toLowerCase()
 			//Theres a limitation in manager that domains with less 5 characters are blocked
-			if(e.target.value.toLowerCase().length <= 5){
+			if(insertedDomain.length <= 5){
 				this.props.displayWarning("Domains with less than 5 characters are blocked.")
 				return
 			}
 
 			let domains = JSON.parse(localStorage.rnsDomains);
-			let existDomain = domains.find(domain => domain.domain === e.target.value.toLowerCase())
+			let existDomain = domains.find(domain => domain.domain === insertedDomain)
 			if(existDomain)
 				return this.props.showDomainsDetailPage(existDomain)
 			//Checks if the domain is available, so if it is, it need to render a screen so the user can register it
-			this.props.checkDomainAvailable(e.target.value.toLowerCase()).then(domainToRegister => {
-				if(domainToRegister.length > 0)
-					this.props.showDomainRegisterPage(domainToRegister)
+			this.props.checkDomainAvailable(insertedDomain).then(domain => {
+				if(domain.length > 0)
+					this.props.showDomainRegisterPage(domain)
 				else{
-					this.props.getDomainDetails(domain).then(ret => {
+					this.props.getDomainDetails(insertedDomain).then(ret => {
 						console.log("I finished getDomainDetail", ret)
 					})
 				}

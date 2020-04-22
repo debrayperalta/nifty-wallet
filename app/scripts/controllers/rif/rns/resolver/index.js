@@ -51,24 +51,34 @@ export default class RnsResolver extends RnsJsDelegate {
     });
   }
   
+  /**
+   * Gets all details of a given domain name
+   * @param domainName the domain name to check (without resolver).
+   * @returns {Promise<boolean>} true if it can get all the details correctly, false otherwise.
+   */
   getDomainDetails(domainName) {
     const domainNameResolver = domainName + ".rsk";
     return new Promise((resolve, reject) => {
-      this.checkIfSubdomainAndGetExpirationRemaining(domainNameResolver).then(remainingDays => { 
+      this.getExpirationRemaining(domainNameResolver).then(remainingDays => { 
         //Here i have the expiration in remainingDays
         this.getOwner(domainNameResolver)
         .then(ownerAddress => {
           //Here i have the owner address in ownerAddress
           this.getDomainAddress(domainNameResolver).then(domainAddress => {
             //Here i have the domain address in domainAddress
-            resolve(new DomainDetails(domainAddress, '0xabcd', remainingDays, false, ownerAddress));
+            resolve(new DomainDetails(domainNameResolver, domainAddress, '0xabcd', remainingDays, false, ownerAddress));
           }).catch(error => reject(error));        
         }).catch(error => reject(error));        
       }).catch(error => reject(error));
     });
   }
 
-  checkIfSubdomainAndGetExpirationRemaining(domainName) {  
+  /**
+   * Gets the expiration time in days of a given domain name
+   * @param domainName the domain name to check (without resolver).
+   * @returns {Promise<boolean>} Days remaining (int), an error otherwise
+   */
+  getExpirationRemaining(domainName) {  
     return new Promise((resolve, reject) => {
       const label = domainName.split('.')[0];
       const hash = `0x${sha3(label)}`;
