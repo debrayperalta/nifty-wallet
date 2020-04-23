@@ -25,7 +25,7 @@ export default class RnsRegister extends RnsJsDelegate {
    * Make a request for registration on the domainName for an amount of years.
    * @param domainName the Domain to register.
    * @param yearsToRegister the amount of years to register.
-   * @returns {Promise<string>} commitHash to use on the finishRegistration operation.
+   * @returns {Promise<string>} secret to use on the finishRegistration operation.
    */
   requestRegistration (domainName, yearsToRegister) {
     const domainHash = web3Utils.sha3(domainName);
@@ -74,6 +74,22 @@ export default class RnsRegister extends RnsJsDelegate {
   }
 
   /**
+   * This method checks if we can invoke finishRegistration, because that has to be invoked after some time so we can
+   * check when we can invoke that method with these call.
+   * @param secret the secret obtained on the requestRegistration call.
+   * @returns {Promise<boolean>} a boolean indicating that we can reveal the commit or not.
+   */
+  canFinishRegistration (secret) {
+    return new Promise((resolve, reject) => {
+      this.call(this.fifsContractInstance, 'canReveal', [secret])
+        .then(canReveal => {
+          console.debug('Can Reveal Commit?', canReveal);
+          resolve(canReveal);
+        }).catch(error => reject(error));
+    })
+  }
+
+  /**
    * Finish the domain registration using the hash from the requestRegistration operation.
    * @param domainName the Domain to be registered.
    * @param secret the secret hash generated on the first request.
@@ -87,8 +103,10 @@ export default class RnsRegister extends RnsJsDelegate {
       domainRegister.secret === secret &&
       domainRegister.yearsToRegister === yearsToRegister &&
       domainRegister.domainName === domainName) {
+      const domainHash = web3Utils.sha3(domainName);
+      const yearsToRegisterHash = web3Utils.sha3(web3Utils.toHex(yearsToRegister));
       return new Promise((resolve, reject) => {
-        this.sendTransaction(this.fifsContractInstance, 'register', [domainName, this.address, secret, yearsToRegister])
+        this.sendTransaction(this.fifsContractInstance, 'register', [domainHash, this.address, secret, yearsToRegisterHash])
           .then(result => {
             console.debug('Domain registered!', result);
             resolve(result);
