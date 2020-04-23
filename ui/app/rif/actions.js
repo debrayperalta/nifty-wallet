@@ -16,6 +16,7 @@ const rifActions = {
   // RNS
   checkDomainAvailable,
   registerDomain,
+  finishRegistration,
 }
 
 let background = null;
@@ -86,6 +87,16 @@ function registerDomain (domainName, yearsToRegister) {
         dispatch(actions.hideLoadingIndication());
         return resolve(secret);
       });
+    })
+  }
+}
+
+function finishRegistration (domainName, yearsToRegister, secret) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      background.rif.rns.register.finishRegistration(domainName, yearsToRegister, secret);
+      resolve();
     })
   }
 }

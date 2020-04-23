@@ -30,26 +30,26 @@ export default class RnsRegister extends RnsJsDelegate {
   requestRegistration (domainName, yearsToRegister) {
     const domainHash = web3Utils.sha3(domainName);
     const secret = generateRandomSecret();
-
     return new Promise((resolve, reject) => {
-      this.fifsContractInstance['makeCommitment']
-        .call(domainHash, this.address, secret, (error, commitment) => {
-          if (error) {
-            reject(error);
-          }
-          console.debug('Commitment: ' + commitment);
-
-          const transaction = {
-            from: this.address,
-            to: this.rifConfig.rns.contracts.registrar,
-            gas: '200000',
-            data: generateDataHash('commit(bytes32)', [commitment]),
-          };
-
-          this.transactionController.newUnapprovedTransaction(transaction);
-
+      this.call(this.fifsContractInstance, 'makeCommitment', [domainHash, this.address, secret])
+        .then(commitment => {
+          console.debug('Commitment received', commitment);
+          this.sendTransaction(this.fifsContractInstance, 'commit', [commitment])
+            .then(result => {
+              console.debug('Commitment committed', result);
+              const state = this.getStoreState();
+              if (!state.register[this.address]) {
+                state.register[this.address] = {};
+              }
+              state.register[this.address].domainRegister = {
+                secret,
+                domainName,
+                yearsToRegister,
+              };
+              this.updateStoreState(state);
+            }).catch(error => reject(error));
           resolve(secret);
-      });
+        }).catch(error => reject(error));
     });
   }
 
@@ -80,7 +80,7 @@ export default class RnsRegister extends RnsJsDelegate {
    * @param yearsToRegister the amount of years to register the domain.
    * @returns {Promise<void>}
    */
-  finishRegistration (domainName, secret, yearsToRegister) {
+  finishRegistration (domainName, yearsToRegister, secret) {
     const state = this.getStoreState();
     const domainRegister = state.register[this.address].domainRegister;
     if (domainRegister &&
@@ -88,15 +88,11 @@ export default class RnsRegister extends RnsJsDelegate {
       domainRegister.yearsToRegister === yearsToRegister &&
       domainRegister.domainName === domainName) {
       return new Promise((resolve, reject) => {
-        this.fifsContractInstance['register']
-          .send(domainName, this.address, secret, yearsToRegister, (error, hash) => {
-            if (error) {
-              reject(error);
-            }
-            console.debug(hash);
-            console.debug('Domain registered!');
-            resolve();
-          });
+        this.sendTransaction(this.fifsContractInstance, 'register', [domainName, this.address, secret, yearsToRegister])
+          .then(result => {
+            console.debug('Domain registered!', result);
+            resolve(result);
+          }).catch(error => reject(error));
       });
     } else {
       return Promise.reject('Invalid Secret domain or amount of years, you need to use the same as the first request');

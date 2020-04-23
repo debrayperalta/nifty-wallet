@@ -43,4 +43,52 @@ export default class RnsDelegate {
   bindOperation (operation, member) {
     return nodeify(operation, member);
   }
+
+  /**
+   * Util method to invoke call transactions with web3
+   * @param contractInstance the contract instance to invoke
+   * @param methodName the contract method to invoke
+   * @param parameters the method parameters array
+   * @returns a Promise with the result of the transaction
+   */
+  call (contractInstance, methodName, parameters) {
+    if (contractInstance && methodName) {
+      if (contractInstance[methodName]) {
+        return new Promise((resolve, reject) => {
+          contractInstance[methodName].call(...parameters, (error, result) => {
+            if (error) {
+              reject(error);
+            }
+            resolve(result);
+          })
+        });
+      }
+      return Promise.reject('Invalid method for contract instance');
+    }
+    return Promise.reject('Contract and Method is needed');
+  }
+
+  /**
+   * Util method to invoke send transactions with web3
+   * @param contractInstance the contract instance to invoke
+   * @param methodName the contract method to invoke
+   * @param parameters the method parameters array
+   * @returns a Promise with the result of the transaction
+   */
+  sendTransaction (contractInstance, methodName, parameters) {
+    if (contractInstance && methodName) {
+      if (contractInstance[methodName]) {
+        return new Promise((resolve, reject) => {
+          contractInstance[methodName].sendTransaction(...parameters, {from: this.address}, (error, result) => {
+            if (error) {
+              reject(error);
+            }
+            resolve(result);
+          })
+        });
+      }
+      return Promise.reject('Invalid method for contract instance');
+    }
+    return Promise.reject('Contract and Method is needed');
+  }
 }
