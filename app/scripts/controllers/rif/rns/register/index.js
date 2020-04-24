@@ -68,7 +68,7 @@ export default class RnsRegister extends RnsJsDelegate {
    */
   getDomainCost (domainName, yearsToRegister) {
     const cleanDomainName = this.cleanDomainFromRskPrefix(domainName);
-    return this.call(this.fifsAddrRegistrarInstance, 'price', [domainName, 0, yearsToRegister]);
+    return this.call(this.fifsAddrRegistrarInstance, 'price', [cleanDomainName, 0, yearsToRegister]);
   }
 
   /**
