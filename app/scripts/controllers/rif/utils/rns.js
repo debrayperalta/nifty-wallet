@@ -23,3 +23,17 @@ export function generateDataHash (methodSignature, orderedParameterArray) {
   }
   return cleanMethodHash + cleanParameterHashes.join();
 }
+
+export function numberToUint32 (number) {
+  const hexDuration = web3Utils.numberToHex(number);
+  let duration = '';
+  for (let i = 0; i < 66 - hexDuration.length; i += 1) {
+    duration += '0';
+  }
+  duration += hexDuration.slice(2);
+  return duration;
+}
+
+export function utf8ToHexString (string) {
+  return string ? web3Utils.asciiToHex(string).slice(2) : '';
+}

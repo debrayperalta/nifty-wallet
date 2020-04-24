@@ -11,6 +11,7 @@ export default class RnsDelegate {
     this.transactionController = props.transactionController;
     this.rifConfig = props.rifConfig;
     this.rnsContractInstance = props.rnsContractInstance;
+    this.rifContractInstance = props.rifContractInstance;
     this.address = props.address;
     this.store = props.store;
     this.initialize();
@@ -73,13 +74,14 @@ export default class RnsDelegate {
    * @param contractInstance the contract instance to invoke
    * @param methodName the contract method to invoke
    * @param parameters the method parameters array
+   * @param gas optional, if you want to specify the gas for this transaction
    * @returns a Promise with the result of the transaction
    */
-  sendTransaction (contractInstance, methodName, parameters) {
+  send (contractInstance, methodName, parameters, transactionOptions = {from: this.address}) {
     if (contractInstance && methodName) {
       if (contractInstance[methodName]) {
         return new Promise((resolve, reject) => {
-          contractInstance[methodName].sendTransaction(...parameters, {from: this.address}, (error, result) => {
+          contractInstance[methodName].sendTransaction(...parameters, transactionOptions, (error, result) => {
             if (error) {
               reject(error);
             }
@@ -90,5 +92,15 @@ export default class RnsDelegate {
       return Promise.reject('Invalid method for contract instance');
     }
     return Promise.reject('Contract and Method is needed');
+  }
+
+  /**
+   * Returns the domain name without .rsk, this is because the top level call has for example infuy.rsk but some
+   * contracts are working only without the .rsk, we have this method to clear that.
+   * @param domainName the domain name to clear.
+   * @returns the cleared domain name
+   */
+  cleanDomainFromRskPrefix (domainName) {
+    return (domainName && domainName.indexOf('.rsk') !== -1) ? domainName.replace('.rsk', '') : domainName;
   }
 }

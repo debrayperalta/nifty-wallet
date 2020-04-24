@@ -3,6 +3,7 @@ import RnsResolver from './resolver';
 import RnsTransfer from './transfer';
 import rifConfig from './../../../../../rif.config';
 import RNS from './abis/RNS.json';
+import RIF from './abis/RIF.json';
 import ObservableStore from 'obs-store';
 
 /**
@@ -28,6 +29,7 @@ export default class RnsManager {
     this.address = this.preferencesController.store.getState().selectedAddress;
     this.rifConfig = rifConfig;
     this.rnsContractInstance = this.web3.eth.contract(RNS).at(this.rifConfig.rns.contracts.rns);
+    this.rifContractInstance = this.web3.eth.contract(RIF).at(this.rifConfig.rns.contracts.rif);
     this.store = new ObservableStore({
       register: {},
       resolver: {},
@@ -41,6 +43,7 @@ export default class RnsManager {
       transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
+      rifContractInstance: this.rifContractInstance,
       address: this.address,
       store: this.store,
     });
@@ -51,6 +54,7 @@ export default class RnsManager {
       transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
+      rifContractInstance: this.rifContractInstance,
       address: this.address,
       store: this.store,
     });
@@ -61,6 +65,7 @@ export default class RnsManager {
       transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
+      rifContractInstance: this.rifContractInstance,
       address: this.address,
       store: this.store,
     });

@@ -16,6 +16,7 @@ const rifActions = {
   // RNS
   checkDomainAvailable,
   registerDomain,
+  canFinishRegistration,
   finishRegistration,
 }
 
@@ -80,23 +81,39 @@ function registerDomain (domainName, yearsToRegister) {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve, reject) => {
       background.rif.rns.register.requestRegistration(domainName, yearsToRegister, (error, secret) => {
+        dispatch(actions.hideLoadingIndication());
         if (error) {
           dispatch(actions.displayWarning(error));
           return reject(error);
         }
-        dispatch(actions.hideLoadingIndication());
         return resolve(secret);
       });
     })
   }
 }
 
-function finishRegistration (domainName, yearsToRegister, secret) {
+function canFinishRegistration (commitmentHash) {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve, reject) => {
-      background.rif.rns.register.finishRegistration(domainName, yearsToRegister, secret);
-      resolve();
+      background.rif.rns.register.canFinishRegistration(commitmentHash, (error, result) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          return reject(error);
+        }
+        return resolve(result);
+      });
+    })
+  }
+}
+
+function finishRegistration (domainName) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve) => {
+      dispatch(actions.hideLoadingIndication());
+      background.rif.rns.register.finishRegistration(domainName);
+      return resolve();
     })
   }
 }
