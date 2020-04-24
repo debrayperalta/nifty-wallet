@@ -7,6 +7,7 @@ const rifActions = {
   SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE: 'SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE',
   SHOW_MODAL: 'SHOW_MODAL',
   HIDE_MODAL: 'HIDE_MODAL',
+  SHOW_DOMAINS_REGISTER: 'SHOW_DOMAINS_REGISTER',
   showDomainsPage,
   showDomainsDetailPage,
   showPaymentsPage,
@@ -18,6 +19,7 @@ const rifActions = {
   registerDomain,
   canFinishRegistration,
   finishRegistration,
+  showRegisterNewDomain,
 }
 
 let background = null;
@@ -115,6 +117,15 @@ function finishRegistration (domainName) {
       background.rif.rns.register.finishRegistration(domainName);
       return resolve();
     })
+  }
+}
+
+function showRegisterNewDomain (domainName) {
+  return {
+    type: rifActions.SHOW_DOMAINS_REGISTER,
+    data: {
+      domainName,
+    },
   }
 }
 
