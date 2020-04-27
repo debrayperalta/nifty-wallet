@@ -18,6 +18,7 @@ export default class RnsRegister extends RnsJsDelegate {
       requestRegistration: this.bindOperation(this.requestRegistration, this),
       finishRegistration: this.bindOperation(this.finishRegistration, this),
       canFinishRegistration: this.bindOperation(this.canFinishRegistration, this),
+      getDomainCost: this.bindOperation(this.getDomainCost, this),
       ...rnsJsApi,
     }
   }
@@ -65,6 +66,7 @@ export default class RnsRegister extends RnsJsDelegate {
    * It uses the formula here: https://github.com/rnsdomains/rns-rskregistrar#name-price
    * @param domainName the domain name to ask for
    * @param yearsToRegister the amount of years to ask
+   * @returns registration cost in RIF (wei)
    */
   getDomainCost (domainName, yearsToRegister) {
     const cleanDomainName = this.cleanDomainFromRskPrefix(domainName);

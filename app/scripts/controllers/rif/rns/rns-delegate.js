@@ -33,7 +33,11 @@ export default class RnsDelegate {
    *   doSomething: this.bindOperation(this.doSomething, this),
    * }
    */
-  buildApi () {}
+  buildApi () {
+    return {
+      getUnapprovedTransactions: this.bindOperation(this.getUnapprovedTransactions, this),
+    }
+  }
 
   /**
    * Makes the operation callback available
@@ -74,7 +78,7 @@ export default class RnsDelegate {
    * @param contractInstance the contract instance to invoke
    * @param methodName the contract method to invoke
    * @param parameters the method parameters array
-   * @param gas optional, if you want to specify the gas for this transaction
+   * @param transactionOptions optional, if you want to specify the gas for this transaction or another parameter
    * @returns a Promise with the result of the transaction
    */
   send (contractInstance, methodName, parameters, transactionOptions = {from: this.address}) {
@@ -102,5 +106,9 @@ export default class RnsDelegate {
    */
   cleanDomainFromRskPrefix (domainName) {
     return (domainName && domainName.indexOf('.rsk') !== -1) ? domainName.replace('.rsk', '') : domainName;
+  }
+
+  getUnapprovedTransactions () {
+    return Promise.resolve(this.transactionController.txStateManager.getUnapprovedTxList());
   }
 }
