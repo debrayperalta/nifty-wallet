@@ -238,69 +238,6 @@ AccountDetailScreen.prototype.render = function () {
             },
           }, ifContractAcc(currentKeyring) ? 'Execute methods' : 'Send'),
         ]),
-        // TODO: Remove this after testing
-        h('div', {
-          style: {
-            height: '100px',
-          },
-        }, [
-          h('button', {
-            style: {
-              margin: '0.2em',
-            },
-            onClick: () => {
-              const domainName = prompt('Enter Domain Name', 'jonathan.rsk');
-              this.props.dispatch(rifActions.checkDomainAvailable(domainName)).then(available => {
-                alert('Domain is available: ' + available);
-              })
-            },
-          }, 'Check'),
-          h('button', {
-            style: {
-              margin: '0.2em',
-            },
-            onClick: () => {
-              const domainName = prompt('Enter Domain Name', 'jonathan.rsk');
-              const yearsToRegister = prompt('Enter Years', '1');
-              this.props.dispatch(rifActions.requestDomainRegistration(domainName, yearsToRegister)).then(commitment => {
-                alert('Commitment: ' + commitment);
-              })
-            },
-          }, 'Request'),
-          h('button', {
-            style: {
-              margin: '0.2em',
-            },
-            onClick: () => {
-              const commitment = prompt('Enter Commitment Hash', '');
-              this.props.dispatch(rifActions.canFinishRegistration(commitment)).then(canFinish => {
-                alert('Can Finish registration?: ' + canFinish);
-              })
-            },
-          }, 'Can Confirm'),
-          h('button', {
-            style: {
-              margin: '0.2em',
-            },
-            onClick: () => {
-              const domainName = prompt('Enter Domain Name', 'jonathan.rsk');
-              this.props.dispatch(rifActions.finishRegistration(domainName));
-            },
-          }, 'Confirm'),
-        ]),
-        h('button', {
-          style: {
-            margin: '0.2em',
-          },
-          onClick: () => {
-            const domainName = prompt('Domain to search', 'newdomain.rsk');
-            return props.dispatch(rifActions.showRegisterNewDomain({
-              domainName: domainName,
-              currentStep: 'available',
-            }))
-          },
-        }, 'Register'),
-        // TODO: Remove this after testing
       ]),
 
       // subview (tx history, pk export confirm, buy eth warning)
