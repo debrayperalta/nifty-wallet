@@ -9,7 +9,7 @@ class SearchDomains extends Component {
 		if (e.key === 'Enter') {
 			let insertedDomain = e.target.value.toLowerCase()
 			//Theres a limitation in manager that domains with less 5 characters are blocked
-			if(insertedDomain.length <= 5){
+			if(insertedDomain.length < 5){
 				this.props.displayWarning("Domains with less than 5 characters are blocked.")
 				return
 			}
@@ -23,12 +23,19 @@ class SearchDomains extends Component {
 				if(domain.length > 0)
 					this.props.showDomainRegisterPage(domain)
 				else{
-					this.props.getDomainDetails(insertedDomain).then(ret => {
-						console.debug("============================================================================== I finished getDomainDetail ==============================================================================", ret)
+					this.props.getDomainDetails(insertedDomain).then(details => {
+						console.debug("Details retrieved", details)
+						return this.props.showDomainsDetailPage(details)
+					}).catch(error => {
+						console.debug("Error retrieving domain details", error)
+						this.props.displayWarning("An error happend trying to get details from domain, please try again later.")
 					})
 				}
 				//We need to put an else here, so we can redirect to details page, remember that the localstorage part of code, will not be anymore here
 				
+			}).catch(error => {
+				console.debug("Error retrieving domain details", error)
+				this.props.displayWarning("An error happend checking if domain is available, please try again later.")
 			})
 		}
 	}

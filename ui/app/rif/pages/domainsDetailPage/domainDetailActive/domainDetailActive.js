@@ -100,7 +100,7 @@ class DomainsDetailActiveScreen extends Component {
 	}
 	render () {
 		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage } = this.props
-		let networks = this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
+		let networks = !this.state.resolvers[this.state.selectedResolverIndex] ? <div></div> : this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
 			return <div key={index} className={'resolver-network-description'}>
 					<FontAwesomeIcon icon={getIconForToken(network.networkIcon).icon} color={getIconForToken(network.networkIcon).color} className={'domain-icon'}/>
 					<span>{network.networkName}</span>
@@ -129,7 +129,8 @@ class DomainsDetailActiveScreen extends Component {
                     <div><span className={'domain-description-field'}>Auto renew: <a href={this.props.setAutoRenew()}>{autoRenew ? "on" : "off"}</a></span></div>
                     <div><span className={'domain-description-field'}>Owner:</span><span className={'domain-description-value label-spacing-left'}>{ownerAddress}</span></div>
                 </div>
-                {isOwner &&
+				{console.log("RESOLVERS", this.state.resolvers)}
+                {(isOwner && this.state.resolvers) &&
                     <div id='resolversBody' className={'resolvers-body'}>
                         <div className='resolver-body-top'>
                             <div id='selectResolver' className={'custom-select'}>

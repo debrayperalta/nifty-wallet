@@ -3,6 +3,9 @@ import RnsJsDelegate from '../rnsjs-delegate';
 import web3Utils from 'web3-utils';
 import { DomainDetails } from '../classes';
 import RSKOwner from '../abis/RSKOwner.json';
+import MultiChainresolver from '../abis/MultiChainResolver.json';
+import { DOMAIN_STATUSES, EXPIRING_REMAINING_DAYS } from '../../constants';
+import { getDateFormatted } from '../../utils/dateUtils';
 
 /**
  * This is a delegate to manage all the RNS resolver operations.
@@ -10,6 +13,7 @@ import RSKOwner from '../abis/RSKOwner.json';
 export default class RnsResolver extends RnsJsDelegate {
   initialize () {
     this.rskOwnerContractInstance = this.web3.eth.contract(RSKOwner).at(this.rifConfig.rns.contracts.rskOwner);
+    this.multiChainresolverContractInstance = this.web3.eth.contract(MultiChainresolver).at(this.rifConfig.rns.contracts.multiChainResolver);
   }
 
   buildApi () {
@@ -34,7 +38,7 @@ export default class RnsResolver extends RnsJsDelegate {
             reject(error);
           }
           console.debug('Owner Address', address);
-          resolve(address);
+          resolve(web3Utils.toChecksumAddress(address));
       });
     });
   }
@@ -60,22 +64,36 @@ export default class RnsResolver extends RnsJsDelegate {
    * Gets all details of a given domain name
    * @param domainName the domain name to check (without resolver).
    * @returns {Promise<boolean>} true if it can get all the details correctly, false otherwise.
-   */
+   */  
   getDomainDetails(domainName) {
     const domainNameResolver = domainName + ".rsk";
     return new Promise((resolve, reject) => {
-      this.getExpirationRemaining(domainNameResolver).then(remainingDays => { 
-        //Here i have the expiration in remainingDays
-        this.getOwner(domainNameResolver)
-        .then(ownerAddress => {
-          //Here i have the owner address in ownerAddress
-          this.getDomainAddress(domainNameResolver).then(domainAddress => {
-            //Here i have the domain address in domainAddress
-            resolve(new DomainDetails(domainNameResolver, domainAddress, '0xabcd', remainingDays, false, ownerAddress));
-          }).catch(error => reject(error));        
-        }).catch(error => reject(error));        
-      }).catch(error => reject(error));
+      const getDomainAddress = this.getDomainAddress(domainNameResolver);
+      const content = this.getContent(domainNameResolver);
+      const expiration = this.getExpirationRemaining(domainNameResolver);
+      const getOwner = this.getOwner(domainNameResolver);
+      Promise.all([getDomainAddress, content, expiration, getOwner]).then(values => { 
+        let expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + values[2]);
+        let status = this.getStatus(values[2]);
+        resolve(new DomainDetails(domainNameResolver, values[0], values[1], getDateFormatted(expirationDate), false, values[3], status, false, false));
+      }).catch(error => {
+        reject(error);
+      });
     });
+  }
+
+ /**
+  * Returns a status for the days remaining of a domain
+  * @param {int} daysRemaining 
+  */
+  getStatus(daysRemaining){
+    let retStatus = 'active'
+    if(daysRemaining <= 0)
+      retStatus = DOMAIN_STATUSES.EXPIRED;
+    else if(daysRemaining > 0 && daysRemaining <= EXPIRING_REMAINING_DAYS)
+      retStatus = DOMAIN_STATUSES.EXPIRING;
+    return retStatus;
   }
 
   /**
@@ -85,7 +103,7 @@ export default class RnsResolver extends RnsJsDelegate {
    */
   getExpirationRemaining(domainName) {  
     return new Promise((resolve, reject) => {
-      const label = domainName.split('.')[0];
+      const label = this.cleanDomainFromRskPrefix(domainName);
       const hash = `0x${web3Utils.sha3(label)}`;
       this.rskOwnerContractInstance.expirationTime(hash, (error, result) => {
         if (error) {
@@ -105,6 +123,19 @@ export default class RnsResolver extends RnsJsDelegate {
           resolve(remainingDays);
         });
       });
+    });
+  };
+
+  getContent(domainName) {  
+    return new Promise((resolve, reject) => {
+      const label = domainName.split('.')[0];
+      this.multiChainresolverContractInstance.content(label, (error, result) => {
+        if (error) {
+          console.debug("Error when trying to get content of domain", error);
+          reject(error);
+        }
+        resolve(result);
+        });
     });
   };
 }

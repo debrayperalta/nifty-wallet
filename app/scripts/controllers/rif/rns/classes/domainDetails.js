@@ -1,22 +1,29 @@
 /**
  * This class is used to retrieve data from the contracts 
- * @attribute domainName: Domain address with resolver (Ex: jhondoe.rsk)
+ * @attribute domain: Domain address with resolver (Ex: jhondoe.rsk)
  * @attribute address: Address of domain in hex checksummed (Ex: 0x1234567912345)
  * @attribute content: Content of domain
- * @attribute expiration: Expiration time in days (Number, ex: 365)
+ * @attribute expiration: Expiration date (Date, ex: 01/01/2020)
  * @attribute autoRenew: Boolean, if the domain has the autoRenew option setted
- * @attribute owner: Address of the domain owner checksummed (Ex: 0x1234567912345)
+ * @attribute ownerAddress: Address of the domain owner checksummed (Ex: 0x1234567912345)
+ * @attribute status: Status of the domain (ENUM: {'active', 'pending', 'expired', 'expiring'})
+ * @attribute isLuminoNode: If the domain has a lumino node asociated
+ * @attribute isRifStorage: If the domain has a rif storage asociated
  */
 /**Dev comment
  * Use proptypes to validate this values, or some solution so it will always be the same format
  */
 export default class DomainDetails {
-    constructor(domainName, address, content, expiration, autoRenew, owner) {
-        this.domainName = domainName;
+    constructor(domain, address, content, expiration, autoRenew, ownerAddress, status, isLuminoNode, isRifStorage) {
+        this.domain = domain;
         this.address = address;
         this.content = content;
         this.expiration = expiration;
         this.autoRenew = autoRenew;
-        this.owner = owner;
+        this.ownerAddress = ownerAddress;
+        this.status = status;
+        this.isLuminoNode = isLuminoNode;
+        this.isRifStorage = isRifStorage;
+        this.resolvers = []
     }
 }
