@@ -18,6 +18,9 @@ const rifActions = {
   // RNS
   checkDomainAvailable,
   getDomainDetails,
+  registerDomain,
+  canFinishRegistration,
+  finishRegistration,
 }
 
 let background = null;
@@ -90,7 +93,7 @@ function getDomainDetails (domainName) {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve, reject) => {
         background.rif.rns.resolver.getDomainDetails(domainName, (error, details) => {
-          console.log("This are the details bringed", details)
+          console.debug("This are the details bringed", details)
           if (error) {
             dispatch(actions.displayWarning(error));
             return reject(error);
@@ -98,6 +101,48 @@ function getDomainDetails (domainName) {
           dispatch(actions.hideLoadingIndication());
           return resolve(details);
         })      
+    })
+  }
+}
+
+function registerDomain (domainName, yearsToRegister) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      background.rif.rns.register.requestRegistration(domainName, yearsToRegister, (error, secret) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(secret);
+      });
+    })
+  }
+}
+
+function canFinishRegistration (commitmentHash) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      background.rif.rns.register.canFinishRegistration(commitmentHash, (error, result) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          return reject(error);
+        }
+        return resolve(result);
+      });
+    })
+  }
+}
+
+function finishRegistration (domainName) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve) => {
+      dispatch(actions.hideLoadingIndication());
+      background.rif.rns.register.finishRegistration(domainName);
+      return resolve();
     })
   }
 }

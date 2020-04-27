@@ -1,12 +1,17 @@
 import * as namehash from 'eth-ens-namehash';
 import RnsJsDelegate from '../rnsjs-delegate';
-import { keccak_256 as sha3 } from 'js-sha3';
-import { DomainDetails } from '../classes'
+import web3Utils from 'web3-utils';
+import { DomainDetails } from '../classes';
+import RSKOwner from '../abis/RSKOwner.json';
 
 /**
  * This is a delegate to manage all the RNS resolver operations.
  */
 export default class RnsResolver extends RnsJsDelegate {
+  initialize () {
+    this.rskOwnerContractInstance = this.web3.eth.contract(RSKOwner).at(this.rifConfig.rns.contracts.rskOwner);
+  }
+
   buildApi () {
     const rnsJsApi = super.buildApi();
     return {
@@ -81,7 +86,7 @@ export default class RnsResolver extends RnsJsDelegate {
   getExpirationRemaining(domainName) {  
     return new Promise((resolve, reject) => {
       const label = domainName.split('.')[0];
-      const hash = `0x${sha3(label)}`;
+      const hash = `0x${web3Utils.sha3(label)}`;
       this.rskOwnerContractInstance.expirationTime(hash, (error, result) => {
         if (error) {
           console.debug("Error when trying to invoke expirationTime", error);

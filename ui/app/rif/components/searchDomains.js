@@ -24,7 +24,7 @@ class SearchDomains extends Component {
 					this.props.showDomainRegisterPage(domain)
 				else{
 					this.props.getDomainDetails(insertedDomain).then(ret => {
-						console.log("I finished getDomainDetail", ret)
+						console.debug("============================================================================== I finished getDomainDetail ==============================================================================", ret)
 					})
 				}
 				//We need to put an else here, so we can redirect to details page, remember that the localstorage part of code, will not be anymore here

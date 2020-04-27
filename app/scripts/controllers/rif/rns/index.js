@@ -3,8 +3,8 @@ import RnsResolver from './resolver';
 import RnsTransfer from './transfer';
 import rifConfig from './../../../../../rif.config';
 import RNS from './abis/RNS.json';
-import RSKOwner from './abis/RSKOwner.json';
 
+import RIF from './abis/RIF.json';
 import ObservableStore from 'obs-store';
 
 /**
@@ -18,17 +18,19 @@ export default class RnsManager {
   constructor (props) {
     const preferencesController = props.preferencesController;
     const networkController = props.networkController;
+    const transactionController = props.transactionController;
 
     this.web3 = props.web3;
 
     this.preferencesController = preferencesController;
     this.networkController = networkController;
+    this.transactionController = transactionController;
 
-    this.preferencesController.store.subscribe(this.preferencesUpdated);
-    this.address = this.preferencesController.store.getState().selectedAccount;
+    this.preferencesController.store.subscribe(updatedPreferences => this.preferencesUpdated(updatedPreferences));
+    this.address = this.preferencesController.store.getState().selectedAddress;
     this.rifConfig = rifConfig;
     this.rnsContractInstance = this.web3.eth.contract(RNS).at(this.rifConfig.rns.contracts.rns);
-    this.rskOwnerContractInstance = this.web3.eth.contract(RSKOwner).at(this.rifConfig.rns.contracts.rskOwner);
+    this.rifContractInstance = this.web3.eth.contract(RIF).at(this.rifConfig.rns.contracts.rif);
     this.store = new ObservableStore({
       register: {},
       resolver: {},
@@ -39,9 +41,10 @@ export default class RnsManager {
       web3: this.web3,
       preferencesController,
       networkController,
+      transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
-      rskOwnerContractInstance: this.rskOwnerContractInstance,
+      rifContractInstance: this.rifContractInstance,
       address: this.address,
       store: this.store,
     });
@@ -49,9 +52,10 @@ export default class RnsManager {
       web3: this.web3,
       preferencesController,
       networkController,
+      transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
-      rskOwnerContractInstance: this.rskOwnerContractInstance,
+      rifContractInstance: this.rifContractInstance,
       address: this.address,
       store: this.store,
     });
@@ -59,9 +63,10 @@ export default class RnsManager {
       web3: this.web3,
       preferencesController,
       networkController,
+      transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
-      rskOwnerContractInstance: this.rskOwnerContractInstance,
+      rifContractInstance: this.rifContractInstance,
       address: this.address,
       store: this.store,
     });
@@ -74,9 +79,9 @@ export default class RnsManager {
    */
   preferencesUpdated (preferences) {
     // check if the account was changed and update the rns domains to show
-    if (this.address !== preferences.selectedAccount) {
+    if (this.address !== preferences.selectedAddress) {
       // update
-      this.updateAccount(preferences.selectedAccount);
+      this.updateAccount(preferences.selectedAddress);
     }
   }
 

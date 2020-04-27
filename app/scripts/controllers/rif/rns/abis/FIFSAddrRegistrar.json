@@ -20,6 +20,16 @@
         "internalType": "contract AbstractNamePrice",
         "name": "_namePrice",
         "type": "address"
+      },
+      {
+        "internalType": "contract AbstractRNS",
+        "name": "_rns",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "_rootNode",
+        "type": "bytes32"
       }
     ],
     "payable": false,
@@ -322,6 +332,11 @@
         "internalType": "uint256",
         "name": "duration",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
       }
     ],
     "name": "register",

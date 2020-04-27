@@ -23,6 +23,10 @@ export default class RifController {
       throw new Error('NetworkController has to be present');
     }
 
+    if (!props.transactionController) {
+      throw new Error('TransactionController has to be present');
+    }
+
     if (!props.metamaskStore) {
       throw new Error('MetaMask store has to be present');
     }
@@ -35,11 +39,13 @@ export default class RifController {
     this.memoryStore = props.memoryStore;
     this.preferencesController = props.preferencesController;
     this.networkController = props.networkController;
+    this.transactionController = props.transactionController;
     this.web3 = new Web3(this.networkController._provider);
 
     this.rnsManager = new RnsManager({
       preferencesController: this.preferencesController,
       networkController: this.networkController,
+      transactionController: this.transactionController,
       web3: this.web3,
     });
 
