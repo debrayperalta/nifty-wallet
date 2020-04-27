@@ -105,11 +105,7 @@ export default class RnsResolver extends RnsJsDelegate {
     return new Promise((resolve, reject) => {
       const label = this.cleanDomainFromRskPrefix(domainName);
       const hash = `0x${web3Utils.sha3(label)}`;
-      this.rskOwnerContractInstance.expirationTime(hash, (error, result) => {
-        if (error) {
-          console.debug("Error when trying to invoke expirationTime", error);
-          reject(error);
-        }
+      this.call(this.rskOwnerContractInstance, 'expirationTime', [hash]).then(result => {
         const expirationTime = result;
         this.web3.eth.getBlock('latest', (timeError, currentBlock) => {
           if (timeError) {
@@ -122,6 +118,9 @@ export default class RnsResolver extends RnsJsDelegate {
           console.debug("Remaining time of domain", remainingDays);
           resolve(remainingDays);
         });
+      }).catch(error => {
+        console.debug("Error when trying to invoke expirationTime", error);
+        reject(error);
       });
     });
   };
@@ -129,13 +128,12 @@ export default class RnsResolver extends RnsJsDelegate {
   getContent(domainName) {  
     return new Promise((resolve, reject) => {
       const label = domainName.split('.')[0];
-      this.multiChainresolverContractInstance.content(label, (error, result) => {
-        if (error) {
-          console.debug("Error when trying to get content of domain", error);
-          reject(error);
-        }
+      this.call(this.multiChainresolverContractInstance, 'content', [label]).then(result => {
         resolve(result);
-        });
+      }).catch(error => {
+        console.debug("Error when trying to get content of domain", error);
+        reject(error);
+      });
     });
   };
 }
