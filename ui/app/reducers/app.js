@@ -237,7 +237,7 @@ function reduceApp (state, action) {
         warning: null,
       })
 
-    case rifActions.SHOW_DOMAINS_REGISTER:
+    case rifActions.SHOW_DOMAIN_REGISTER_PAGE:
       return extend(appState, {
         currentView: {
           name: 'domainRegister',

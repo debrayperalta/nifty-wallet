@@ -8,7 +8,6 @@ const rifActions = {
   SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE: 'SHOW_ADD_NEW_MULTICRYPTO_ADDRESS_PAGE',
   SHOW_MODAL: 'SHOW_MODAL',
   HIDE_MODAL: 'HIDE_MODAL',
-  SHOW_DOMAINS_REGISTER: 'SHOW_DOMAINS_REGISTER',
   showDomainsPage,
   showDomainsDetailPage,
   showDomainRegisterPage,
@@ -21,10 +20,10 @@ const rifActions = {
   requestDomainRegistration,
   canFinishRegistration,
   finishRegistration,
-  showRegisterNewDomain,
   getRegistrationCost,
   getUnapprovedTransactions,
   waitUntil,
+  getSelectedAddress,
 }
 
 let background = null;
@@ -44,15 +43,6 @@ function showDomainsDetailPage (data) {
     type: rifActions.SHOW_DOMAINS_DETAIL_PAGE,
     value: {
       value: data,
-    },
-  }
-}
-
-function showDomainRegisterPage (domainName) {
-  return {
-    type: rifActions.SHOW_DOMAIN_REGISTER_PAGE,
-    value: {
-      domainName: domainName,
     },
   }
 }
@@ -149,9 +139,15 @@ function getRegistrationCost (domainName, yearsToRegister) {
   };
 }
 
-function showRegisterNewDomain (data) {
+function showDomainRegisterPage (data) {
+  if (data && !data.domainName) {
+    data = {
+      domainName: data,
+      currentStep: 'available',
+    }
+  }
   return {
-    type: rifActions.SHOW_DOMAINS_REGISTER,
+    type: rifActions.SHOW_DOMAIN_REGISTER_PAGE,
     data: data,
   }
 }
@@ -166,6 +162,21 @@ function getUnapprovedTransactions () {
           return reject(error);
         }
         return resolve(transactions);
+      });
+    });
+  };
+}
+
+function getSelectedAddress () {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      background.rif.rns.register.getSelectedAddress((error, selectedAddress) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          return reject(error);
+        }
+        return resolve(selectedAddress);
       });
     });
   };

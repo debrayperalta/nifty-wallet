@@ -92,11 +92,10 @@ export default class RnsRegister extends RnsJsDelegate {
   /**
    * Finish the domain registration using the data stored with the domainName key on the requestRegistration operation.
    * @param domainName the Domain to be registered.
-   * @param domainRegistrationSuccessCallback this is a callback for the contract when it's successfully registered, this
    * is used to do something after the user submits the operation and the domain it's registered
    * @returns {Promise<void>}
    */
-  finishRegistration (domainName, domainRegistrationSuccessCallback) {
+  finishRegistration (domainName) {
     const cleanDomainName = this.cleanDomainFromRskPrefix(domainName);
     const state = this.getStoreState();
     const registerByAddress = state.register[this.address];

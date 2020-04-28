@@ -1,4 +1,4 @@
-//import icons for each token
+// import icons for each token
 import { faBitcoin, faEthereum } from '@fortawesome/free-brands-svg-icons'
 import { faCoins, faCheckCircle, faBolt, faArchive } from '@fortawesome/free-solid-svg-icons'
 /**
@@ -36,4 +36,9 @@ export const luminoNodeIconProps = {
 export const rifStorageIconProps = {
     color: '#AD3232',
     icon: faArchive,
+}
+
+export const registrationTimeouts = {
+  registering: 4,
+  registerConfirmation: 6,
 }

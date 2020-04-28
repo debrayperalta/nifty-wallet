@@ -36,7 +36,16 @@ export default class RnsDelegate {
   buildApi () {
     return {
       getUnapprovedTransactions: this.bindOperation(this.getUnapprovedTransactions, this),
+      getSelectedAddress: this.bindOperation(this.getSelectedAddress, this),
     }
+  }
+
+  /**
+   * Method to get the selected address to expose it to the ui.
+   * @returns selected address
+   */
+  getSelectedAddress () {
+    return Promise.resolve(this.address);
   }
 
   /**
