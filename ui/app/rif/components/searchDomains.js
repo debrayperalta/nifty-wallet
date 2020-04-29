@@ -23,13 +23,13 @@ class SearchDomains extends Component {
 				if(domain.length > 0)
 					this.props.showDomainRegisterPage(domain)
 				//We need to put an else here, so we can redirect to details page, remember that the localstorage part of code, will not be anymore here
-				
+
 			})
 		}
 	}
 	render () {
 		return (
-			<input 
+			<input
 				placeholder="Search for domains"
 				className={'search-bar'}
 				onKeyDown={this._handleKeyDown}
@@ -50,8 +50,8 @@ SearchDomains.propTypes = {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		showDomainsDetailPage: (data) => dispatch(rifActions.showDomainsDetailPage(data)),
-		showDomainRegisterPage: (domainName) => dispatch(rifActions.showDomainRegisterPage(domainName)),
+		showDomainsDetailPage: (data) => dispatch(rifActions.navigateTo('domainsDetail', data)),
+		showDomainRegisterPage: (domainName) => dispatch(rifActions.navigateTo('domainRegister', domainName)),
 		checkDomainAvailable: (domainName) => dispatch(rifActions.checkDomainAvailable(domainName)),
 		displayWarning: (message) => dispatch(actions.displayWarning(message)),
 	}

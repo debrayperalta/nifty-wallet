@@ -1,0 +1,39 @@
+.rns-menu {
+  position: absolute;
+  bottom: 1em;
+  right: 1.5em;
+  font-size: 2em;
+  color: #548CDC;
+  cursor: pointer;
+}
+.rns-menu-icon {
+  width: 0.6em;
+}
+.rns-menu-opened {
+  position: absolute;
+  width: 120pt;
+  font-size: 0.5em;
+  color: #5B5D67;
+  border-radius: 0.5em;
+  padding: 1em;
+  right: 1em;
+  bottom: 2em;
+  background: white;
+  box-shadow: 0.1em 0.1em 0.3em #9b9b9b;
+  cursor: auto;
+}
+
+.rns-menu-opened>ul>li {
+  border-bottom: solid 1px #5B5D67;
+  margin-top: 0.3em;
+  color: #1b243d;
+}
+
+.rns-menu-opened>ul>li:last-child {
+  border-bottom: none;
+}
+
+.rns-menu-opened>ul>li:hover {
+  font-weight: bold;
+  cursor: pointer;
+}
