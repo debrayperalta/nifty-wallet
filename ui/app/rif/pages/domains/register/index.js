@@ -34,9 +34,9 @@ class DomainRegisterScreen extends Component {
     getSelectedAddress: PropTypes.func,
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     if (!this.props.selectedAddress) {
-      const address = this.props.getSelectedAddress();
+      const address = await this.props.getSelectedAddress();
       this.props.showThis({
         ...this.props,
         selectedAddress: address,
@@ -351,6 +351,7 @@ function mapStateToProps (state) {
     commitment: state.appState.currentView.data.commitment,
     registeringProgress: state.appState.currentView.data.registeringProgress,
     waitingForConfirmation: state.appState.currentView.data.waitingForConfirmation,
+    selectedAddress: state.appState.currentView.data.selectedAddress,
   }
 }
 
