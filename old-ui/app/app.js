@@ -98,7 +98,7 @@ function mapStateToProps (state) {
     frequentRpcList: state.metamask.frequentRpcList || [],
     featureFlags,
     suggestedTokens: state.metamask.suggestedTokens,
-    modalMessage: state.appState.modalMessage,
+    currentModal: state.appState.currentModal,
 
     // state needed to get account dropdown temporarily rendering from app bar
     identities,

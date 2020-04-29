@@ -22,27 +22,27 @@ class Menu extends Component {
       },
       {
         label: 'Renew Domain',
-        action: () => alert('Renew Domain'),
+        action: () => this.props.navigateTo('renew'),
       },
       {
         label: 'Pay',
-        action: () => alert('Pay'),
+        action: () => this.props.navigateTo('pay'),
       },
       {
         label: 'Sell it on MKP',
-        action: () => alert('Sell it on MKP'),
+        action: () => this.props.navigateTo('sell-on-mkp'),
       },
       {
         label: 'Exchange Domain',
-        action: () => alert('Exchange Domain'),
+        action: () => this.props.navigateTo('exchange'),
       },
       {
         label: 'Transfer',
-        action: () => alert('Transfer'),
+        action: () => this.props.navigateTo('transfer'),
       },
       {
         label: 'Lumino Channels',
-        action: () => alert('Lumino Channels'),
+        action: () => this.props.navigateTo('lumino-channels'),
       },
     ];
   }
@@ -117,7 +117,10 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     showThis: (data) => dispatch(rifActions.showMenu(data)),
-    navigateTo: (screenName, params) => dispatch(rifActions.navigateTo(screenName, params)),
+    navigateTo: (screenName, params) => {
+      dispatch(rifActions.navigateTo(screenName, params));
+      dispatch(rifActions.hideMenu());
+    },
   }
 }
 module.exports = connect(mapStateToProps, mapDispatchToProps)(Menu)

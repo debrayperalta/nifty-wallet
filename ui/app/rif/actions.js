@@ -11,6 +11,7 @@ const rifActions = {
   canFinishRegistration,
   finishRegistration,
   showMenu,
+  hideMenu,
   navigateTo,
   showModal,
   hideModal,
@@ -94,6 +95,13 @@ function finishRegistration (domainName) {
       background.rif.rns.register.finishRegistration(domainName);
       return resolve();
     })
+  }
+}
+
+function hideMenu () {
+  return {
+    type: rifActions.SHOW_MENU,
+    data: null,
   }
 }
 

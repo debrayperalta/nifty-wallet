@@ -1,22 +1,36 @@
 import extend from 'xtend'
 
 function showModal (appState, action) {
-  return extend(appState, {
-    currentModal: {
-      name: action.data.name,
-      message: action.data.message,
-    },
-    transForward: false,
-    warning: null,
-  })
+  if (action.currentModal) {
+    return extend(appState, {
+      currentModal: {
+        name: action.currentModal.name,
+        message: action.currentModal.message,
+      },
+      transForward: false,
+      warning: null,
+    });
+  } else {
+    return extend(appState, {
+      currentModal: null,
+      transForward: false,
+      warning: null,
+    });
+  }
 }
 
 function showMenu (appState, action) {
-  return extend(appState, {
-    currentMenu: {
-      data: action.data,
-    },
-  });
+  if (action.data) {
+    return extend(appState, {
+      currentMenu: {
+        data: action.data,
+      },
+    });
+  } else {
+    return extend(appState, {
+      currentMenu: null,
+    });
+  }
 }
 
 function navigateTo (appState, action) {
