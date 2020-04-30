@@ -67,6 +67,9 @@ const mapDispatchToProps = dispatch => {
     showDomainsDetailPage: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, data)),
     showDomainRegisterPage: (domainName) => dispatch(rifActions.navigateTo(pageNames.rns.domainRegister, {
       domainName,
+      navBar: {
+        title: 'Domain Register',
+      },
     })),
     checkDomainAvailable: (domainName) => dispatch(rifActions.checkDomainAvailable(domainName)),
     displayWarning: (message) => dispatch(actions.displayWarning(message)),

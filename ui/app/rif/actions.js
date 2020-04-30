@@ -1,5 +1,7 @@
 const actions = require('../actions');
 
+import extend from 'xtend'
+
 const rifActions = {
   SHOW_MODAL: 'SHOW_MODAL',
   SHOW_MENU: 'SHOW_MENU',
@@ -17,11 +19,14 @@ const rifActions = {
   showMenu,
   hideMenu,
   navigateTo,
+  navigateBack,
   showModal,
   hideModal,
 }
 
 let background = null;
+const navigationStack = [];
+let backNavigated = false;
 
 function setBackgroundConnection (backgroundConnection) {
   background = backgroundConnection;
@@ -117,19 +122,6 @@ function getRegistrationCost (domainName, yearsToRegister) {
   };
 }
 
-function showDomainRegisterPage (data) {
-  if (data && !data.domainName) {
-    data = {
-      domainName: data,
-      currentStep: 'available',
-    }
-  }
-  return {
-    type: rifActions.SHOW_DOMAIN_REGISTER_PAGE,
-    data: data,
-  }
-}
-
 function getUnapprovedTransactions () {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())
@@ -193,14 +185,44 @@ function showMenu (data) {
   }
 }
 
+function navigateBack () {
+  if (navigationStack && navigationStack.length > 0) {
+    // we cleanup the last navigation since it was to the current page
+    if (!backNavigated) {
+      navigationStack.pop();
+      backNavigated = true;
+    }
+    if (navigationStack.length > 0) {
+      return navigationStack.pop();
+    }
+  }
+  // go to home since we don't have any other page to go to.
+  return actions.goHome();
+}
+
 function navigateTo (screenName, params) {
-  return {
+  const defaultParams = {
+    showDomainsSearch: true,
+  };
+
+  const defaultNavBarParams = {
+    showTitle: true,
+    showBack: true,
+  };
+
+  params = extend(defaultParams, params);
+  params.navBar = extend(defaultNavBarParams, params.navBar);
+
+  const currentNavigation = {
     type: rifActions.NAVIGATE_TO,
     data: {
       screenName,
       params,
     },
   }
+  navigationStack.push(currentNavigation);
+  backNavigated = false;
+  return currentNavigation;
 }
 
 module.exports = rifActions

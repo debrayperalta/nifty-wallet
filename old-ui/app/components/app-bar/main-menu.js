@@ -90,8 +90,20 @@ const mapDispatchToProps = dispatch => {
     showConfigPage: () => dispatch(actions.showConfigPage()),
     lockMetamask: () => dispatch(actions.lockMetamask()),
     showInfoPage: () => dispatch(actions.showInfoPage()),
-    showDomainsPage: () => dispatch(rifActions.navigateTo(pageNames.rns.domains)),
-    showPaymentsPage: () => dispatch(rifActions.navigateTo(pageNames.rns.payments)),
+    showDomainsPage: () => dispatch(rifActions.navigateTo(
+      pageNames.rns.domains,
+      {
+        navBar: {
+          showTitle: false,
+        },
+      })),
+    showPaymentsPage: () => dispatch(rifActions.navigateTo(
+      pageNames.rns.payments,
+      {
+        navBar: {
+          title: 'Payments',
+        },
+      })),
   }
 }
 

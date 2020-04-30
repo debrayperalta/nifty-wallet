@@ -49,10 +49,16 @@ class ErrorComponent extends Component {
 	}
 }
 
+function mapStateToProps (state) {
+  return {
+    error: state.appState.warning,
+  }
+}
+
 function mapDispatchToProps (dispatch) {
 	return {
 		hideWarning: () => dispatch(actions.hideWarning()),
 	}
 }
 
-module.exports = connect(null, mapDispatchToProps)(ErrorComponent)
+module.exports = connect(mapStateToProps, mapDispatchToProps)(ErrorComponent)

@@ -19,31 +19,31 @@ class Menu extends Component {
     return [
       {
         label: 'Subdomains',
-        action: () => this.props.navigateTo(pageNames.rns.subdomains),
+        action: () => this.props.navigateTo(pageNames.rns.subdomains, 'Subdomains'),
       },
       {
         label: 'Renew Domain',
-        action: () => this.props.navigateTo(pageNames.rns.renew),
+        action: () => this.props.navigateTo(pageNames.rns.renew, 'Renew Domain'),
       },
       {
         label: 'Pay',
-        action: () => this.props.navigateTo(pageNames.rns.pay),
+        action: () => this.props.navigateTo(pageNames.rns.pay, 'Pay'),
       },
       {
         label: 'Sell it on MKP',
-        action: () => this.props.navigateTo(pageNames.rns.sellOnMKP),
+        action: () => this.props.navigateTo(pageNames.rns.sellOnMKP, 'Sell it on Marketplace'),
       },
       {
         label: 'Exchange Domain',
-        action: () => this.props.navigateTo(pageNames.rns.exchange),
+        action: () => this.props.navigateTo(pageNames.rns.exchange, 'Exchange Domain'),
       },
       {
         label: 'Transfer',
-        action: () => this.props.navigateTo(pageNames.rns.transfer),
+        action: () => this.props.navigateTo(pageNames.rns.transfer, 'Transfer Domain'),
       },
       {
         label: 'Lumino Channels',
-        action: () => this.props.navigateTo(pageNames.rns.luminoChannels),
+        action: () => this.props.navigateTo(pageNames.rns.luminoChannels, 'Lumino Channels'),
       },
     ];
   }
@@ -118,8 +118,15 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     showThis: (data) => dispatch(rifActions.showMenu(data)),
-    navigateTo: (screenName, params) => {
-      dispatch(rifActions.navigateTo(screenName, params));
+    navigateTo: (screenName, title, params) => {
+      dispatch(rifActions.navigateTo(screenName, {
+        ...params,
+        showDomainsSearch: true,
+        navBar: {
+          title,
+          backAction: () => dispatch(rifActions.navigateBack()),
+        },
+      }));
       dispatch(rifActions.hideMenu());
     },
   }
