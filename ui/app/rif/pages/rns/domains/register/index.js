@@ -1,12 +1,12 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
-import rifActions from '../../../actions'
-import niftyActions from '../../../../actions'
+import rifActions from '../../../../actions'
+import niftyActions from '../../../../../actions'
 import {faChevronLeft} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {SearchDomains} from '../../../components'
-import {registrationTimeouts} from '../../../constants/index';
+import {SearchDomains} from '../../../../components'
+import {registrationTimeouts} from '../../../../constants';
 
 class DomainRegisterScreen extends Component {
 
@@ -193,7 +193,7 @@ class DomainRegisterScreen extends Component {
       register: (
         <div className="domainRegisterInitiate">
           <div>
-            You are going to renew {this.props.domainName}
+            You are going to register <span className="bold">{this.props.domainName}</span>
           </div>
           <div>
             <span>Number of years:</span>
@@ -224,7 +224,9 @@ class DomainRegisterScreen extends Component {
                 <div className="seconds"/>
               </div>
             </article>
-            Waiting for the final step
+            <p>
+              Waiting for confirmation. You need to wait while we secure your domain, then you need to confirm the registration at the final step
+            </p>
             {waitingForConfirmation ? (<progress/>) : (<progress max="120" value={this.props.registeringProgress}/>)}
           </div>
         </div>
@@ -241,7 +243,7 @@ class DomainRegisterScreen extends Component {
             <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
           </svg>
           <div>
-            We are ready!!!
+            We are ready!
           </div>
         </div>
       ),

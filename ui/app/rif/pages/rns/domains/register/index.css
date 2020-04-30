@@ -97,10 +97,15 @@
   display: flex;
   align-items: center;
   flex-flow: column;
+}
+
+.domainRegisterProgress>div>p {
   text-transform: uppercase;
   color: #00a344;
-  font-size: 0.9em;
+  font-size: 0.7em;
   font-weight: bold;
+  text-align: center;
+  padding: 0 3em 0 3em;
 }
 
 .domainRegisterProgress>div>progress[value] {
