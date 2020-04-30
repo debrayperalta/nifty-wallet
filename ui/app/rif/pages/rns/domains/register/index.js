@@ -135,11 +135,7 @@ class DomainRegisterScreen extends Component {
           afterApproval: {
             action: (payload) => {
               if (callback) {
-                if (payload) {
                   callback(payload);
-                } else {
-                  callback();
-                }
               }
             },
             payload: payload,
