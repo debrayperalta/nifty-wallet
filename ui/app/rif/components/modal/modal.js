@@ -1,8 +1,8 @@
-import React, {Component} from 'react'
-import {connect} from 'react-redux'
-import Modal from 'react-modal'
-import PropTypes from 'prop-types'
-import rifActions from '../../actions'
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import Modal from 'react-modal';
+import PropTypes from 'prop-types';
+import rifActions from '../../actions';
 
 class CustomModal extends Component {
 
@@ -17,27 +17,27 @@ class CustomModal extends Component {
   }
 
   closeModal () {
-    this.props.dispatch(rifActions.hideModal())
+    this.props.dispatch(rifActions.hideModal());
   }
 
   cancel () {
-    this.props.message.cancelCallback()
-    this.closeModal()
+    this.props.message.cancelCallback();
+    this.closeModal();
   }
 
   confirm () {
-    this.props.message.confirmCallback()
-    this.closeModal()
+    this.props.message.confirmCallback();
+    this.closeModal();
   }
 
   render () {
-    let body = null
-    if (this.props.message.body.text)
-        body = (<p>{this.props.message.body.text}</p>)
-    else if (this.props.message.body.elements){
-      body = []
+    let body = null;
+    if (this.props.message.body.text) {
+      body = (<p>{this.props.message.body.text}</p>);
+    } else if (this.props.message.body.elements) {
+      body = [];
       this.props.message.body.elements.map((element, index) => {
-        body.push(<div key={index}>{element}</div>)
+        body.push(<div key={index}>{element}</div>);
       });
     }
     return (

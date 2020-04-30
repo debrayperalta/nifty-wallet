@@ -6,6 +6,7 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import DomainsDetailActiveScreen from './domainDetailActive/domainDetailActive'
 import { SearchDomains } from '../../components'
 import rifActions from '../../actions'
+import {pageNames} from '../index'
 
 class DomainsDetailScreen extends Component {
 	static propTypes = {
@@ -18,10 +19,10 @@ class DomainsDetailScreen extends Component {
 		<div className={'body'}>
 			<FontAwesomeIcon icon={faChevronLeft} className={'rif-back-button'} onClick={() => this.props.goBack()}/>
 			<SearchDomains />
-			{status === 'active' && 
+			{status === 'active' &&
 				<DomainsDetailActiveScreen />
 			}
-			{status !== 'active' && 
+			{status !== 'active' &&
 				<div>
 					Domain detail page still in progress for this status!
 				</div>
@@ -32,15 +33,15 @@ class DomainsDetailScreen extends Component {
 }
 
 function mapStateToProps (state) {
-  	return {
+  return {
 		dispatch: state.dispatch,
-		status: state.appState.currentView.data.value.status,
+		status: state.appState.currentView.params.status,
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
-		goBack: () => dispatch(rifActions.showDomainsPage()),
+		goBack: () => dispatch(rifActions.navigateTo(pageNames.rns.domains)),
 	}
 }
 

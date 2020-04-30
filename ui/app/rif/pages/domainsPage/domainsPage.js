@@ -7,6 +7,7 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import actions from '../../../actions'
 import rifActions from '../../actions'
 import { mockDomains } from '../../test/mocks'
+import {pageNames} from '../index'
 
 function statusStyle(status){
 	switch(status){
@@ -32,10 +33,10 @@ class DomainsScreen extends Component {
 			localStorage.setItem('rnsDomains', JSON.stringify(mockDomains))
 		if(localStorage.rnsDomains){
 			let domains = JSON.parse(localStorage.rnsDomains);
-			this.state = { 
+			this.state = {
 				domains: domains,
 			}
-		}	
+		}
 	}
 	navigateTo (url) {
 		global.platform.openWindow({ url })
@@ -47,7 +48,7 @@ class DomainsScreen extends Component {
 				<div onClick={() => {this.props.showDomainsDetailPage(data)}} id="chipletTitle" className={'chiplet-title'}>
 					{data.domain}
 				</div>
-				<div id="chipletDescription" className={'chiplet-description'}>	
+				<div id="chipletDescription" className={'chiplet-description'}>
 					<div id="chipletExpiration">
 						<span>Expires on: {data.expiration}</span>
 					</div>
@@ -92,7 +93,7 @@ function mapStateToProps (state) {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		showDomainsDetailPage: (data) => dispatch(rifActions.showDomainsDetailPage(data)),
+		showDomainsDetailPage: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, data)),
 		setAutoRenew: (data) => {},
 		goHome: () => dispatch(actions.goHome()),
 	}

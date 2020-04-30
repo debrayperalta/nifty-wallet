@@ -4,6 +4,7 @@ const rifActions = require('../rif/actions')
 const txHelper = require('../../lib/tx-helper')
 const { customHdPaths } = require('../../../old-ui/app/components/connect-hardware/util.js')
 const log = require('loglevel')
+import {rifReducers} from '../rif/reducers';
 
 module.exports = reduceApp
 
@@ -213,64 +214,6 @@ function reduceApp (state, action) {
           context: appState.currentView.context,
         },
         transForward: action.value,
-        warning: null,
-      })
-
-    case rifActions.SHOW_DOMAINS_PAGE:
-      return extend(appState, {
-        currentView: {
-          name: 'domains',
-          context: appState.currentView.context,
-        },
-        transForward: false,
-        warning: null,
-      })
-
-    case rifActions.SHOW_DOMAINS_DETAIL_PAGE:
-      return extend(appState, {
-        currentView: {
-          name: 'domainsDetail',
-          context: appState.currentView.context,
-          data: action.value,
-        },
-        transForward: false,
-        warning: null,
-      })
-
-    case rifActions.SHOW_DOMAIN_REGISTER_PAGE:
-      return extend(appState, {
-        currentView: {
-          name: 'domainRegister',
-          context: appState.currentView.context,
-          data: action.data,
-        },
-        transForward: false,
-        warning: null,
-      })
-
-    case rifActions.SHOW_PAYMENTS_PAGE:
-      return extend(appState, {
-        currentView: {
-          name: 'payments',
-          context: appState.currentView.context,
-        },
-        transForward: false,
-        warning: null,
-      })
-
-    case rifActions.SHOW_MODAL:
-      return extend(appState, {
-        modalMessage: {
-          message: action.message,
-        },
-        transForward: false,
-        warning: null,
-      })
-
-    case rifActions.HIDE_MODAL:
-      return extend(appState, {
-        modalMessage: null,
-        transForward: false,
         warning: null,
       })
 
@@ -918,6 +861,15 @@ function reduceApp (state, action) {
           inputValues: action.inputValues,
         },
       })
+
+    case rifActions.SHOW_MODAL:
+      return rifReducers.showModal(appState, action)
+
+    case rifActions.SHOW_MENU:
+      return rifReducers.showMenu(appState, action)
+
+    case rifActions.NAVIGATE_TO:
+      return rifReducers.navigateTo(appState, action)
 
     default:
       return appState
