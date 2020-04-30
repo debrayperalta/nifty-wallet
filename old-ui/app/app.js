@@ -35,7 +35,7 @@ const Import = require('./accounts/import')
 const ForgetDeviceScreen = require('./components/connect-hardware/forget-screen')
 import ConnectHardwareForm from './components/connect-hardware/index'
 const InfoScreen = require('./info')
-import { PaymentsScreen, DomainsScreen, DomainsDetailScreen, AddNewMulticryptoAddressScreen } from '../../ui/app/rif/pages'
+import { PaymentsScreen, DomainsScreen, DomainsDetailScreen, DomainRegisterScreen, AddNewMulticryptoAddressScreen } from '../../ui/app/rif/pages'
 const AppBar = require('./components/app-bar/app-bar.component')
 const Loading = require('./components/loading')
 const BuyView = require('./components/buy-button-subview')
@@ -317,7 +317,7 @@ App.prototype.renderPrimary = function () {
     case 'info':
       log.debug('rendering info screen')
       return h(InfoScreen, {key: 'info'})
-      
+
     case 'buyEth':
       log.debug('rendering buy ether screen')
       return h(BuyView, {key: 'buyEthView'})
@@ -383,6 +383,10 @@ App.prototype.renderPrimary = function () {
     case 'domainsDetail':
       log.debug('rendering domains detail screen')
       return h(DomainsDetailScreen, {key: 'domainsDetail'})
+
+    case 'domainRegister':
+      log.debug('rendering domain register screen')
+      return h(DomainRegisterScreen, {key: 'domainRegister'})
 
     default:
       log.debug('rendering default, account detail screen')

@@ -17,9 +17,13 @@ const rifActions = {
   setBackgroundConnection,
   // RNS
   checkDomainAvailable,
-  registerDomain,
+  requestDomainRegistration,
   canFinishRegistration,
   finishRegistration,
+  getRegistrationCost,
+  getUnapprovedTransactions,
+  waitUntil,
+  getSelectedAddress,
 }
 
 let background = null;
@@ -39,15 +43,6 @@ function showDomainsDetailPage (data) {
     type: rifActions.SHOW_DOMAINS_DETAIL_PAGE,
     value: {
       value: data,
-    },
-  }
-}
-
-function showDomainRegisterPage (domainName) {
-  return {
-    type: rifActions.SHOW_DOMAIN_REGISTER_PAGE,
-    value: {
-      domainName: domainName,
     },
   }
 }
@@ -83,24 +78,24 @@ function checkDomainAvailable (domainName) {
         dispatch(actions.hideLoadingIndication());
         return resolve(available);
       });
-    })
-  }
+    });
+  };
 }
 
-function registerDomain (domainName, yearsToRegister) {
+function requestDomainRegistration (domainName, yearsToRegister) {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve, reject) => {
-      background.rif.rns.register.requestRegistration(domainName, yearsToRegister, (error, secret) => {
+      background.rif.rns.register.requestRegistration(domainName, yearsToRegister, (error, commitment) => {
         dispatch(actions.hideLoadingIndication());
         if (error) {
           dispatch(actions.displayWarning(error));
           return reject(error);
         }
-        return resolve(secret);
+        return resolve(commitment);
       });
-    })
-  }
+    });
+  };
 }
 
 function canFinishRegistration (commitmentHash) {
@@ -114,8 +109,8 @@ function canFinishRegistration (commitmentHash) {
         }
         return resolve(result);
       });
-    })
-  }
+    });
+  };
 }
 
 function finishRegistration (domainName) {
@@ -125,7 +120,84 @@ function finishRegistration (domainName) {
       dispatch(actions.hideLoadingIndication());
       background.rif.rns.register.finishRegistration(domainName);
       return resolve();
-    })
+    });
+  };
+}
+
+function getRegistrationCost (domainName, yearsToRegister) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      dispatch(actions.hideLoadingIndication());
+      background.rif.rns.register.getDomainCost(domainName, yearsToRegister, (error, result) => {
+        if (error) {
+          return reject(error);
+        }
+        return resolve(result);
+      });
+    });
+  };
+}
+
+function showDomainRegisterPage (data) {
+  if (data && !data.domainName) {
+    data = {
+      domainName: data,
+      currentStep: 'available',
+    }
+  }
+  return {
+    type: rifActions.SHOW_DOMAIN_REGISTER_PAGE,
+    data: data,
+  }
+}
+
+function getUnapprovedTransactions () {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      background.rif.rns.register.getUnapprovedTransactions((error, transactions) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          return reject(error);
+        }
+        return resolve(transactions);
+      });
+    });
+  };
+}
+
+function getSelectedAddress () {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      background.rif.rns.register.getSelectedAddress((error, selectedAddress) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          return reject(error);
+        }
+        return resolve(selectedAddress);
+      });
+    });
+  };
+}
+
+/**
+ * This is used only for specific cases where we can't do anything else to sync with the plugin state machine
+ * rather than wait. We wait until the state machine get's the latest transactions.
+ * @param time to wait in milliseconds
+ * @returns a Promise that's resolved when the time is done.
+ */
+function waitUntil (time = 1000) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+        dispatch(actions.hideLoadingIndication());
+        clearTimeout(timeout);
+        return resolve();
+      }, time);
+    });
   }
 }
 

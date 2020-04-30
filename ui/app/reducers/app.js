@@ -237,6 +237,17 @@ function reduceApp (state, action) {
         warning: null,
       })
 
+    case rifActions.SHOW_DOMAIN_REGISTER_PAGE:
+      return extend(appState, {
+        currentView: {
+          name: 'domainRegister',
+          context: appState.currentView.context,
+          data: action.data,
+        },
+        transForward: false,
+        warning: null,
+      })
+
     case rifActions.SHOW_PAYMENTS_PAGE:
       return extend(appState, {
         currentView: {
