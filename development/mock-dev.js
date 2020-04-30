@@ -16,6 +16,7 @@ const render = require('react-dom').render
 const h = require('react-hyperscript')
 const Root = require('../ui/app/root')
 const configureStore = require('../ui/app/store')
+const rifActions = require('../ui/app/rif/actions')
 const actions = require('../ui/app/actions')
 const states = require('./states')
 const backGroundConnectionModifiers = require('./backGroundConnectionModifiers')
@@ -86,6 +87,7 @@ global.platform = new ExtensionPlatform()
 //
 
 actions._setBackgroundConnection(controller.getApi())
+rifActions.setBackgroundConnection(controller.getApi())
 actions.update = function (stateName) {
   selectedView = stateName
   updateQueryParams(stateName)
@@ -99,6 +101,7 @@ actions.update = function (stateName) {
 function modifyBackgroundConnection (backgroundConnectionModifier) {
   const modifiedBackgroundConnection = Object.assign({}, controller.getApi(), backgroundConnectionModifier)
   actions._setBackgroundConnection(modifiedBackgroundConnection)
+  rifActions.setBackgroundConnection(modifiedBackgroundConnection)
 }
 
 var css = MetaMaskUiCss()

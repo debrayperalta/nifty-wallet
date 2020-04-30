@@ -26,7 +26,7 @@ function mapStateToProps (state) {
     accounts: getMetaMaskAccounts(state),
     keyrings: metamask.keyrings,
     selectedAddress: metamask.selectedAddress,
-    unapprovedTxs: metamask.unapprovedTxs,
+    unapprovedTxs: screenParams.unapprovedTransactions ? screenParams.unapprovedTransactions : metamask.unapprovedTxs,
     unapprovedMsgs: metamask.unapprovedMsgs,
     unapprovedPersonalMsgs: metamask.unapprovedPersonalMsgs,
     unapprovedTypedMessages: metamask.unapprovedTypedMessages,
@@ -43,6 +43,7 @@ function mapStateToProps (state) {
     tokensToSend: (screenParams && screenParams.tokensToSend),
     tokensTransferTo: (screenParams && screenParams.tokensTransferTo),
     isContractExecutionByUser: (screenParams && screenParams.isContractExecutionByUser),
+    afterApproval: screenParams.afterApproval,
   }
 }
 
@@ -160,7 +161,7 @@ ConfirmTxScreen.prototype.buyEth = function (address, isContractExecutionByUser,
 
 ConfirmTxScreen.prototype.sendTransaction = function (txData, event) {
   this.stopPropagation(event)
-  this.props.dispatch(actions.updateAndApproveTx(txData))
+  this.props.dispatch(actions.updateAndApproveTx(txData, this.props.afterApproval))
   this._checkIfContractExecutionAndUnlockContract(txData)
 }
 
@@ -262,7 +263,7 @@ ConfirmTxScreen.prototype._checkIfContractExecutionAndUnlockContract = function 
 ConfirmTxScreen.prototype._unlockContract = function (to) {
   const currentKeyring = getCurrentKeyring(to, this.props.network, this.props.keyrings, this.props.identities)
   if (ifContractAcc(currentKeyring)) {
-    this.props.dispatch(actions.showAccountDetail(to))
+     this.props.dispatch(actions.showAccountDetail(to))
   }
 }
 

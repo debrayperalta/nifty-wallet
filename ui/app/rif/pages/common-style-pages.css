@@ -12,3 +12,6 @@
     font-size: 1.3rem;
     margin-left: 0.5rem;
 }
+.hand-over {
+  cursor: pointer;
+}

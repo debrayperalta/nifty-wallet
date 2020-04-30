@@ -89,6 +89,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/react-fontawesome": "^0.1.9",
     "@material-ui/core": "^4.1.1",
+    "@rsksmart/rns": "^1.5.0",
     "@zxing/library": "^0.8.0",
     "abi-decoder": "^1.2.0",
     "asmcrypto.js": "0.22.0",
@@ -212,6 +213,7 @@
     "valid-url": "^1.0.9",
     "vreme": "^3.0.2",
     "web3": "^0.20.7",
+    "web3-utils": "^1.2.4",
     "web3-eth-abi": "^1.2.6",
     "web3-stream-provider": "^4.0.0",
     "xtend": "^4.0.1"
@@ -279,6 +281,7 @@
     "gulp-watch": "^5.0.1",
     "gulp-zip": "^4.0.0",
     "http-server": "^0.12.1",
+    "husky": "^4.2.5",
     "image-size": "^0.6.2",
     "isomorphic-fetch": "^2.2.1",
     "jsdoc": "^3.6.3",

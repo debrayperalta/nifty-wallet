@@ -66,6 +66,8 @@ const { ifPOA, ifRSK, getNetworkID, getDPath, setDPath } = require('../../old-ui
 import {
   PhishingController,
 } from 'gaba'
+import Web3 from 'web3'
+import RifController from './controllers/rif'
 
 const {
   CLASSIC_CODE,
@@ -173,27 +175,27 @@ module.exports = class MetamaskController extends EventEmitter {
     this.networkController.on('networkDidChange', (newType, previousNetworkIDStr) => {
       const dPath = getDPath(newType)
       this.deriveKeyringFromNewDPath(dPath)
-      .then(accounts => {
-        this.accountTracker._updateAccounts()
-        this.detectTokensController.restartTokenDetection()
+        .then(accounts => {
+          this.accountTracker._updateAccounts()
+          this.detectTokensController.restartTokenDetection()
 
-        const previousNetworkID = parseInt(previousNetworkIDStr, 10)
-        const nextNetwork = getNetworkID({network: newType})
-        const nextNetworkID = parseInt(nextNetwork && nextNetwork.netId, 10)
-        if (nextNetworkID !== previousNetworkID) {
-          const isPreviousETC = previousNetworkID === CLASSIC_CODE
-          const isPreviousRSK = ifRSK(previousNetworkID)
-          const isNextETC = nextNetworkID === CLASSIC_CODE
-          const isNextRSK = ifRSK(nextNetworkID)
-          if (isPreviousETC || isPreviousRSK || isNextETC || isNextRSK) {
-            this.forgetDevice(LEDGER, false)
-            this.forgetDevice(TREZOR, false)
+          const previousNetworkID = parseInt(previousNetworkIDStr, 10)
+          const nextNetwork = getNetworkID({network: newType})
+          const nextNetworkID = parseInt(nextNetwork && nextNetwork.netId, 10)
+          if (nextNetworkID !== previousNetworkID) {
+            const isPreviousETC = previousNetworkID === CLASSIC_CODE
+            const isPreviousRSK = ifRSK(previousNetworkID)
+            const isNextETC = nextNetworkID === CLASSIC_CODE
+            const isNextRSK = ifRSK(nextNetworkID)
+            if (isPreviousETC || isPreviousRSK || isNextETC || isNextRSK) {
+              this.forgetDevice(LEDGER, false)
+              this.forgetDevice(TREZOR, false)
+            }
           }
-        }
-      })
-      .catch(e => {
-        console.log(e)
-      })
+        })
+        .catch(e => {
+          console.log(e)
+        })
     })
 
     // key mgmt
@@ -277,7 +279,7 @@ module.exports = class MetamaskController extends EventEmitter {
     this.personalMessageManager = new PersonalMessageManager()
     this.decryptMessageManager = new DecryptMessageManager()
     this.encryptionPublicKeyManager = new EncryptionPublicKeyManager()
-    this.typedMessageManager = new TypedMessageManager({ networkController: this.networkController })
+    this.typedMessageManager = new TypedMessageManager({networkController: this.networkController})
 
     // ensure isClientOpenAndUnlocked is updated when memState updates
     this.on('update', (memState) => {
@@ -323,6 +325,16 @@ module.exports = class MetamaskController extends EventEmitter {
       // PermissionsMetadata: this.permissionsController.store,
     })
     this.memStore.subscribe(this.sendUpdate.bind(this))
+
+    // RIF
+    this.rifController = new RifController({
+      preferencesController: this.preferencesController,
+      networkController: this.networkController,
+      transactionController: this.txController,
+      memoryStore: this.memStore,
+      metamaskStore: this.store,
+    });
+
   }
 
   /**
@@ -540,9 +552,11 @@ module.exports = class MetamaskController extends EventEmitter {
       // updatePermittedAccounts: nodeify(permissionsController.updatePermittedAccounts, permissionsController),
       // legacyExposeAccounts: nodeify(permissionsController.legacyExposeAccounts, permissionsController),
       // handleNewAccountSelected: nodeify(this.handleNewAccountSelected, this),
+
+      // RIF
+      rif: this.rifController.exposeApi(),
     }
   }
-
 
 //=============================================================================
 // VAULT / KEYRING RELATED METHODS

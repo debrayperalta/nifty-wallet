@@ -1,4 +1,4 @@
-//import icons for each token
+// import icons for each token
 import { faBitcoin, faEthereum } from '@fortawesome/free-brands-svg-icons'
 import { faCoins, faCheckCircle, faBolt, faArchive } from '@fortawesome/free-solid-svg-icons'
 /**
@@ -36,4 +36,11 @@ export const luminoNodeIconProps = {
 export const rifStorageIconProps = {
     color: '#AD3232',
     icon: faArchive,
+}
+
+export const registrationTimeouts = {
+  // number of seconds to wait before updating the page for the clock waiting.
+  registering: 4,
+  // number of seconds to wait before showing the confirmation message, this is to wait for the confirmation operation.
+  registerConfirmation: 6,
 }

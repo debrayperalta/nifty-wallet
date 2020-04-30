@@ -20,7 +20,7 @@ const { POA,
 const { hasUnconfirmedTransactions } = require('./helpers/confirm-transaction/util')
 const WebcamUtils = require('../lib/webcam-utils')
 
-var actions = {
+const actions = {
   _setBackgroundConnection: _setBackgroundConnection,
 
   GO_HOME: 'GO_HOME',
@@ -368,7 +368,7 @@ var actions = {
 
 module.exports = actions
 
-var background = null
+let background = null
 function _setBackgroundConnection (backgroundConnection) {
   background = backgroundConnection
 }
@@ -1259,7 +1259,7 @@ function updateTransaction (txData) {
   }
 }
 
-function updateAndApproveTx (txData) {
+function updateAndApproveTx (txData, afterApproval) {
   log.info('actions: updateAndApproveTx: ' + JSON.stringify(txData))
   return (dispatch, getState) => {
     log.debug(`actions calling background.updateAndApproveTx`)
@@ -1285,9 +1285,14 @@ function updateAndApproveTx (txData) {
       .then(newState => dispatch(actions.updateMetamaskState(newState)))
       .then(() => {
         dispatch(actions.clearSend())
-        dispatch(actions.completedTx(txData.id))
-        dispatch(actions.hideLoadingIndication())
-        dispatch(actions.setCurrentAccountTab('history'))
+        if (afterApproval) {
+          dispatch(actions.hideLoadingIndication())
+          afterApproval.action(afterApproval.payload);
+        } else {
+          dispatch(actions.completedTx(txData.id))
+          dispatch(actions.hideLoadingIndication())
+          dispatch(actions.setCurrentAccountTab('history'))
+        }
 
         if (!hasUnconfirmedTransactions(getState())) {
           return global.platform.closeNotificationWindow()
