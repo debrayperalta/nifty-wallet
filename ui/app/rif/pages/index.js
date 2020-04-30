@@ -57,5 +57,5 @@ function getPage (context) {
 
 export {
   getPage,
-  pageNames
+  pageNames,
 }

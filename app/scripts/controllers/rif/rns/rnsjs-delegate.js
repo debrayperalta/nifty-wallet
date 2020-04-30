@@ -12,7 +12,9 @@ export default class RnsJsDelegate extends RnsDelegate {
   }
 
   buildApi () {
+    const api = super.buildApi();
     return {
+      ...api,
       getDomainAddress: this.bindOperation(this.getDomainAddress, this),
       getAddressDomain: this.bindOperation(this.getAddressDomain, this),
       setAddressToDomain: this.bindOperation(this.setAddressToDomain, this),
