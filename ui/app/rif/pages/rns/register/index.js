@@ -7,6 +7,7 @@ import {faChevronLeft} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {SearchDomains} from '../../../components'
 import {registrationTimeouts} from '../../../constants';
+import {pageNames} from '../../index';
 
 class DomainRegisterScreen extends Component {
 
@@ -341,23 +342,23 @@ class DomainRegisterScreen extends Component {
 
 function mapStateToProps (state) {
   return {
-    domainName: state.appState.currentView.data.domainName,
-    currentStep: state.appState.currentView.data.currentStep,
-    yearsToRegister: state.appState.currentView.data.yearsToRegister,
-    costInRif: state.appState.currentView.data.costInRif,
-    gasCost: state.appState.currentView.data.gasCost,
-    commitment: state.appState.currentView.data.commitment,
-    registeringProgress: state.appState.currentView.data.registeringProgress,
-    waitingForConfirmation: state.appState.currentView.data.waitingForConfirmation,
-    selectedAddress: state.appState.currentView.data.selectedAddress,
+    domainName: state.appState.currentView.params.domainName,
+    currentStep: state.appState.currentView.params.currentStep,
+    yearsToRegister: state.appState.currentView.params.yearsToRegister,
+    costInRif: state.appState.currentView.params.costInRif,
+    gasCost: state.appState.currentView.params.gasCost,
+    commitment: state.appState.currentView.params.commitment,
+    registeringProgress: state.appState.currentView.params.registeringProgress,
+    waitingForConfirmation: state.appState.currentView.params.waitingForConfirmation,
+    selectedAddress: state.appState.currentView.params.selectedAddress,
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    goBack: () => dispatch(rifActions.showDomainsPage()),
+    goBack: () => dispatch(rifActions.navigateTo(pageNames.rns.domains)),
     dispatch: dispatch,
-    showThis: (data) => dispatch(rifActions.showDomainRegisterPage(data)),
+    showThis: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainRegister, data)),
     getCost: (domainName, yearsToRegister) => dispatch(rifActions.getRegistrationCost(domainName, yearsToRegister)),
     requestRegistration: (domainName, yearsToRegister) => dispatch(rifActions.requestDomainRegistration(domainName, yearsToRegister)),
     wait: (time) => dispatch(rifActions.waitUntil(time)),
@@ -365,7 +366,7 @@ const mapDispatchToProps = dispatch => {
     showTransactionConfirmPage: (data) => dispatch(niftyActions.showConfTxPage(data)),
     completeRegistration: (domainName) => dispatch(rifActions.finishRegistration(domainName)),
     canCompleteRegistration: (commitment) => dispatch(rifActions.canFinishRegistration(commitment)),
-    viewDomainDetails: (domainName) => dispatch(rifActions.showDomainsDetailPage(domainName)),
+    viewDomainDetails: (domainName) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, domainName)),
     getSelectedAddress: () => dispatch(rifActions.getSelectedAddress()),
   }
 }

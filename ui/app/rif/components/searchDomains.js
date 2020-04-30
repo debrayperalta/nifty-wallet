@@ -65,7 +65,9 @@ SearchDomains.propTypes = {
 const mapDispatchToProps = dispatch => {
   return {
     showDomainsDetailPage: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, data)),
-    showDomainRegisterPage: (domainName) => dispatch(rifActions.navigateTo(pageNames.rns.domainRegister, domainName)),
+    showDomainRegisterPage: (domainName) => dispatch(rifActions.navigateTo(pageNames.rns.domainRegister, {
+      domainName,
+    })),
     checkDomainAvailable: (domainName) => dispatch(rifActions.checkDomainAvailable(domainName)),
     displayWarning: (message) => dispatch(actions.displayWarning(message)),
   }
