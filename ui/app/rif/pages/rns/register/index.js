@@ -1,12 +1,12 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
-import rifActions from '../../../../actions'
-import niftyActions from '../../../../../actions'
+import rifActions from '../../../actions'
+import niftyActions from '../../../../actions'
 import {faChevronLeft} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {SearchDomains} from '../../../../components'
-import {registrationTimeouts} from '../../../../constants';
+import {SearchDomains} from '../../../components'
+import {registrationTimeouts} from '../../../constants';
 
 class DomainRegisterScreen extends Component {
 

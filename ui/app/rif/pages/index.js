@@ -9,6 +9,7 @@ import Pay from './rns/pay';
 import Renew from './rns/renew';
 import SellOnMKP from './rns/sell-on-mkp';
 import Transfer from './rns/transfer';
+import DomainRegisterScreen from './rns/register';
 
 const pageNames = {
   rns: {
@@ -52,6 +53,8 @@ function getPage (context) {
       return buildScreen(SellOnMKP, context);
     case pageNames.rns.transfer:
       return buildScreen(Transfer, context);
+    case pageNames.rns.domainRegister:
+      return buildScreen(DomainRegisterScreen, context);
   }
 }
 
