@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import rifActions from '../../rif/actions'
 import actions from '../../actions'
+import {pageNames} from '../pages'
 
 class SearchDomains extends Component {
 	_handleKeyDown = (e) => {
@@ -50,8 +51,8 @@ SearchDomains.propTypes = {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		showDomainsDetailPage: (data) => dispatch(rifActions.navigateTo('domainsDetail', data)),
-		showDomainRegisterPage: (domainName) => dispatch(rifActions.navigateTo('domainRegister', domainName)),
+		showDomainsDetailPage: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, data)),
+		showDomainRegisterPage: (domainName) => dispatch(rifActions.navigateTo(pageNames.rns.domainRegister, domainName)),
 		checkDomainAvailable: (domainName) => dispatch(rifActions.checkDomainAvailable(domainName)),
 		displayWarning: (message) => dispatch(actions.displayWarning(message)),
 	}

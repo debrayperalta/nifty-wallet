@@ -6,6 +6,7 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import DomainsDetailActiveScreen from './domainDetailActive/domainDetailActive'
 import { SearchDomains } from '../../components'
 import rifActions from '../../actions'
+import {pageNames} from '../index'
 
 class DomainsDetailScreen extends Component {
 	static propTypes = {
@@ -40,7 +41,7 @@ function mapStateToProps (state) {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		goBack: () => dispatch(rifActions.navigateTo('domains')),
+		goBack: () => dispatch(rifActions.navigateTo(pageNames.rns.domains)),
 	}
 }
 

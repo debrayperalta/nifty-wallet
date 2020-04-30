@@ -4,6 +4,7 @@ import {faPlusCircle, faTimesCircle} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import rifActions from '../../actions';
+import {pageNames} from '../../pages';
 
 class Menu extends Component {
 
@@ -18,31 +19,31 @@ class Menu extends Component {
     return [
       {
         label: 'Subdomains',
-        action: () => this.props.navigateTo('subdomains'),
+        action: () => this.props.navigateTo(pageNames.rns.subdomains),
       },
       {
         label: 'Renew Domain',
-        action: () => this.props.navigateTo('renew'),
+        action: () => this.props.navigateTo(pageNames.rns.renew),
       },
       {
         label: 'Pay',
-        action: () => this.props.navigateTo('pay'),
+        action: () => this.props.navigateTo(pageNames.rns.pay),
       },
       {
         label: 'Sell it on MKP',
-        action: () => this.props.navigateTo('sell-on-mkp'),
+        action: () => this.props.navigateTo(pageNames.rns.sellOnMKP),
       },
       {
         label: 'Exchange Domain',
-        action: () => this.props.navigateTo('exchange'),
+        action: () => this.props.navigateTo(pageNames.rns.exchange),
       },
       {
         label: 'Transfer',
-        action: () => this.props.navigateTo('transfer'),
+        action: () => this.props.navigateTo(pageNames.rns.transfer),
       },
       {
         label: 'Lumino Channels',
-        action: () => this.props.navigateTo('lumino-channels'),
+        action: () => this.props.navigateTo(pageNames.rns.luminoChannels),
       },
     ];
   }
