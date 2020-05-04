@@ -12,6 +12,7 @@ class SearchDomains extends Component {
     checkDomainAvailable: PropTypes.func,
     showDomainRegisterPage: PropTypes.func,
     showDomainsDetailPage: PropTypes.func,
+    getDomainDetails: PropTypes.func,
   }
 
   _handleKeyDown = (e) => {
@@ -34,13 +35,13 @@ class SearchDomains extends Component {
             this.props.showDomainRegisterPage(typedDomain);
           } else {
             // We need to put an else here, so we can redirect to details page, remember that the localstorage part of code, will not be anymore here
-            this.props.getDomainDetails(insertedDomain).then(details => {
-              console.debug("Details retrieved", details)
+            this.props.getDomainDetails(typedDomain).then(details => {
+              console.debug('Details retrieved', details);
               return this.props.showDomainsDetailPage(details);
             }).catch(error => {
-              console.debug("Error retrieving domain details", error)
-              this.props.displayWarning("An error happend trying to get details from domain, please try again later.")
-            })
+              console.debug('Error retrieving domain details', error);
+              this.props.displayWarning('An error happend trying to get details from domain, please try again later.');
+            });
           }
         });
       }
@@ -75,6 +76,7 @@ const mapDispatchToProps = dispatch => {
       domainName,
     })),
     checkDomainAvailable: (domainName) => dispatch(rifActions.checkDomainAvailable(domainName)),
+    getDomainDetails: (domainName) => dispatch(rifActions.getDomainDetails(domainName)),
     displayWarning: (message) => dispatch(actions.displayWarning(message)),
   }
 }

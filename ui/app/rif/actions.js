@@ -7,12 +7,8 @@ const rifActions = {
   setBackgroundConnection,
   // RNS
   checkDomainAvailable,
-<<<<<<< HEAD
   getDomainDetails,
-  registerDomain,
-=======
   requestDomainRegistration,
->>>>>>> 7d0d8dcb5a10c0a5454ae12b3e6e033bfe08cf7b
   canFinishRegistration,
   finishRegistration,
   getRegistrationCost,
@@ -65,28 +61,24 @@ function checkDomainAvailable (domainName) {
   };
 }
 
-<<<<<<< HEAD
 function getDomainDetails (domainName) {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve, reject) => {
         background.rif.rns.resolver.getDomainDetails(domainName, (error, details) => {
-          console.debug("This are the details bringed", details)
+          console.debug('This are the details bringed', details);
           if (error) {
             dispatch(actions.displayWarning(error));
             return reject(error);
           }
           dispatch(actions.hideLoadingIndication());
           return resolve(details);
-        })      
+        });
     })
   }
 }
 
-function registerDomain (domainName, yearsToRegister) {
-=======
 function requestDomainRegistration (domainName, yearsToRegister) {
->>>>>>> 7d0d8dcb5a10c0a5454ae12b3e6e033bfe08cf7b
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve, reject) => {
