@@ -78,6 +78,10 @@ function getDomainDetails (domainName) {
   }
 }
 
+function getResolversName () {
+  background.rif.rns.resolver.getResolversNames
+}
+
 function requestDomainRegistration (domainName, yearsToRegister) {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())

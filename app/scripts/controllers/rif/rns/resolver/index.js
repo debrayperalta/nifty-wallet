@@ -22,6 +22,7 @@ export default class RnsResolver extends RnsJsDelegate {
       getOwner: this.bindOperation(this.getOwner, this),
       isOwner: this.bindOperation(this.isOwner, this),
       getDomainDetails: this.bindOperation(this.getDomainDetails, this),
+      getNetoworksForResolvers: this.bindOperation(this.getNetoworksForResolvers, this),
       ...rnsJsApi,
     }
   }
@@ -59,20 +60,22 @@ export default class RnsResolver extends RnsJsDelegate {
         }).catch(error => reject(error));
     });
   }
-  
+
   /**
    * Gets all details of a given domain name
    * @param domainName the domain name to check (without resolver).
    * @returns {Promise<boolean>} true if it can get all the details correctly, false otherwise.
-   */  
-  getDomainDetails(domainName) {
-    const domainNameResolver = domainName + ".rsk";
+   * @param domainName
+   * @returns {Promise<unknown>}
+   */
+  getDomainDetails (domainName) {
+    const domainNameResolver = domainName + '.rsk';
     return new Promise((resolve, reject) => {
       const getDomainAddress = this.getDomainAddress(domainNameResolver);
       const content = this.getContent(domainNameResolver);
       const expiration = this.getExpirationRemaining(domainNameResolver);
       const getOwner = this.getOwner(domainNameResolver);
-      Promise.all([getDomainAddress, content, expiration, getOwner]).then(values => { 
+      Promise.all([getDomainAddress, content, expiration, getOwner]).then(values => {
         let expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + values[2]);
         let status = this.getStatus(values[2]);
@@ -83,16 +86,40 @@ export default class RnsResolver extends RnsJsDelegate {
     });
   }
 
- /**
+  // 0xfE87342112c26fbF2Ae30031FE84860793b495B9
+  getNetoworksForResolvers (address) {
+    return new Promise((resolve, reject) => {
+      // This event is different, it deppends if we're on the chain of RSK, or not, to develop purposes i'll use only ChainAddrChanged
+      const eventToListen = web3Utils.sha3('ChainAddrChanged(bytes32,bytes4,string)');
+      const filter = this.web3.eth.filter({
+        fromBlock: 0,
+        toBlock: 'latest',
+        address: address,
+        topics: [eventToListen],
+      });
+      console.debug('Web3Filtered');
+      filter.get(function (error, result) {
+        if (error) {
+          console.debug('Error', error);
+          reject(error);
+        }
+        console.debug('result', result);
+        resolve(result);
+      });
+    });
+  }
+
+  /**
   * Returns a status for the days remaining of a domain
-  * @param {int} daysRemaining 
+  * @param {int} daysRemaining
   */
-  getStatus(daysRemaining){
-    let retStatus = DOMAIN_STATUSES.ACTIVE
-    if(daysRemaining <= 0)
-      retStatus = DOMAIN_STATUSES.EXPIRED;
-    else if(daysRemaining > 0 && daysRemaining <= EXPIRING_REMAINING_DAYS)
-      retStatus = DOMAIN_STATUSES.EXPIRING;
+  getStatus(daysRemaining) {
+   let retStatus = DOMAIN_STATUSES.ACTIVE
+   if (daysRemaining <= 0) {
+     retStatus = DOMAIN_STATUSES.EXPIRED;
+   } else if (daysRemaining > 0 && daysRemaining <= EXPIRING_REMAINING_DAYS) {
+     retStatus = DOMAIN_STATUSES.EXPIRING;
+   }
     return retStatus;
   }
 
@@ -101,7 +128,7 @@ export default class RnsResolver extends RnsJsDelegate {
    * @param domainName the domain name to check (without resolver).
    * @returns {Promise<boolean>} Days remaining (int), an error otherwise
    */
-  getExpirationRemaining(domainName) {  
+  getExpirationRemaining (domainName) {
     return new Promise((resolve, reject) => {
       const label = this.cleanDomainFromRskPrefix(domainName);
       const hash = `0x${web3Utils.sha3(label)}`;
@@ -109,29 +136,29 @@ export default class RnsResolver extends RnsJsDelegate {
         const expirationTime = result;
         this.web3.eth.getBlock('latest', (timeError, currentBlock) => {
           if (timeError) {
-            console.debug("Time error when tryng to get last block ", timeError);
+            console.debug('Time error when tryng to get last block ', timeError);
             reject(timeError);
           }
           const diff = expirationTime - currentBlock.timestamp;
           // the difference is in seconds, so it is divided by the amount of seconds per day
           const remainingDays = Math.floor(diff / (60 * 60 * 24));
-          console.debug("Remaining time of domain", remainingDays);
+          console.debug('Remaining time of domain', remainingDays);
           resolve(remainingDays);
         });
       }).catch(error => {
-        console.debug("Error when trying to invoke expirationTime", error);
+        console.debug('Error when trying to invoke expirationTime', error);
         reject(error);
       });
     });
   };
 
-  getContent(domainName) {  
+  getContent (domainName) {
     return new Promise((resolve, reject) => {
       const label = domainName.split('.')[0];
       this.call(this.multiChainresolverContractInstance, 'content', [label]).then(result => {
         resolve(result);
       }).catch(error => {
-        console.debug("Error when trying to get content of domain", error);
+        console.debug('Error when trying to get content of domain', error);
         reject(error);
       });
     });

@@ -44,3 +44,21 @@ export const registrationTimeouts = {
   // number of seconds to wait before showing the confirmation message, this is to wait for the confirmation operation.
   registerConfirmation: 6,
 }
+/**
+ * Both of this consts need to be moved to a config file
+ * @type {string[]}
+ */
+const RESOLVERS_MAINNET = [
+  'Multicrypto',
+]
+const RESOLVERS_TEST = [
+  'Multi-chain',
+]
+
+export function GET_RESOLVERS (env) {
+  if (env === 'dev') {
+    return RESOLVERS_TEST;
+  } else {
+    return RESOLVERS_MAINNET;
+  }
+}

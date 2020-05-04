@@ -6,7 +6,7 @@ import { faPlusCircle } from '@fortawesome/free-solid-svg-icons'
 import { getIconForToken } from '../../../utils/utils'
 import { CustomButton, AddNewTokenNetworkAddress, DomainIcon, LuminoNodeIcon, RifStorageIcon, Menu } from '../../../components'
 import rifActions from '../../../actions'
-import { cryptos } from '../../../constants'
+import { cryptos, GET_RESOLVERS } from '../../../constants'
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
@@ -19,7 +19,6 @@ class DomainsDetailActiveScreen extends Component {
 		expirationDate: PropTypes.string.isRequired,
 		autoRenew: PropTypes.bool.isRequired,
 		ownerAddress: PropTypes.string.isRequired,
-    resolvers: PropTypes.array.isRequired,
 		isOwner: PropTypes.bool,
 		isLuminoNode: PropTypes.bool,
 		isRifStorage: PropTypes.bool,
@@ -27,7 +26,6 @@ class DomainsDetailActiveScreen extends Component {
 	constructor(props) {
 		super(props);
 		let networks = [];
-		const resolvers = [...props.resolvers];
 		Object.keys(cryptos).forEach(function(key) {
 			let crypto = cryptos[key];
 			let network = {
@@ -39,8 +37,8 @@ class DomainsDetailActiveScreen extends Component {
 			networks.push(network);
 		});
 		this.state = {
-			resolvers: resolvers,
-			selectedResolverIndex: 0,
+			resolvers: GET_RESOLVERS(),
+			selectedResolverIndex: -1,
 			networks: networks,
 			selectedNetwork: networks[0].value,
 			insertedAddress: '',
@@ -103,6 +101,9 @@ class DomainsDetailActiveScreen extends Component {
 
 	render () {
 		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage } = this.props;
+    console.debug('this.state.resolvers =======================================================================', this.state.resolvers)
+    console.debug('this.state.resolvers[this.state.selectedResolverIndex] =======================================================================', this.state.resolvers[this.state.selectedResolverIndex])
+		/*
 		let networks = !this.state.resolvers[this.state.selectedResolverIndex] ? <div></div> : this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
 			return <div key={index} className={'resolver-network-description'}>
 					<FontAwesomeIcon icon={getIconForToken(network.networkIcon).icon} color={getIconForToken(network.networkIcon).color} className={'domain-icon'}/>
@@ -110,6 +111,7 @@ class DomainsDetailActiveScreen extends Component {
 					<span className={'resolver-network-description-address'}>{network.address}</span>
 				</div>
 			});
+		 */
 		return (
 		<div className={'body'}>
             <div id="headerName" className={'domain-name'}>
@@ -136,10 +138,11 @@ class DomainsDetailActiveScreen extends Component {
                     <div id="resolversBody" className={'resolvers-body'}>
                         <div className="resolver-body-top">
                             <div id="selectResolver" className={'custom-select'}>
-                                <select id="comboResolvers" className="select-css" onChange={(value) => this.setState({selectedResolverIndex:value.target.selectedIndex})}>
-                                    {this.state.resolvers.map((resolver, index) => {
-                                            return <option key={index} value={resolver.name}>{resolver.name}</option>
-                                        })
+                              <select id="comboResolvers" className="select-css" onChange={(value) => this.setState({selectedResolverIndex:value.target.selectedIndex})}>
+                                    {
+                                      this.state.resolvers.map((resolver, index) => {
+                                        return <option key={index} value={resolver}>{resolver}</option>
+                                      })
                                     }
                                 </select>
                             </div>
@@ -157,7 +160,9 @@ class DomainsDetailActiveScreen extends Component {
 							/>
                         </div>
                         <div id="resolverNetworksBody" className={'resolver-network'}>
-                            {networks}
+                            {
+                              // networks
+                            }
                         </div>
                     </div>
                 }
