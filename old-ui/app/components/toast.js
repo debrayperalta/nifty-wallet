@@ -47,9 +47,12 @@ class ToastComponent extends Component {
 }
 
 function mapStateToProps (state) {
-	return {
-		toastMsg: state.appState.toastMsg,
-	}
+  if (state.appState.toast) {
+    return {
+      toastMsg: state.appState.toast.message,
+      isSuccess: state.appState.toast.success,
+    }
+  }
 }
 
 function mapDispatchToProps (dispatch) {

@@ -1,24 +1,16 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import {connect} from 'react-redux'
 import DomainsDetailActiveScreen from './domainDetailActive/domainDetailActive'
-import { SearchDomains } from '../../components'
-import rifActions from '../../actions'
-import {pageNames} from '../index'
 
 class DomainsDetailScreen extends Component {
 	static propTypes = {
 		status: PropTypes.string.isRequired,
-		goBack: PropTypes.func.isRequired,
 	}
 	render () {
 		const { status } = this.props
 		return (
 		<div className={'body'}>
-			<FontAwesomeIcon icon={faChevronLeft} className={'rif-back-button'} onClick={() => this.props.goBack()}/>
-			<SearchDomains />
 			{status === 'active' &&
 				<DomainsDetailActiveScreen />
 			}
@@ -40,9 +32,7 @@ function mapStateToProps (state) {
 }
 
 const mapDispatchToProps = dispatch => {
-	return {
-		goBack: () => dispatch(rifActions.navigateTo(pageNames.rns.domains)),
-	}
+	return {}
 }
 
 module.exports = connect(mapStateToProps, mapDispatchToProps)(DomainsDetailScreen)

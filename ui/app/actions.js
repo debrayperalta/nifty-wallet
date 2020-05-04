@@ -2215,10 +2215,13 @@ function hideWarning () {
   }
 }
 
-function displayToast (text) {
+function displayToast (text, success = true) {
   return {
     type: actions.DISPLAY_TOAST,
-    value: text,
+    value: {
+      message: text,
+      success,
+    },
   }
 }
 

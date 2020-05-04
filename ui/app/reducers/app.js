@@ -652,7 +652,7 @@ function reduceApp (state, action) {
 
     case actions.DISPLAY_TOAST:
       return extend(appState, {
-        toastMsg: action.value,
+        toast: action.value,
         isLoading: false,
       })
 
