@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArchive, faBolt, faChevronLeft, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
+import { faPlusCircle } from '@fortawesome/free-solid-svg-icons'
 import { getIconForToken } from '../../../utils/utils'
 import { CustomButton, AddNewTokenNetworkAddress, DomainIcon, LuminoNodeIcon, RifStorageIcon, Menu } from '../../../components'
 import rifActions from '../../../actions'
@@ -12,29 +12,31 @@ class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
 		addNewNetwork: PropTypes.func.isRequired,
 		setAutoRenew: PropTypes.func.isRequired,
+    domain: PropTypes.object.isRequired,
 		domainName: PropTypes.string.isRequired,
 		address: PropTypes.string.isRequired,
 		content: PropTypes.string.isRequired,
 		expirationDate: PropTypes.string.isRequired,
 		autoRenew: PropTypes.bool.isRequired,
 		ownerAddress: PropTypes.string.isRequired,
+    resolvers: PropTypes.array.isRequired,
 		isOwner: PropTypes.bool,
 		isLuminoNode: PropTypes.bool,
 		isRifStorage: PropTypes.bool,
 	}
 	constructor(props) {
-		super(props)
-		let networks = []
-		const resolvers = [...props.resolvers]
+		super(props);
+		let networks = [];
+		const resolvers = [...props.resolvers];
 		Object.keys(cryptos).forEach(function(key) {
-			let crypto = cryptos[key]
+			let crypto = cryptos[key];
 			let network = {
 				value: key,
 				label: crypto.name,
 				icon: crypto.icon,
 				color: crypto.color,
-			}
-			networks.push(network)
+			};
+			networks.push(network);
 		});
 		this.state = {
 			resolvers: resolvers,
@@ -42,51 +44,51 @@ class DomainsDetailActiveScreen extends Component {
 			networks: networks,
 			selectedNetwork: networks[0].value,
 			insertedAddress: '',
-		}
+		};
 	}
 	updateNetwork = (selectedOption) => {
-		this.setState({ selectedNetwork: selectedOption.value })
+		this.setState({ selectedNetwork: selectedOption.value });
 	}
 	updateAddress = (address) => {
-		this.setState({ insertedAddress: address })
+		this.setState({ insertedAddress: address });
 	}
 	addAddress = () => {
-		let domains = JSON.parse(localStorage.rnsDomains)
-		let networkIndex = -1
-		let resolverIndex = this.state.selectedResolverIndex
-		let selecteddomain = domains.find((domain, index) => {
-			if(domain.domain === this.props.domain.domain){
-				networkIndex = index
-				return domain
+		let domains = JSON.parse(localStorage.rnsDomains);
+		let networkIndex = -1;
+		let resolverIndex = this.state.selectedResolverIndex;
+		domains.find((domain, index) => {
+			if (domain.domain === this.props.domain.domain){
+				networkIndex = index;
+				return domain;
 			}
 		})
 
-		if(networkIndex !== -1 && resolverIndex !== -1){
+		if (networkIndex !== -1 && resolverIndex !== -1){
 			let newNetwork = {
 				networkName: this.state.selectedNetwork,
 				networkIcon:this.state.selectedNetwork,
 				address: this.state.insertedAddress,
-			}
-			domains[networkIndex].resolvers[resolverIndex].network.push(newNetwork)
-			localStorage.setItem('rnsDomains', JSON.stringify(domains))
-			//Sending back with localstorage rnsDomains (Here we try to get again localstorage so if it wasnt updated, we're going to show whats really saved)
-			domains = JSON.parse(localStorage.rnsDomains)
+			};
+			domains[networkIndex].resolvers[resolverIndex].network.push(newNetwork);
+			localStorage.setItem('rnsDomains', JSON.stringify(domains));
+			// Sending back with localstorage rnsDomains (Here we try to get again localstorage so if it wasnt updated, we're going to show whats really saved)
+			domains = JSON.parse(localStorage.rnsDomains);
 			this.setState({
-				resolvers: domains[networkIndex].resolvers
-			})
+				resolvers: domains[networkIndex].resolvers,
+			});
 		}
 	}
 	showModalAddNetworkAddress = () => {
-		let elements = []
+		let elements = [];
 		elements.push(<AddNewTokenNetworkAddress
 			updateNetwork={this.updateNetwork.bind(this)}
 			updateAddress={this.updateAddress.bind(this)}
 			networks={this.state.networks}
-		/>)
+		/>);
 		let message = {
 			title: 'Add new network',
 			body: {
-				elements: elements
+				elements: elements,
 			},
 			confirmLabel: 'SAVE',
 			cancelLabel: 'CANCEL',
@@ -95,22 +97,22 @@ class DomainsDetailActiveScreen extends Component {
 			},
 			cancelCallback: () => {
 			},
-		}
-		this.props.addNewNetwork(message)
+		};
+		this.props.addNewNetwork(message);
 	}
 
 	render () {
-		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage } = this.props
+		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage } = this.props;
 		let networks = !this.state.resolvers[this.state.selectedResolverIndex] ? <div></div> : this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
 			return <div key={index} className={'resolver-network-description'}>
 					<FontAwesomeIcon icon={getIconForToken(network.networkIcon).icon} color={getIconForToken(network.networkIcon).color} className={'domain-icon'}/>
 					<span>{network.networkName}</span>
 					<span className={'resolver-network-description-address'}>{network.address}</span>
 				</div>
-			})
+			});
 		return (
 		<div className={'body'}>
-            <div id='headerName' className={'domain-name'}>
+            <div id="headerName" className={'domain-name'}>
                 <span>{domainName}</span>
                 {isOwner &&
                     <DomainIcon className={'domain-icon'}/>
@@ -122,20 +124,19 @@ class DomainsDetailActiveScreen extends Component {
                     <RifStorageIcon className={'domain-icon'}/>
                 }
             </div>
-            <div id='domainDetailBody' className={'domain-detail-body'}>
-                <div id='bodyDescription' className={'domain-description'}>
+            <div id="domainDetailBody" className={'domain-detail-body'}>
+                <div id="bodyDescription" className={'domain-description'}>
                     <div><span className={'domain-description-field'}>Address:</span><span className={'domain-description-value label-spacing-left'}>{address}</span></div>
                     <div><span className={'domain-description-field'}>Content:</span><span className={'domain-description-value label-spacing-left'}>{content}</span></div>
                     <div><span className={'domain-description-field'}>Expires on:</span><span className={'domain-description-value label-spacing-left'}>{expirationDate}</span></div>
-                    <div><span className={'domain-description-field'}>Auto renew: <a href={this.props.setAutoRenew()}>{autoRenew ? "on" : "off"}</a></span></div>
+                    <div><span className={'domain-description-field'}>Auto renew: <a href={this.props.setAutoRenew()}>{autoRenew ? 'on' : 'off'}</a></span></div>
                     <div><span className={'domain-description-field'}>Owner:</span><span className={'domain-description-value label-spacing-left'}>{ownerAddress}</span></div>
                 </div>
-				{console.log("RESOLVERS", this.state.resolvers)}
                 {(isOwner && this.state.resolvers) &&
-                    <div id='resolversBody' className={'resolvers-body'}>
-                        <div className='resolver-body-top'>
-                            <div id='selectResolver' className={'custom-select'}>
-                                <select id='comboResolvers' className="select-css" onChange={(value) => this.setState({selectedResolverIndex:value.target.selectedIndex})}>
+                    <div id="resolversBody" className={'resolvers-body'}>
+                        <div className="resolver-body-top">
+                            <div id="selectResolver" className={'custom-select'}>
+                                <select id="comboResolvers" className="select-css" onChange={(value) => this.setState({selectedResolverIndex:value.target.selectedIndex})}>
                                     {this.state.resolvers.map((resolver, index) => {
                                             return <option key={index} value={resolver.name}>{resolver.name}</option>
                                         })
@@ -155,7 +156,7 @@ class DomainsDetailActiveScreen extends Component {
 								}
 							/>
                         </div>
-                        <div id='resolverNetworksBody' className={'resolver-network'}>
+                        <div id="resolverNetworksBody" className={'resolver-network'}>
                             {networks}
                         </div>
                     </div>
@@ -163,7 +164,7 @@ class DomainsDetailActiveScreen extends Component {
                 <Menu />
             </div>
         </div>
-		)
+		);
 	}
 }
 
