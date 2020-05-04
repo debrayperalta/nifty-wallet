@@ -201,7 +201,8 @@ function navigateBack () {
       backNavigated = true;
     }
     if (navigationStack.length > 0) {
-      return navigationStack.pop();
+      const navigation = navigationStack.pop();
+      return navigateTo(navigation.data.screenName, navigation.data.params);
     }
   }
   // go to home since we don't have any other page to go to.

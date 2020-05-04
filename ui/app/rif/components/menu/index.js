@@ -13,13 +13,14 @@ class Menu extends Component {
     navigateTo: PropTypes.func,
     opened: PropTypes.bool,
     options: PropTypes.array,
+    domainInfo: PropTypes.object,
   }
 
   getDefaultMenuOptions () {
     return [
       {
         label: 'Subdomains',
-        action: () => this.props.navigateTo(pageNames.rns.subdomains, 'Subdomains'),
+        action: () => this.props.navigateTo(pageNames.rns.subdomains, 'Subdomains', {domainInfo: this.props.domainInfo}),
       },
       {
         label: 'Renew Domain',
