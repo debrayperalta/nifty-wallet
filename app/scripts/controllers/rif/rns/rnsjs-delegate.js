@@ -1,6 +1,7 @@
 import RnsDelegate from './rns-delegate'
 import RNS from '@rsksmart/rns'
 import rifConfig from './../../../../../rif.config';
+import {rns} from '../constants'
 
 /**
  * This class encapsulates all the RNSJS logic, it initializes rnsjs library and uses it as a wrapper.
@@ -23,6 +24,7 @@ export default class RnsJsDelegate extends RnsDelegate {
       isSubdomainAvailable: this.bindOperation(this.isSubdomainAvailable, this),
       setSubdomainOwner: this.bindOperation(this.setSubdomainOwner, this),
       createSubdomain: this.bindOperation(this.createSubdomain, this),
+      getSubdomainsForDomain: this.bindOperation(this.getSubdomainsForDomain, this),
     }
   }
 
@@ -107,7 +109,16 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<>}
    */
   setSubdomainOwner (domainName, subdomain, ownerAddress) {
-    return this.rnsJs.subdomains.setOwner(domainName, subdomain, ownerAddress);
+    const result = this.rnsJs.subdomains.setOwner(domainName, subdomain, ownerAddress);
+    result.then(transactionReceipt => {
+      if (transactionReceipt) {
+        const subdomains = this.getSubdomains(domainName);
+        const foundSubdomain = subdomains.find(sd => sd.name === subdomain);
+        foundSubdomain.ownerAddress = ownerAddress;
+        this.updateSubdomains(domainName, subdomains);
+      }
+    })
+    return result;
   }
 
   /**
@@ -125,23 +136,59 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<>} TransactionReceipt of the latest transaction
    */
   createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress) {
-    return this.rnsJs.subdomains.create(domainName, subdomain, ownerAddress, parentOwnerAddress);
+    const result = this.rnsJs.subdomains.create(domainName, subdomain, ownerAddress, parentOwnerAddress);
+    result.then(transactionReceipt => {
+      if (transactionReceipt) {
+        const subdomains = this.getSubdomains(domainName);
+        subdomains.push({
+          domainName,
+          name: subdomain,
+          ownerAddress,
+          parentOwnerAddress,
+        });
+        this.updateSubdomains(domainName, subdomains);
+      }
+    })
+    return result;
   }
 
   /**
-   * Updates the store state
-   * @param newState
+   * Gets the subdomains under a domain name
+   * @param domainName the domain name to query
+   * @returns the subdomains array
    */
-  updateStoreState (newState) {
-    this.store.putState(newState);
+  getSubdomains (domainName) {
+    const state = this.getStateForContainer(rns.storeContainers.register);
+    if (!state || !state.subdomains || !state.subdomains[domainName]) {
+      return [];
+    }
+    return state.subdomains[domainName];
   }
 
   /**
-   * Gets the store state
-   * @returns the current state
+   * Method to get the subdomains under a domain name, exposes the getSubdomains method
+   * @param domainName the domain name to query
+   * @returns the subdomains under the domain name
    */
-  getStoreState () {
-    return this.store.getState();
+  getSubdomainsForDomain (domainName) {
+    return Promise.resolve(this.getSubdomains(domainName));
   }
+
+  /**
+   * Updates the subdomains under a domain name
+   * @param domainName the domain to update
+   * @param subdomains the subdomains under the domain name
+   */
+  updateSubdomains (domainName, subdomains) {
+    let state = this.getStateForContainer(rns.storeContainers.register);
+    if (!state) {
+      state = {
+        subdomains: [],
+      };
+    }
+    state.subdomains[domainName] = subdomains;
+    this.updateStateForContainer(rns.storeContainers.register, state);
+  }
+
 
 }

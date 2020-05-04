@@ -1,0 +1,17 @@
+.subdomains .list {
+  display: flex;
+  justify-content: center;
+}
+.subdomains .new-button {
+  border-radius: 0.2em;
+  border: solid #4a74b3 0.1em;
+  color: #4a74b3;
+  background: white;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+.subdomains .new-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin: 1em;
+}

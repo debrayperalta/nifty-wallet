@@ -1,5 +1,5 @@
 const nodeify = require('../../../lib/nodeify')
-
+import extend from 'xtend'
 /**
  * Delegate class to encapsulate all the logic related to delegates.
  */
@@ -117,7 +117,56 @@ export default class RnsDelegate {
     return (domainName && domainName.indexOf('.rsk') !== -1) ? domainName.replace('.rsk', '') : domainName;
   }
 
+  /**
+   * Gets the unapproved transactions. Used to redirect a page to the confirmation page.
+   * @returns the unapproved transactions array.
+   */
   getUnapprovedTransactions () {
     return Promise.resolve(this.transactionController.txStateManager.getUnapprovedTxList());
+  }
+
+  /**
+   * Updates the store state
+   * @param newState
+   */
+  updateStoreState (newState) {
+    this.store.putState(newState);
+  }
+
+  /**
+   * Gets the store state
+   * @returns the current state
+   */
+  getStoreState () {
+    return this.store.getState();
+  }
+
+  /**
+   * Gets the state of the container for the current selected address.
+   * @param containerName
+   * @returns the current container state
+   */
+  getStateForContainer (containerName) {
+    return this.getStoreState() && this.getStoreState()[containerName] ? this.getStoreState()[containerName][this.address] : null;
+  }
+
+  /**
+   * Updates the state for a container on the current selected address
+   * @param containerName the container name
+   * @param newState to update with
+   */
+  updateStateForContainer (containerName, newState) {
+    let currentState = this.getStoreState();
+    if (!currentState) {
+      currentState = {};
+    }
+    if (!currentState[containerName]) {
+      currentState[containerName] = {};
+    }
+    if (!currentState[containerName][[this.address]]) {
+      currentState[containerName][[this.address]] = {};
+    }
+    currentState[containerName][[this.address]] = extend(currentState[containerName][[this.address]], newState);
+    this.updateStoreState(currentState);
   }
 }

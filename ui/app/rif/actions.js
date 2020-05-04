@@ -22,6 +22,7 @@ const rifActions = {
   navigateBack,
   showModal,
   hideModal,
+  getSubdomains,
 }
 
 let background = null;
@@ -229,9 +230,28 @@ function navigateTo (screenName, params) {
       params,
     },
   }
-  navigationStack.push(currentNavigation);
+  const alreadyNavigatedTo = navigationStack.find(navigation => navigation.data.screenName === screenName);
+  if (!alreadyNavigatedTo) {
+    navigationStack.push(currentNavigation);
+  }
   backNavigated = false;
   return currentNavigation;
+}
+
+function getSubdomains (domainName) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      dispatch(actions.hideLoadingIndication());
+      background.rif.rns.register.getSubdomainsForDomain(domainName, (error, result) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(result);
+      });
+    });
+  };
 }
 
 module.exports = rifActions
