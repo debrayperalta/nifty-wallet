@@ -88,7 +88,7 @@ export default class RnsResolver extends RnsJsDelegate {
   * @param {int} daysRemaining 
   */
   getStatus(daysRemaining){
-    let retStatus = 'active'
+    let retStatus = DOMAIN_STATUSES.ACTIVE
     if(daysRemaining <= 0)
       retStatus = DOMAIN_STATUSES.EXPIRED;
     else if(daysRemaining > 0 && daysRemaining <= EXPIRING_REMAINING_DAYS)

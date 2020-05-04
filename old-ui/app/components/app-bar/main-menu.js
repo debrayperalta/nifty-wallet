@@ -5,6 +5,7 @@ import actions from '../../../../ui/app/actions'
 import rifActions from '../../../../ui/app/rif/actions'
 import { connect } from 'react-redux'
 import { faMoneyBill, faAddressCard } from '@fortawesome/free-solid-svg-icons'
+import {pageNames} from '../../../../ui/app/rif/pages'
 
 class MainMenu extends Component {
   static propTypes = {
@@ -89,8 +90,8 @@ const mapDispatchToProps = dispatch => {
     showConfigPage: () => dispatch(actions.showConfigPage()),
     lockMetamask: () => dispatch(actions.lockMetamask()),
     showInfoPage: () => dispatch(actions.showInfoPage()),
-    showDomainsPage: () => dispatch(rifActions.showDomainsPage()),
-    showPaymentsPage: () => dispatch(rifActions.showPaymentsPage()),
+    showDomainsPage: () => dispatch(rifActions.navigateTo(pageNames.rns.domains)),
+    showPaymentsPage: () => dispatch(rifActions.navigateTo(pageNames.rns.payments)),
   }
 }
 

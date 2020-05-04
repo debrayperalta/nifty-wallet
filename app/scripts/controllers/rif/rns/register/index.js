@@ -18,6 +18,7 @@ export default class RnsRegister extends RnsJsDelegate {
       requestRegistration: this.bindOperation(this.requestRegistration, this),
       finishRegistration: this.bindOperation(this.finishRegistration, this),
       canFinishRegistration: this.bindOperation(this.canFinishRegistration, this),
+      getDomainCost: this.bindOperation(this.getDomainCost, this),
       ...rnsJsApi,
     }
   }
@@ -65,6 +66,7 @@ export default class RnsRegister extends RnsJsDelegate {
    * It uses the formula here: https://github.com/rnsdomains/rns-rskregistrar#name-price
    * @param domainName the domain name to ask for
    * @param yearsToRegister the amount of years to ask
+   * @returns registration cost in RIF (wei)
    */
   getDomainCost (domainName, yearsToRegister) {
     const cleanDomainName = this.cleanDomainFromRskPrefix(domainName);
@@ -90,11 +92,10 @@ export default class RnsRegister extends RnsJsDelegate {
   /**
    * Finish the domain registration using the data stored with the domainName key on the requestRegistration operation.
    * @param domainName the Domain to be registered.
-   * @param domainRegistrationSuccessCallback this is a callback for the contract when it's successfully registered, this
    * is used to do something after the user submits the operation and the domain it's registered
    * @returns {Promise<void>}
    */
-  finishRegistration (domainName, domainRegistrationSuccessCallback) {
+  finishRegistration (domainName) {
     const cleanDomainName = this.cleanDomainFromRskPrefix(domainName);
     const state = this.getStoreState();
     const registerByAddress = state.register[this.address];

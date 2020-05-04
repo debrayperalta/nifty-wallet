@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArchive, faBolt, faChevronLeft, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
 import { getIconForToken } from '../../../utils/utils'
-import { CustomButton, AddNewTokenNetworkAddress, DomainIcon, LuminoNodeIcon, RifStorageIcon } from '../../../components'
+import { CustomButton, AddNewTokenNetworkAddress, DomainIcon, LuminoNodeIcon, RifStorageIcon, Menu } from '../../../components'
 import rifActions from '../../../actions'
 import { cryptos } from '../../../constants'
 
@@ -14,7 +14,7 @@ class DomainsDetailActiveScreen extends Component {
 		setAutoRenew: PropTypes.func.isRequired,
 		domainName: PropTypes.string.isRequired,
 		address: PropTypes.string.isRequired,
-		content: PropTypes.string.isRequired, 
+		content: PropTypes.string.isRequired,
 		expirationDate: PropTypes.string.isRequired,
 		autoRenew: PropTypes.bool.isRequired,
 		ownerAddress: PropTypes.string.isRequired,
@@ -36,7 +36,7 @@ class DomainsDetailActiveScreen extends Component {
 			}
 			networks.push(network)
 		});
-		this.state = { 
+		this.state = {
 			resolvers: resolvers,
 			selectedResolverIndex: 0,
 			networks: networks,
@@ -78,14 +78,14 @@ class DomainsDetailActiveScreen extends Component {
 	}
 	showModalAddNetworkAddress = () => {
 		let elements = []
-		elements.push(<AddNewTokenNetworkAddress 
+		elements.push(<AddNewTokenNetworkAddress
 			updateNetwork={this.updateNetwork.bind(this)}
 			updateAddress={this.updateAddress.bind(this)}
 			networks={this.state.networks}
 		/>)
 		let message = {
 			title: 'Add new network',
-			body: { 
+			body: {
 				elements: elements
 			},
 			confirmLabel: 'SAVE',
@@ -98,6 +98,7 @@ class DomainsDetailActiveScreen extends Component {
 		}
 		this.props.addNewNetwork(message)
 	}
+
 	render () {
 		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage } = this.props
 		let networks = !this.state.resolvers[this.state.selectedResolverIndex] ? <div></div> : this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
@@ -138,13 +139,13 @@ class DomainsDetailActiveScreen extends Component {
                                     {this.state.resolvers.map((resolver, index) => {
                                             return <option key={index} value={resolver.name}>{resolver.name}</option>
                                         })
-                                    }								
+                                    }
                                 </select>
                             </div>
-							<CustomButton 
-								icon={faPlusCircle} 
+							<CustomButton
+								icon={faPlusCircle}
 								text={'NEW'}
-								onClick={() => this.showModalAddNetworkAddress()} 
+								onClick={() => this.showModalAddNetworkAddress()}
 								className={
 									{
 										button: 'domain-detail-new-button',
@@ -159,7 +160,7 @@ class DomainsDetailActiveScreen extends Component {
                         </div>
                     </div>
                 }
-            <FontAwesomeIcon icon={faPlusCircle} className={'domain-description-plus-button'} onClick={() => {}}/>
+                <Menu />
             </div>
         </div>
 		)
@@ -167,8 +168,8 @@ class DomainsDetailActiveScreen extends Component {
 }
 
 function mapStateToProps (state) {
-	const data = state.appState.currentView.data.value
-  	return {
+	const data = state.appState.currentView.params;
+  return {
 		dispatch: state.dispatch,
 		status: data.status,
 		domainName: data.domain,
