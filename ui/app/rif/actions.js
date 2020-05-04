@@ -88,6 +88,7 @@ function canFinishRegistration (commitmentHash) {
       background.rif.rns.register.canFinishRegistration(commitmentHash, (error, result) => {
         dispatch(actions.hideLoadingIndication());
         if (error) {
+          dispatch(actions.displayWarning(error));
           return reject(error);
         }
         return resolve(result);
@@ -101,7 +102,11 @@ function finishRegistration (domainName) {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve) => {
       dispatch(actions.hideLoadingIndication());
-      background.rif.rns.register.finishRegistration(domainName);
+      background.rif.rns.register.finishRegistration(domainName, (error, result) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+        }
+      });
       return resolve();
     });
   };
@@ -114,6 +119,7 @@ function getRegistrationCost (domainName, yearsToRegister) {
       dispatch(actions.hideLoadingIndication());
       background.rif.rns.register.getDomainCost(domainName, yearsToRegister, (error, result) => {
         if (error) {
+          dispatch(actions.displayWarning(error));
           return reject(error);
         }
         return resolve(result);
@@ -129,6 +135,7 @@ function getUnapprovedTransactions () {
       background.rif.rns.register.getUnapprovedTransactions((error, transactions) => {
         dispatch(actions.hideLoadingIndication());
         if (error) {
+          dispatch(actions.displayWarning(error));
           return reject(error);
         }
         return resolve(transactions);
@@ -144,6 +151,7 @@ function getSelectedAddress () {
       background.rif.rns.register.getSelectedAddress((error, selectedAddress) => {
         dispatch(actions.hideLoadingIndication());
         if (error) {
+          dispatch(actions.displayWarning(error));
           return reject(error);
         }
         return resolve(selectedAddress);
