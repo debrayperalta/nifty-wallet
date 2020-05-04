@@ -80,8 +80,7 @@ class DomainsScreen extends Component {
 
 DomainsScreen.propTypes = {
   showDomainsDetailPage: PropTypes.func.isRequired,
-  setAutoRenew: PropTypes.func.isRequired,
-  goHome: PropTypes.func.isRequired,
+  setAutoRenew: PropTypes.func.isRequired
 
 }
 
@@ -101,7 +100,6 @@ const mapDispatchToProps = dispatch => {
     })),
     setAutoRenew: (data) => {
     },
-    goHome: () => dispatch(actions.goHome()),
   }
 }
 
