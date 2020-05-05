@@ -4,11 +4,21 @@
 }
 .subdomains .new-button {
   border-radius: 0.2em;
-  border: solid #4a74b3 0.1em;
+  border: solid #4a74b3 2px;
   color: #4a74b3;
-  background: white;
+  background: rgba(74, 116, 179, 0.1);
   text-transform: uppercase;
   font-weight: bold;
+  width: 40%;
+  height: 3em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.subdomains .new-button>svg {
+  margin-right: 0.8em;
+  width: 1.5em;
+  height: 1.5em;
 }
 .subdomains .new-button-container {
   display: flex;
