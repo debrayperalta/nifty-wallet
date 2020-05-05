@@ -23,6 +23,8 @@ const rifActions = {
   showModal,
   hideModal,
   getSubdomains,
+  createSubdomain,
+  isSubdomainAvailable,
 }
 
 let background = null;
@@ -249,6 +251,37 @@ function getSubdomains (domainName) {
           return reject(error);
         }
         return resolve(result);
+      });
+    });
+  };
+}
+
+function createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve) => {
+      dispatch(actions.hideLoadingIndication());
+      background.rif.rns.register.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress, (error) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+        }
+      });
+      return resolve();
+    });
+  };
+}
+
+function isSubdomainAvailable (domainName, subdomain) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve) => {
+      dispatch(actions.hideLoadingIndication());
+      background.rif.rns.register.isSubdomainAvailable(domainName, subdomain, (error, available) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(available);
       });
     });
   };

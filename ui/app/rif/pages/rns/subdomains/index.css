@@ -1,6 +1,7 @@
 .subdomains .list {
   display: flex;
-  justify-content: center;
+  justify-content: left;
+  padding: 2em;
 }
 .subdomains .new-button {
   border-radius: 0.2em;
@@ -24,4 +25,13 @@
   display: flex;
   justify-content: flex-end;
   margin: 1em;
+}
+.subdomains .list>ul {
+  width: 100%;
+}
+.subdomains .list>ul>li {
+  font-weight: bold;
+  font-size: 1.3em;
+  border-bottom: solid 0.1em #bbbbbb;
+  padding-bottom: 0.5em;
 }

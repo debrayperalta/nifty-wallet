@@ -48,6 +48,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<string>} the address resolution
    */
   getDomainAddress (domainName, chainId) {
+    domainName = this.addRskSuffix(domainName);
     return this.rnsJs.addr(domainName, chainId);
   }
 
@@ -67,6 +68,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<>} TransactionReceipt
    */
   setAddressToDomain (domainName, address) {
+    domainName = this.addRskSuffix(domainName);
     return this.rnsJs.setAddr(domainName, address);
   }
 
@@ -77,6 +79,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<>} TransactionReceipt
    */
   setDomainResolver (domainName, resolver) {
+    domainName = this.addRskSuffix(domainName);
     return this.rnsJs.setResolver(domainName, resolver);
   }
 
@@ -87,6 +90,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * or an array of available domains under possible TLDs if the parameter is a label
    */
   isDomainAvailable (domainName) {
+    domainName = this.addRskSuffix(domainName);
     return this.rnsJs.available(domainName);
   }
 
@@ -97,6 +101,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<boolean>} true if available, false if not
    */
   isSubdomainAvailable (domainName, subdomain) {
+    domainName = this.addRskSuffix(domainName);
     return this.rnsJs.subdomains.available(domainName, subdomain);
   }
 
@@ -109,6 +114,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<>}
    */
   setSubdomainOwner (domainName, subdomain, ownerAddress) {
+    domainName = this.addRskSuffix(domainName);
     const result = this.rnsJs.subdomains.setOwner(domainName, subdomain, ownerAddress);
     result.then(transactionReceipt => {
       if (transactionReceipt) {
@@ -136,6 +142,10 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<>} TransactionReceipt of the latest transaction
    */
   createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress) {
+    domainName = this.addRskSuffix(domainName);
+    if (!ownerAddress) {
+      ownerAddress = this.address;
+    }
     const result = this.rnsJs.subdomains.create(domainName, subdomain, ownerAddress, parentOwnerAddress);
     result.then(transactionReceipt => {
       if (transactionReceipt) {
@@ -148,7 +158,9 @@ export default class RnsJsDelegate extends RnsDelegate {
         });
         this.updateSubdomains(domainName, subdomains);
       }
-    })
+    }).catch(error => {
+      console.log(error);
+    });
     return result;
   }
 
@@ -158,6 +170,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns the subdomains array
    */
   getSubdomains (domainName) {
+    domainName = this.addRskSuffix(domainName);
     const state = this.getStateForContainer(rns.storeContainers.register);
     if (!state || !state.subdomains || !state.subdomains[domainName]) {
       return [];
@@ -171,6 +184,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns the subdomains under the domain name
    */
   getSubdomainsForDomain (domainName) {
+    domainName = this.addRskSuffix(domainName);
     return Promise.resolve(this.getSubdomains(domainName));
   }
 
@@ -180,6 +194,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @param subdomains the subdomains under the domain name
    */
   updateSubdomains (domainName, subdomains) {
+    domainName = this.addRskSuffix(domainName);
     let state = this.getStateForContainer(rns.storeContainers.register);
     if (!state) {
       state = {
