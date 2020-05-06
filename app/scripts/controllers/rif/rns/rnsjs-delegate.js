@@ -172,10 +172,10 @@ export default class RnsJsDelegate extends RnsDelegate {
   getSubdomains (domainName) {
     domainName = this.addRskSuffix(domainName);
     const state = this.getStateForContainer(rns.storeContainers.register);
-    if (!state || !state.subdomains || !state.subdomains[domainName]) {
+    if (!state || !state.domains || !state.domains[domainName] || !state.domains[domainName].subdomains) {
       return [];
     }
-    return state.subdomains[domainName];
+    return state.domains[domainName].subdomains;
   }
 
   /**
@@ -198,10 +198,21 @@ export default class RnsJsDelegate extends RnsDelegate {
     let state = this.getStateForContainer(rns.storeContainers.register);
     if (!state) {
       state = {
+        domains: [],
+      };
+    }
+    if (!state.domains) {
+      state.domains = {};
+    }
+    if (!state.domains[domainName]) {
+      state.domains[domainName] = {
         subdomains: [],
       };
     }
-    state.subdomains[domainName] = subdomains;
+    if (!state.domains[domainName].subdomains) {
+      state.domains[domainName].subdomains = [];
+    }
+    state.domains[domainName].subdomains = subdomains;
     this.updateStateForContainer(rns.storeContainers.register, state);
   }
 

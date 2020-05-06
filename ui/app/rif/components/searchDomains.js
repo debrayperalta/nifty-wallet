@@ -16,7 +16,7 @@ class SearchDomains extends Component {
 
   _handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      const typedDomain = e.target.value.toLowerCase();
+      const typedDomain = (e.target.value.toLowerCase() && e.target.value.toLowerCase().indexOf('.rsk') === -1) ? (e.target.value.toLowerCase() + '.rsk') : e.target.value.toLowerCase();
       // There is a limitation in manager that domains with less 5 characters are blocked
       if (typedDomain.length <= 5) {
         this.props.displayWarning('Domains with less than 5 characters are blocked.');
@@ -30,7 +30,7 @@ class SearchDomains extends Component {
       } else {
         // Checks if the domain is available, so if it is, it need to render a screen so the user can register it
         this.props.checkDomainAvailable(typedDomain).then(domain => {
-          if (domain.length > 0) {
+          if (domain) {
             this.props.showDomainRegisterPage(typedDomain);
           } else {
             // We need to put an else here, so we can redirect to details page, remember that the localstorage part of code, will not be anymore here
