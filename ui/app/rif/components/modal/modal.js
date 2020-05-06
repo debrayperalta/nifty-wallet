@@ -39,7 +39,23 @@ class CustomModal extends Component {
     this.closeModal();
   }
 
+  getButtons () {
+    let cancelButton = (<button onClick={this.cancel.bind(this)}>{this.props.message.cancelLabel}</button>);
+    let confirmButton = (<button onClick={this.confirm.bind(this)}>{this.props.message.confirmLabel}</button>);
+    if (this.props.message.hideCancel) {
+      cancelButton = null;
+    }
+    if (this.props.message.hideConfirm) {
+      confirmButton = null;
+    }
+    return {
+      cancelButton,
+      confirmButton,
+    }
+  }
+
   render () {
+    const buttons = this.getButtons();
     let body = null;
     if (this.props.message.body.text) {
       body = (<p>{this.props.message.body.text}</p>);
@@ -57,10 +73,12 @@ class CustomModal extends Component {
         className="modal">
         <div className="modal-message">
           <h1>{this.props.message.title}</h1>
-          {body}
+          <div className="modal-body">
+            {body}
+          </div>
           <div className="modal-buttons">
-            <button onClick={this.cancel.bind(this)}>{this.props.message.cancelLabel}</button>
-            <button onClick={this.confirm.bind(this)}>{this.props.message.confirmLabel}</button>
+            {buttons.cancelButton}
+            {buttons.confirmButton}
           </div>
         </div>
       </Modal>

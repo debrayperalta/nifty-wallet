@@ -25,6 +25,7 @@ const rifActions = {
   getSubdomains,
   createSubdomain,
   isSubdomainAvailable,
+  goToConfirmPageForLastTransaction,
 }
 
 let background = null;
@@ -274,7 +275,7 @@ function createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddres
 function isSubdomainAvailable (domainName, subdomain) {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       dispatch(actions.hideLoadingIndication());
       background.rif.rns.register.isSubdomainAvailable(domainName, subdomain, (error, available) => {
         if (error) {
@@ -285,6 +286,18 @@ function isSubdomainAvailable (domainName, subdomain) {
       });
     });
   };
+}
+
+function goToConfirmPageForLastTransaction (afterApproval) {
+  return (dispatch) => {
+    dispatch(getUnapprovedTransactions()).then(latestTransaction => {
+      dispatch(actions.showConfTxPage({
+        id: latestTransaction.id,
+        unapprovedTransactions: latestTransaction,
+        afterApproval,
+      }));
+    });
+  }
 }
 
 module.exports = rifActions

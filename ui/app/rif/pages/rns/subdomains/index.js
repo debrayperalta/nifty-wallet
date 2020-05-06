@@ -5,8 +5,10 @@ import PropTypes from 'prop-types'
 import rifActions from '../../../actions'
 import niftyActions from '../../../../actions'
 import {pageNames} from '../../../pages/index'
-import {faPlusCircle} from '@fortawesome/free-solid-svg-icons'
+import {faPlusCircle, faCopy} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import extend from 'xtend'
+import copyToClipboard from 'copy-to-clipboard'
 
 class Subdomains extends Component {
 
@@ -18,7 +20,6 @@ class Subdomains extends Component {
     showPopup: PropTypes.func,
     createSubdomain: PropTypes.func,
     showToast: PropTypes.func,
-    getUnapprovedTransactions: PropTypes.func,
     showTransactionConfirmPage: PropTypes.func,
     isSubdomainAvailable: PropTypes.func,
   }
@@ -48,12 +49,36 @@ class Subdomains extends Component {
   }
 
   openSubdomainPopup (subdomain) {
-    // TODO: open the modal for the view page.
-    console.log(subdomain);
+    const details = [
+      (
+        <div key="subdomain-popup" className="subdomain-popup-view">
+          <div>
+            <label>Name:</label>
+            <span>{subdomain.name}</span>
+          </div>
+          <div>
+            <label>Address:</label>
+            <span className="subdomain-address">{subdomain.ownerAddress}</span>
+            <FontAwesomeIcon className="hand-over"
+                             onClick={() => {
+                               copyToClipboard(subdomain.ownerAddress, {onCopy: (data) => {
+                                 this.props.showToast('Address copied successfully!');
+                                 }, format: 'text/plain'});
+                             }}
+                             icon={faCopy} />
+          </div>
+        </div>
+      ),
+    ];
+    this.props.showPopup('Subdomain Details', {
+      elements: details,
+      hideConfirm: true,
+      cancelLabel: 'Close',
+    });
   }
 
   openNewSubdomainPopup () {
-    const elements = [
+    const inputs = [
       (<input key="subdomain-name" type="text" placeholder="Subdomain Name" onChange={(e) => {
         const newSubdomain = this.state.newSubdomain;
         newSubdomain.name = e.target.value;
@@ -65,36 +90,40 @@ class Subdomains extends Component {
         this.setState({newSubdomain});
       }}/>),
     ];
-    this.props.showPopup('New Subdomain', elements, async () => {
-      await this.props.createSubdomain(this.props.domainInfo.domainName, this.state.newSubdomain.name, this.state.newSubdomain.owner, this.props.domainInfo.ownerAddress);
-      this.props.showPopup('Confirmation', 'Please confirm the operation in the next screen to create the subdomain.', async () => {
-        const latestTransaction = await this.props.getUnapprovedTransactions();
-        this.props.showTransactionConfirmPage({
-            id: latestTransaction.id,
-            unapprovedTransactions: latestTransaction,
-            afterApproval: {
+    this.props.showPopup('New Subdomain', {
+      elements: inputs,
+      confirmLabel: 'Next',
+      confirmCallback: async () => {
+        await this.props.createSubdomain(this.props.domainInfo.domainName, this.state.newSubdomain.name, this.state.newSubdomain.owner, this.props.domainInfo.ownerAddress);
+        this.props.showPopup('Confirmation', {
+          text: 'Please confirm the operation in the next screen to create the subdomain.',
+          hideCancel: true,
+          confirmCallback: async () => {
+            this.props.showTransactionConfirmPage({
               action: (payload) => {
                 this.loadSubdomains();
               },
               payload: null,
-            },
-          });
-      }, 'Confirm');
-    }, 'Next', async () => {
-      const available = await this.props.isSubdomainAvailable(this.props.domainInfo.domainName, this.state.newSubdomain.name);
-      if (!available) {
-        this.props.showToast(`Subdomain ${this.state.newSubdomain.name} not available!`, false);
-      }
-      return available;
+            });
+          },
+        });
+      },
+      validateConfirm: async () => {
+        const available = await this.props.isSubdomainAvailable(this.props.domainInfo.domainName, this.state.newSubdomain.name);
+        if (!available) {
+          this.props.showToast(`Subdomain ${this.state.newSubdomain.name} not available!`, false);
+        }
+        return available;
+      },
     });
   }
 
   getList () {
     const listItems = [];
     if (this.props.subdomains) {
-      this.props.subdomains.forEach(subdomain => {
+      this.props.subdomains.forEach((subdomain, index) => {
         listItems.push((
-          <li onClick={() => this.openSubdomainPopup(subdomain)}>{subdomain.name}</li>
+          <li className="hand-over" key={'subdomain-' + index} onClick={() => this.openSubdomainPopup(subdomain)}>{subdomain.name}</li>
         ))
       })
     }
@@ -136,35 +165,37 @@ function mapDispatchToProps (dispatch) {
   return {
     getSubdomains: (domainName) => dispatch(rifActions.getSubdomains(domainName)),
     showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.subdomains, params)),
-    showPopup: (title, elements, confirmCallback, confirmLabel, validateConfirm) => {
-      if (elements && Array.isArray(elements)) {
-        dispatch(rifActions.showModal({
-          title,
-          body: {
-            elements,
-          },
-          confirmLabel,
-          cancelLabel: 'Cancel',
-          confirmCallback,
-          validateConfirm,
-        }));
-      } else {
-        dispatch(rifActions.showModal({
-          title,
-          body: {
-            text: elements,
-          },
-          confirmLabel,
-          cancelLabel: 'Cancel',
-          confirmCallback,
-          validateConfirm,
-        }));
-      }
+    showPopup: (title, opts) => {
+      const defaultOpts = {
+        text: null,
+        elements: null,
+        confirmLabel: 'Confirm',
+        cancelLabel: 'Cancel',
+        confirmCallback: () => {},
+        cancelCallback: () => {},
+        validateConfirm: null,
+        hideConfirm: false,
+        hideCancel: false,
+      };
+      opts = extend(defaultOpts, opts);
+      dispatch(rifActions.showModal({
+        title,
+        body: {
+          elements: opts.elements,
+          text: opts.text,
+        },
+        confirmLabel: opts.confirmLabel,
+        confirmCallback: opts.confirmCallback,
+        cancelLabel: opts.cancelLabel,
+        cancelCallback: opts.cancelCallback,
+        validateConfirm: opts.validateConfirm,
+        hideConfirm: opts.hideConfirm,
+        hideCancel: opts.hideCancel,
+      }));
     },
     createSubdomain: (domainName, subdomain, ownerAddress, parentOwnerAddress) => dispatch(rifActions.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress)),
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
-    getUnapprovedTransactions: () => dispatch(rifActions.getUnapprovedTransactions()),
-    showTransactionConfirmPage: (data) => dispatch(niftyActions.showConfTxPage(data)),
+    showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
     isSubdomainAvailable: (domainName, subdomain) => dispatch(rifActions.isSubdomainAvailable(domainName, subdomain)),
   }
 }
