@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 import rifActions from '../../rif/actions'
 import actions from '../../actions'
 import {pageNames} from '../pages'
+import {cleanDomainName} from '../utils/parse'
 
 class SearchDomains extends Component {
 
@@ -16,7 +17,7 @@ class SearchDomains extends Component {
 
   _handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      const typedDomain = (e.target.value.toLowerCase() && e.target.value.toLowerCase().indexOf('.rsk') === -1) ? (e.target.value.toLowerCase() + '.rsk') : e.target.value.toLowerCase();
+      const typedDomain = cleanDomainName(e.target.value);
       // There is a limitation in manager that domains with less 5 characters are blocked
       if (typedDomain.length <= 5) {
         this.props.displayWarning('Domains with less than 5 characters are blocked.');
