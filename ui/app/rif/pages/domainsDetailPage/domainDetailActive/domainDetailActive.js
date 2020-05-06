@@ -7,12 +7,16 @@ import { getIconForToken } from '../../../utils/utils'
 import { CustomButton, AddNewTokenNetworkAddress, DomainIcon, LuminoNodeIcon, RifStorageIcon, Menu } from '../../../components'
 import rifActions from '../../../actions'
 import { cryptos, GET_RESOLVERS } from '../../../constants'
+import niftyActions from '../../../../actions';
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
 		addNewNetwork: PropTypes.func.isRequired,
     setNewResolver: PropTypes.func.isRequired,
 		setAutoRenew: PropTypes.func.isRequired,
+    getUnapprovedTransactions: PropTypes.func,
+    showTransactionConfirmPage: PropTypes.func,
+    wait: PropTypes.func,
     domain: PropTypes.object.isRequired,
 		domainName: PropTypes.string.isRequired,
 		address: PropTypes.string.isRequired,
@@ -101,15 +105,36 @@ class DomainsDetailActiveScreen extends Component {
 		this.props.addNewNetwork(message);
 	}
 
-	onChangeComboResolvers = (e) => {
+	async onChangeComboResolvers (e) {
     for (let resolverItem of e.target.children) {
       if (resolverItem.value === e.target.value) {
         const address = resolverItem.getAttribute('data-address');
-        console.debug('Address of new resolver', address);
         this.props.setNewResolver(this.props.domainName, address);
+        await this.props.wait();
+        this.showConfirmTransactionPage(() => {
+          // TODO: Rodrigo
+          // Send back, or wait
+        });
         return;
       }
     }
+  }
+
+  showConfirmTransactionPage (callback) {
+    this.props.getUnapprovedTransactions()
+      .then(latestTransaction => {
+        this.props.showTransactionConfirmPage({
+          id: latestTransaction.id,
+          unapprovedTransactions: latestTransaction,
+          afterApproval: {
+            action: (payload) => {
+              if (callback) {
+                callback(payload);
+              }
+            },
+          },
+        });
+      });
   }
 
 	render () {
@@ -153,7 +178,7 @@ class DomainsDetailActiveScreen extends Component {
                     <div id="resolversBody" className={'resolvers-body'}>
                         <div className="resolver-body-top">
                             <div id="selectResolver" className={'custom-select'}>
-                              <select id="comboResolvers" className="select-css" onChange={this.onChangeComboResolvers}>
+                              <select id="comboResolvers" className="select-css" onChange={this.onChangeComboResolvers.bind(this)}>
                                 <option disabled selected value hidden> Select Resolver </option>
                                     {
                                       this.state.resolvers.map((resolver, index) => {
@@ -219,6 +244,9 @@ const mapDispatchToProps = dispatch => {
 	return {
 		addNewNetwork: (message) => dispatch(rifActions.showModal(message)),
     setNewResolver: (domainName, resolverAddress) => dispatch(rifActions.setResolverAddress(domainName, resolverAddress)),
+    getUnapprovedTransactions: () => dispatch(rifActions.getUnapprovedTransactions()),
+    showTransactionConfirmPage: (data) => dispatch(niftyActions.showConfTxPage(data)),
+    wait: (time) => dispatch(rifActions.waitUntil(time)),
 		setAutoRenew: () => {},
 	}
 }

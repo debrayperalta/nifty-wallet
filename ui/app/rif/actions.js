@@ -48,7 +48,7 @@ function showModal (message, modalName = 'generic-modal') {
 
 function checkDomainAvailable (domainName) {
   return (dispatch) => {
-    dispatch(actions.showLoadingIndication())
+    dispatch(actions.showLoadingIndication());
     return new Promise((resolve, reject) => {
       background.rif.rns.resolver.isDomainAvailable(domainName, (error, available) => {
         dispatch(actions.hideLoadingIndication());
@@ -64,7 +64,7 @@ function checkDomainAvailable (domainName) {
 
 function getDomainDetails (domainName) {
   return (dispatch) => {
-    dispatch(actions.showLoadingIndication())
+    dispatch(actions.showLoadingIndication());
     return new Promise((resolve, reject) => {
         background.rif.rns.resolver.getDomainDetails(domainName, (error, details) => {
           console.debug('This are the details bringed', details);
@@ -81,7 +81,7 @@ function getDomainDetails (domainName) {
 
 function setResolverAddress (domainName, resolverAddress) {
   return (dispatch) => {
-    dispatch(actions.showLoadingIndication())
+    dispatch(actions.showLoadingIndication());
     return new Promise((resolve, reject) => {
       background.rif.rns.resolver.setResolver(domainName, resolverAddress, (error, result) => {
         dispatch(actions.hideLoadingIndication());

@@ -76,7 +76,8 @@ export default class RnsResolver extends RnsJsDelegate {
       const content = this.getContent(domainNameResolver);
       const expiration = this.getExpirationRemaining(domainNameResolver);
       const getOwner = this.getOwner(domainNameResolver);
-      const getResolver = this.getResolver(domainNameResolver);
+      //const getResolver = this.getResolver(domainNameResolver);
+      const getResolver = this.getNetoworksForResolvers();
       Promise.all([getDomainAddress, content, expiration, getOwner, getResolver]).then(values => {
         let expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + values[2]);
@@ -132,21 +133,26 @@ export default class RnsResolver extends RnsJsDelegate {
   getNetoworksForResolvers (address) {
     return new Promise((resolve, reject) => {
       // This event is different, it deppends if we're on the chain of RSK, or not, to develop purposes i'll use only ChainAddrChanged, it need to differentiate it from one to another
-      const eventToListen = web3Utils.sha3('ChainAddrChanged(bytes32,bytes4,string)');
-      const filter = this.web3.eth.filter({
-        fromBlock: 0,
-        toBlock: 'latest',
-        address: address,
-        topics: [eventToListen],
+      console.debug('INICIO');
+
+      const myEvent = this.multiChainresolverContractInstance.ChainAddrChanged({node: namehash.hash('testing.rsk')}, {fromBlock: 0, toBlock: 'latest'});
+      myEvent.get(function(error, result){
+        console.debug('RESULT ===================', result);
+        console.debug('ERROR ===================', error);
       });
-      console.debug('Web3Filtered');
-      filter.get(function (error, result) {
-        if (error) {
-          console.debug('Error', error);
-          reject(error);
-        }
-        console.debug('result', result);
-        resolve(result);
+      console.debug('FIN');
+    });
+  }
+
+  setNetoworksForResolver () {
+    return new Promise((resolve, reject) => {
+      this.send(this.multiChainresolverContractInstance, 'setChainAddr', [namehash.hash('lebron.rsk'), '0x80000069', '0x123456789'])
+        .then(result => {
+          console.debug('setNetoworksForResolver success', result);
+          resolve(result);
+        }).catch(error => {
+        console.debug('Error when trying to set netoworks for resolver', error);
+        reject(error);
       });
     });
   }
