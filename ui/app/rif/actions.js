@@ -8,6 +8,7 @@ const rifActions = {
   // RNS
   checkDomainAvailable,
   getDomainDetails,
+  setResolverAddress,
   requestDomainRegistration,
   canFinishRegistration,
   finishRegistration,
@@ -50,11 +51,11 @@ function checkDomainAvailable (domainName) {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve, reject) => {
       background.rif.rns.resolver.isDomainAvailable(domainName, (error, available) => {
+        dispatch(actions.hideLoadingIndication());
         if (error) {
           dispatch(actions.displayWarning(error));
           return reject(error);
         }
-        dispatch(actions.hideLoadingIndication());
         return resolve(available);
       });
     });
@@ -67,19 +68,31 @@ function getDomainDetails (domainName) {
     return new Promise((resolve, reject) => {
         background.rif.rns.resolver.getDomainDetails(domainName, (error, details) => {
           console.debug('This are the details bringed', details);
+          dispatch(actions.hideLoadingIndication());
           if (error) {
             dispatch(actions.displayWarning(error));
             return reject(error);
           }
-          dispatch(actions.hideLoadingIndication());
           return resolve(details);
         });
     })
   }
 }
 
-function getResolversName () {
-  background.rif.rns.resolver.getResolversNames
+function setResolverAddress (domainName, resolverAddress) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      background.rif.rns.resolver.setResolver(domainName, resolverAddress, (error, result) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(result);
+      });
+    })
+  }
 }
 
 function requestDomainRegistration (domainName, yearsToRegister) {

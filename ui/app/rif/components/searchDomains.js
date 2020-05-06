@@ -19,7 +19,7 @@ class SearchDomains extends Component {
     if (e.key === 'Enter') {
       const typedDomain = e.target.value.toLowerCase();
       // There is a limitation in manager that domains with less 5 characters are blocked
-      if (typedDomain.length <= 5) {
+      if (typedDomain.length < 5) {
         this.props.displayWarning('Domains with less than 5 characters are blocked.');
         return;
       }

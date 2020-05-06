@@ -22,6 +22,7 @@ export default class RnsResolver extends RnsJsDelegate {
       getOwner: this.bindOperation(this.getOwner, this),
       isOwner: this.bindOperation(this.isOwner, this),
       getDomainDetails: this.bindOperation(this.getDomainDetails, this),
+      setResolver: this.bindOperation(this.setResolver, this),
       getNetoworksForResolvers: this.bindOperation(this.getNetoworksForResolvers, this),
       ...rnsJsApi,
     }
@@ -75,21 +76,62 @@ export default class RnsResolver extends RnsJsDelegate {
       const content = this.getContent(domainNameResolver);
       const expiration = this.getExpirationRemaining(domainNameResolver);
       const getOwner = this.getOwner(domainNameResolver);
-      Promise.all([getDomainAddress, content, expiration, getOwner]).then(values => {
+      const getResolver = this.getResolver(domainNameResolver);
+      Promise.all([getDomainAddress, content, expiration, getOwner, getResolver]).then(values => {
         let expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + values[2]);
         let status = this.getStatus(values[2]);
-        resolve(new DomainDetails(domainNameResolver, values[0], values[1], getDateFormatted(expirationDate), false, values[3], status, false, false));
+        resolve(new DomainDetails(domainNameResolver, values[0], values[1], getDateFormatted(expirationDate), false, values[3], status, values[4], false, false));
       }).catch(error => {
         reject(error);
       });
     });
   }
 
-  // 0xfE87342112c26fbF2Ae30031FE84860793b495B9
+  /**
+   * Gets a resolver address if the domain has one
+   * @param domainNameResolver with the .rsk extension
+   * @returns {Promise<unknown>}
+   */
+  getResolver(domainNameResolver) {
+    return new Promise((resolve, reject) => {
+      this.call(this.rnsContractInstance, 'resolver', [namehash.hash(domainNameResolver)]).then(result => {
+        /* TODO: Rodrigo
+        * 0x0000000000000000000000000000000000000000 this is what it brings when no resolver is setted
+        */
+        console.debug('getResolver resolved with', result);
+        resolve(web3Utils.toChecksumAddress(result));
+      }).catch(error => {
+        console.debug('Error when trying to get resolver addr', error);
+        reject(error);
+      });
+    });
+  }
+// this.rifConfig.rns.contracts.multiChainResolver This is the path to a multicahin address in the config
+  /**
+   * Calls the contract and sets a new resolver to a given DomainName (This function is only_owner)
+   * @param domainNameResolver DomainName with the .rsk extension
+   * @param resolverAddress Address of the new resolver to be setted
+   * @returns {Promise<unknown>}
+   */
+  setResolver(domainNameResolver, resolverAddress) {
+    return new Promise((resolve, reject) => {
+      this.send(this.rnsContractInstance, 'setResolver', [namehash.hash(domainNameResolver), resolverAddress])
+        .then(result => {
+        console.debug('setResolver success', result);
+        resolve(result);
+      }).catch(error => {
+        console.debug('Error when trying to set resolver', error);
+        reject(error);
+      });
+    });
+  }
+
+  // this.rifConfig.rns.contracts.multiChainResolver This is the path to a multicahin address in the config
+  // TODO: Rodrigo
   getNetoworksForResolvers (address) {
     return new Promise((resolve, reject) => {
-      // This event is different, it deppends if we're on the chain of RSK, or not, to develop purposes i'll use only ChainAddrChanged
+      // This event is different, it deppends if we're on the chain of RSK, or not, to develop purposes i'll use only ChainAddrChanged, it need to differentiate it from one to another
       const eventToListen = web3Utils.sha3('ChainAddrChanged(bytes32,bytes4,string)');
       const filter = this.web3.eth.filter({
         fromBlock: 0,
@@ -162,5 +204,5 @@ export default class RnsResolver extends RnsJsDelegate {
         reject(error);
       });
     });
-  };
+  }
 }

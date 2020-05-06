@@ -11,6 +11,7 @@ import { cryptos, GET_RESOLVERS } from '../../../constants'
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
 		addNewNetwork: PropTypes.func.isRequired,
+    setNewResolver: PropTypes.func.isRequired,
 		setAutoRenew: PropTypes.func.isRequired,
     domain: PropTypes.object.isRequired,
 		domainName: PropTypes.string.isRequired,
@@ -19,6 +20,7 @@ class DomainsDetailActiveScreen extends Component {
 		expirationDate: PropTypes.string.isRequired,
 		autoRenew: PropTypes.bool.isRequired,
 		ownerAddress: PropTypes.string.isRequired,
+    selectedResolverAddress: PropTypes.string.isRequired,
 		isOwner: PropTypes.bool,
 		isLuminoNode: PropTypes.bool,
 		isRifStorage: PropTypes.bool,
@@ -100,9 +102,11 @@ class DomainsDetailActiveScreen extends Component {
 	}
 
 	render () {
-		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage } = this.props;
-    console.debug('this.state.resolvers =======================================================================', this.state.resolvers)
-    console.debug('this.state.resolvers[this.state.selectedResolverIndex] =======================================================================', this.state.resolvers[this.state.selectedResolverIndex])
+		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress } = this.props;
+		/* TODO: Rodrigo
+		* This was the old code of networks, check it out how to re implement the networks bringed
+		* Also some of this things are setted in the constructor function
+		*/
 		/*
 		let networks = !this.state.resolvers[this.state.selectedResolverIndex] ? <div></div> : this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
 			return <div key={index} className={'resolver-network-description'}>
@@ -139,9 +143,14 @@ class DomainsDetailActiveScreen extends Component {
                         <div className="resolver-body-top">
                             <div id="selectResolver" className={'custom-select'}>
                               <select id="comboResolvers" className="select-css" onChange={(value) => this.setState({selectedResolverIndex:value.target.selectedIndex})}>
+                                <option disabled selected value hidden> Select Resolver </option>
                                     {
                                       this.state.resolvers.map((resolver, index) => {
-                                        return <option key={index} value={resolver}>{resolver}</option>
+                                        return (<option
+                                          key={index}
+                                          selected={resolver.address === selectedResolverAddress}
+                                          value={resolver.name}
+                                        >{resolver.name}</option>)
                                       })
                                     }
                                 </select>
@@ -161,7 +170,9 @@ class DomainsDetailActiveScreen extends Component {
                         </div>
                         <div id="resolverNetworksBody" className={'resolver-network'}>
                             {
-                              // networks
+                              /* TODO: Rodrigo
+                              * Here goes the networks bringed by the events
+                              */
                             }
                         </div>
                     </div>
@@ -187,7 +198,7 @@ function mapStateToProps (state) {
 		isOwner: state.metamask.selectedAddress.toLowerCase() === data.ownerAddress.toLowerCase(),
 		isLuminoNode: data.isLuminoNode,
 		isRifStorage: data.isRifStorage,
-		resolvers: data.resolvers,
+    selectedResolverAddress: data.selectedResolverAddress,
 		domain: data,
 	}
 }
@@ -195,6 +206,7 @@ function mapStateToProps (state) {
 const mapDispatchToProps = dispatch => {
 	return {
 		addNewNetwork: (message) => dispatch(rifActions.showModal(message)),
+    setNewResolver: (domainName, resolverAddress) => dispatch(rifActions.setResolverAddress(domainName, resolverAddress)),
 		setAutoRenew: () => {},
 	}
 }
