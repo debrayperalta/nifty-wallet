@@ -101,6 +101,17 @@ class DomainsDetailActiveScreen extends Component {
 		this.props.addNewNetwork(message);
 	}
 
+	onChangeComboResolvers = (e) => {
+    for (let resolverItem of e.target.children) {
+      if (resolverItem.value === e.target.value) {
+        const address = resolverItem.getAttribute('data-address');
+        console.debug('Address of new resolver', address);
+        this.props.setNewResolver(this.props.domainName, address);
+        return;
+      }
+    }
+  }
+
 	render () {
 		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress } = this.props;
 		/* TODO: Rodrigo
@@ -142,7 +153,7 @@ class DomainsDetailActiveScreen extends Component {
                     <div id="resolversBody" className={'resolvers-body'}>
                         <div className="resolver-body-top">
                             <div id="selectResolver" className={'custom-select'}>
-                              <select id="comboResolvers" className="select-css" onChange={(value) => this.setState({selectedResolverIndex:value.target.selectedIndex})}>
+                              <select id="comboResolvers" className="select-css" onChange={this.onChangeComboResolvers}>
                                 <option disabled selected value hidden> Select Resolver </option>
                                     {
                                       this.state.resolvers.map((resolver, index) => {
@@ -150,6 +161,7 @@ class DomainsDetailActiveScreen extends Component {
                                           key={index}
                                           selected={resolver.address === selectedResolverAddress}
                                           value={resolver.name}
+                                          data-address={resolver.address}
                                         >{resolver.name}</option>)
                                       })
                                     }

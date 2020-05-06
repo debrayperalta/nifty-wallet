@@ -107,7 +107,7 @@ export default class RnsResolver extends RnsJsDelegate {
       });
     });
   }
-// this.rifConfig.rns.contracts.multiChainResolver This is the path to a multicahin address in the config
+
   /**
    * Calls the contract and sets a new resolver to a given DomainName (This function is only_owner)
    * @param domainNameResolver DomainName with the .rsk extension
