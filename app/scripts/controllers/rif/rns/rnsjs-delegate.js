@@ -143,8 +143,10 @@ export default class RnsJsDelegate extends RnsDelegate {
    */
   createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress) {
     domainName = this.addRskSuffix(domainName);
-    if (!ownerAddress) {
-      ownerAddress = this.address;
+    if (!ownerAddress && !parentOwnerAddress) {
+      return Promise.reject('You need to specify ownerAddress or parentOwnerAddress');
+    } else if (!ownerAddress) {
+      ownerAddress = parentOwnerAddress;
     }
     const result = this.rnsJs.subdomains.create(domainName, subdomain, ownerAddress, parentOwnerAddress);
     result.then(transactionReceipt => {
