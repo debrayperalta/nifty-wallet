@@ -9,6 +9,7 @@ const rifActions = {
   checkDomainAvailable,
   getDomainDetails,
   setResolverAddress,
+  getNetworkAddresses,
   requestDomainRegistration,
   canFinishRegistration,
   finishRegistration,
@@ -84,6 +85,22 @@ function setResolverAddress (domainName, resolverAddress) {
     dispatch(actions.showLoadingIndication());
     return new Promise((resolve, reject) => {
       background.rif.rns.resolver.setResolver(domainName, resolverAddress, (error, result) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(result);
+      });
+    })
+  }
+}
+
+function getNetworkAddresses (domainName) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication());
+    return new Promise((resolve, reject) => {
+      background.rif.rns.resolver.getNetworksForResolvers(domainName, (error, result) => {
         dispatch(actions.hideLoadingIndication());
         if (error) {
           dispatch(actions.displayWarning(error));

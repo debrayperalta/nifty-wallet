@@ -1,7 +1,7 @@
 import * as namehash from 'eth-ens-namehash';
 import RnsJsDelegate from '../rnsjs-delegate';
 import web3Utils from 'web3-utils';
-import { DomainDetails } from '../classes';
+import { DomainDetails, ResolverNetwork } from '../classes';
 import RSKOwner from '../abis/RSKOwner.json';
 import MultiChainresolver from '../abis/MultiChainResolver.json';
 import { DOMAIN_STATUSES, EXPIRING_REMAINING_DAYS } from '../../constants';
@@ -23,7 +23,8 @@ export default class RnsResolver extends RnsJsDelegate {
       isOwner: this.bindOperation(this.isOwner, this),
       getDomainDetails: this.bindOperation(this.getDomainDetails, this),
       setResolver: this.bindOperation(this.setResolver, this),
-      getNetoworksForResolvers: this.bindOperation(this.getNetoworksForResolvers, this),
+      getNetworksForResolvers: this.bindOperation(this.getNetworksForResolvers, this),
+      setNetoworksForResolver: this.bindOperation(this.setNetoworksForResolver, this),
       ...rnsJsApi,
     }
   }
@@ -76,8 +77,7 @@ export default class RnsResolver extends RnsJsDelegate {
       const content = this.getContent(domainNameResolver);
       const expiration = this.getExpirationRemaining(domainNameResolver);
       const getOwner = this.getOwner(domainNameResolver);
-      //const getResolver = this.getResolver(domainNameResolver);
-      const getResolver = this.getNetoworksForResolvers();
+      const getResolver = this.getResolver(domainNameResolver);
       Promise.all([getDomainAddress, content, expiration, getOwner, getResolver]).then(values => {
         let expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + values[2]);
@@ -128,25 +128,47 @@ export default class RnsResolver extends RnsJsDelegate {
     });
   }
 
-  // this.rifConfig.rns.contracts.multiChainResolver This is the path to a multicahin address in the config
-  // TODO: Rodrigo
-  getNetoworksForResolvers (address) {
+  /**
+   * Returns an array of network addresses for a given domain
+   * @param domainNameResolver DomainName with the .rsk extension
+   * @returns {Promise<unknown>}
+   */
+  getNetworksForResolvers (domainNameResolver) {
     return new Promise((resolve, reject) => {
+      // TODO: Rodrigo
       // This event is different, it deppends if we're on the chain of RSK, or not, to develop purposes i'll use only ChainAddrChanged, it need to differentiate it from one to another
-      console.debug('INICIO');
-
-      const myEvent = this.multiChainresolverContractInstance.ChainAddrChanged({node: namehash.hash('testing.rsk')}, {fromBlock: 0, toBlock: 'latest'});
+      const myEvent = this.multiChainresolverContractInstance.ChainAddrChanged({node: namehash.hash(domainNameResolver)}, {fromBlock: 0, toBlock: 'latest'});
       myEvent.get(function(error, result){
-        console.debug('RESULT ===================', result);
-        console.debug('ERROR ===================', error);
+        if (error) {
+          console.debug('Error when trying to get netoworks for resolver', error);
+          reject(error);
+        }
+        const arrChains = [];
+        result.forEach(network => {
+          const networkToPush = new ResolverNetwork(network.args.chain, network.args.addr)
+          const index = arrChains.findIndex((e) => e.chain === networkToPush.chain);
+          if (index === -1) {
+            arrChains.push(networkToPush);
+          } else {
+            arrChains[index] = networkToPush;
+          }
+        });
+        console.debug('getNetworksForResolvers success', arrChains);
+        resolve(arrChains);
       });
-      console.debug('FIN');
     });
   }
 
-  setNetoworksForResolver () {
+  /**
+   * Calls the contract and sets a new network calling the setChainAddr function in the contract of multichainresolver
+   * @param domainNameResolver domainNameResolver DomainName with the .rsk extension
+   * @param chain
+   * @param networkAddress
+   * @returns {Promise<unknown>}
+   */
+  setNetoworksForResolver (domainNameResolver, chain, networkAddress) {
     return new Promise((resolve, reject) => {
-      this.send(this.multiChainresolverContractInstance, 'setChainAddr', [namehash.hash('lebron.rsk'), '0x80000069', '0x123456789'])
+      this.send(this.multiChainresolverContractInstance, 'setChainAddr', [namehash.hash(domainNameResolver), chain, networkAddress])
         .then(result => {
           console.debug('setNetoworksForResolver success', result);
           resolve(result);
