@@ -1,5 +1,6 @@
 const nodeify = require('../../../lib/nodeify')
 import extend from 'xtend'
+import {global} from '../constants'
 /**
  * Delegate class to encapsulate all the logic related to delegates.
  */
@@ -94,11 +95,20 @@ export default class RnsDelegate {
     if (contractInstance && methodName) {
       if (contractInstance[methodName]) {
         return new Promise((resolve, reject) => {
-          contractInstance[methodName].sendTransaction(...parameters, transactionOptions, (error, result) => {
+          contractInstance[methodName].sendTransaction(...parameters, transactionOptions, (error, transactionHash) => {
             if (error) {
               reject(error);
             }
-            resolve(result);
+            this.web3.eth.getTransactionReceipt(transactionHash, (error, transactionReceipt) => {
+              if (error) {
+                reject(error);
+              }
+              if (transactionReceipt && transactionReceipt.status === global.TRANSACTION_STATUS_OK) {
+                resolve(transactionReceipt);
+              } else {
+                reject(transactionReceipt);
+              }
+            });
           })
         });
       }
