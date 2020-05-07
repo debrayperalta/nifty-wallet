@@ -14,6 +14,7 @@ class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
     addNewChainAddress: PropTypes.func.isRequired,
     setNewResolver: PropTypes.func.isRequired,
+    setChainAddressForResolver: PropTypes.func.isRequired,
 		setAutoRenew: PropTypes.func.isRequired,
     getChainAddresses: PropTypes.func,
     getUnapprovedTransactions: PropTypes.func,
@@ -39,42 +40,24 @@ class DomainsDetailActiveScreen extends Component {
 			resolvers: resolvers,
 			selectedResolverIndex: -1,
       slipChainAddresses: slipChainAddresses,
-			selectedChainAddress: slipChainAddresses[0].value,
+      selectedChainAddress: slipChainAddresses[0].chain,
 			insertedAddress: '',
       chainAddresses: [],
 		};
 	}
   updateChainAddress = (selectedOption) => {
-		this.setState({ selectedChainAddress: selectedOption.value });
+		this.setState({ selectedChainAddress: selectedOption });
 	}
 	updateAddress = (address) => {
 		this.setState({ insertedAddress: address });
 	}
-	addAddress = () => {
-		let domains = JSON.parse(localStorage.rnsDomains);
-		let networkIndex = -1;
-		let resolverIndex = this.state.selectedResolverIndex;
-		domains.find((domain, index) => {
-			if (domain.domain === this.props.domain.domain){
-				networkIndex = index;
-				return domain;
-			}
-		})
-
-		if (networkIndex !== -1 && resolverIndex !== -1){
-			let newNetwork = {
-				networkName: this.state.selectedNetwork,
-				networkIcon:this.state.selectedNetwork,
-				address: this.state.insertedAddress,
-			};
-			domains[networkIndex].resolvers[resolverIndex].network.push(newNetwork);
-			localStorage.setItem('rnsDomains', JSON.stringify(domains));
-			// Sending back with localstorage rnsDomains (Here we try to get again localstorage so if it wasnt updated, we're going to show whats really saved)
-			domains = JSON.parse(localStorage.rnsDomains);
-			this.setState({
-				resolvers: domains[networkIndex].resolvers,
-			});
-		}
+  async addAddress () {
+    this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
+    await this.props.wait();
+    this.showConfirmTransactionPage(() => {
+      // TODO: Rodrigo
+      // Send back, or wait
+    });
 	}
   showModalAddChainAddress = () => {
 		let elements = [];
@@ -241,6 +224,7 @@ const mapDispatchToProps = dispatch => {
 		addNewChainAddress: (message) => dispatch(rifActions.showModal(message)),
     setNewResolver: (domainName, resolverAddress) => dispatch(rifActions.setResolverAddress(domainName, resolverAddress)),
     getChainAddresses: (domainName) => dispatch(rifActions.getChainAddresses(domainName)),
+    setChainAddressForResolver: (domainName, chain, chainAddress) => dispatch(rifActions.setChainAddressForResolver(domainName, chain, chainAddress)),
     getUnapprovedTransactions: () => dispatch(rifActions.getUnapprovedTransactions()),
     showTransactionConfirmPage: (data) => dispatch(niftyActions.showConfTxPage(data)),
     wait: (time) => dispatch(rifActions.waitUntil(time)),

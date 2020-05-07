@@ -12,6 +12,7 @@ const rifActions = {
   getDomainDetails,
   setResolverAddress,
   getChainAddresses,
+  setChainAddressForResolver,
   requestDomainRegistration,
   canFinishRegistration,
   finishRegistration,
@@ -90,6 +91,22 @@ function setResolverAddress (domainName, resolverAddress) {
     dispatch(actions.showLoadingIndication());
     return new Promise((resolve, reject) => {
       background.rif.rns.resolver.setResolver(domainName, resolverAddress, (error, result) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(result);
+      });
+    })
+  }
+}
+
+function setChainAddressForResolver (domainName, chain, chainAddress) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication());
+    return new Promise((resolve, reject) => {
+      background.rif.rns.resolver.setChainAddressForResolver(domainName, chain, chainAddress, (error, result) => {
         dispatch(actions.hideLoadingIndication());
         if (error) {
           dispatch(actions.displayWarning(error));

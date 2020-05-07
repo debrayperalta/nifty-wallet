@@ -22,8 +22,9 @@ class AddNewChainAddressToResolver extends Component {
     };
 	}
   updateChainAddress = (selectedOption) => {
+    console.log('SELECTED OPTION', selectedOption);
 		this.setState({ selectedChainAddress: selectedOption });
-		this.props.updateChainAddress(selectedOption);
+		this.props.updateChainAddress(selectedOption.chain);
 	}
 	updateAddress = (e) => {
 		this.setState({ insertedAddress: e.target.value });
@@ -44,14 +45,13 @@ class AddNewChainAddressToResolver extends Component {
     }
     const selectOption = (props) => {
       const { option } = props;
-      console.debug('Option', option);
       const icon = option.icon ? option.icon : DEFAULT_ICON;
       return (
         <div
           onMouseDown={(event) => {
             event.preventDefault();
             event.stopPropagation();
-            props.onSelect(option, event)
+            props.onSelect(option, event);
           }}
           onMouseEnter={(event) => props.onFocus(option, event)}
           onMouseMove={(event) => {
