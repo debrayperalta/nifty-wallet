@@ -3,11 +3,8 @@ import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 import rifActions from '../../../actions'
 import niftyActions from '../../../../actions'
-import {faChevronLeft} from '@fortawesome/free-solid-svg-icons'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {SearchDomains} from '../../../components'
-import {registrationTimeouts} from '../../../constants';
-import {pageNames} from '../../index';
+import {registrationTimeouts} from '../../../constants'
+import {pageNames} from '../../index'
 
 class DomainRegisterScreen extends Component {
 
@@ -18,7 +15,6 @@ class DomainRegisterScreen extends Component {
     getCost: PropTypes.func,
     showThis: PropTypes.func,
     dispatch: PropTypes.func,
-    goBack: PropTypes.func,
     currentStep: PropTypes.string,
     yearsToRegister: PropTypes.number,
     costInRif: PropTypes.number,
@@ -328,8 +324,6 @@ class DomainRegisterScreen extends Component {
     const registerButtons = this.getButtons(this.props.currentStep ? this.props.currentStep : 'available');
     return (
       <div className={'body'}>
-        <FontAwesomeIcon icon={faChevronLeft} className={'rif-back-button'} onClick={() => this.props.goBack()}/>
-        <SearchDomains />
         <div id="headerName" className={'domain-name'}>
           <div>{this.props.domainName}</div>
         </div>
@@ -356,9 +350,13 @@ function mapStateToProps (state) {
 
 const mapDispatchToProps = dispatch => {
   return {
-    goBack: () => dispatch(rifActions.navigateTo(pageNames.rns.domains)),
     dispatch: dispatch,
-    showThis: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainRegister, data)),
+    showThis: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainRegister, {
+      navBar: {
+        title: 'Domain Register',
+      },
+      ...data,
+    })),
     getCost: (domainName, yearsToRegister) => dispatch(rifActions.getRegistrationCost(domainName, yearsToRegister)),
     requestRegistration: (domainName, yearsToRegister) => dispatch(rifActions.requestDomainRegistration(domainName, yearsToRegister)),
     wait: (time) => dispatch(rifActions.waitUntil(time)),

@@ -363,7 +363,7 @@ App.prototype.renderPrimary = function () {
     // RIF SECTION
     case 'rif':
       log.debug('rendering rif screen')
-      return getPage(props.currentView);
+      return getPage(props.currentView, props.dispatch);
 
     default:
       log.debug('rendering default, account detail screen')

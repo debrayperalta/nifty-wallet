@@ -1,5 +1,7 @@
 const actions = require('../actions');
 
+import extend from 'xtend'
+
 const rifActions = {
   SHOW_MODAL: 'SHOW_MODAL',
   SHOW_MENU: 'SHOW_MENU',
@@ -20,11 +22,14 @@ const rifActions = {
   showMenu,
   hideMenu,
   navigateTo,
+  navigateBack,
   showModal,
   hideModal,
 }
 
 let background = null;
+const navigationStack = [];
+let backNavigated = false;
 
 function setBackgroundConnection (backgroundConnection) {
   background = backgroundConnection;
@@ -135,6 +140,7 @@ function canFinishRegistration (commitmentHash) {
       background.rif.rns.register.canFinishRegistration(commitmentHash, (error, result) => {
         dispatch(actions.hideLoadingIndication());
         if (error) {
+          dispatch(actions.displayWarning(error));
           return reject(error);
         }
         return resolve(result);
@@ -148,7 +154,11 @@ function finishRegistration (domainName) {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve) => {
       dispatch(actions.hideLoadingIndication());
-      background.rif.rns.register.finishRegistration(domainName);
+      background.rif.rns.register.finishRegistration(domainName, (error, result) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+        }
+      });
       return resolve();
     });
   };
@@ -161,25 +171,13 @@ function getRegistrationCost (domainName, yearsToRegister) {
       dispatch(actions.hideLoadingIndication());
       background.rif.rns.register.getDomainCost(domainName, yearsToRegister, (error, result) => {
         if (error) {
+          dispatch(actions.displayWarning(error));
           return reject(error);
         }
         return resolve(result);
       });
     });
   };
-}
-
-function showDomainRegisterPage (data) {
-  if (data && !data.domainName) {
-    data = {
-      domainName: data,
-      currentStep: 'available',
-    }
-  }
-  return {
-    type: rifActions.SHOW_DOMAIN_REGISTER_PAGE,
-    data: data,
-  }
 }
 
 function getUnapprovedTransactions () {
@@ -189,6 +187,7 @@ function getUnapprovedTransactions () {
       background.rif.rns.register.getUnapprovedTransactions((error, transactions) => {
         dispatch(actions.hideLoadingIndication());
         if (error) {
+          dispatch(actions.displayWarning(error));
           return reject(error);
         }
         return resolve(transactions);
@@ -204,6 +203,7 @@ function getSelectedAddress () {
       background.rif.rns.register.getSelectedAddress((error, selectedAddress) => {
         dispatch(actions.hideLoadingIndication());
         if (error) {
+          dispatch(actions.displayWarning(error));
           return reject(error);
         }
         return resolve(selectedAddress);
@@ -245,14 +245,44 @@ function showMenu (data) {
   }
 }
 
+function navigateBack () {
+  if (navigationStack && navigationStack.length > 0) {
+    // we cleanup the last navigation since it was to the current page
+    if (!backNavigated) {
+      navigationStack.pop();
+      backNavigated = true;
+    }
+    if (navigationStack.length > 0) {
+      return navigationStack.pop();
+    }
+  }
+  // go to home since we don't have any other page to go to.
+  return actions.goHome();
+}
+
 function navigateTo (screenName, params) {
-  return {
+  const defaultParams = {
+    showDomainsSearch: true,
+  };
+
+  const defaultNavBarParams = {
+    showTitle: true,
+    showBack: true,
+  };
+
+  params = extend(defaultParams, params);
+  params.navBar = extend(defaultNavBarParams, params.navBar);
+
+  const currentNavigation = {
     type: rifActions.NAVIGATE_TO,
     data: {
       screenName,
       params,
     },
   }
+  navigationStack.push(currentNavigation);
+  backNavigated = false;
+  return currentNavigation;
 }
 
 module.exports = rifActions
