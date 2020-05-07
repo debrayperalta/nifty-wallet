@@ -9,6 +9,8 @@ import rifActions from '../../../actions';
 import { GET_RESOLVERS, DEFAULT_ICON } from '../../../constants';
 import { SLIP_ADDRESSES } from '../../../constants/slipAddresses';
 import niftyActions from '../../../../actions';
+import {pageNames} from '../../index';
+import actions from '../../../../actions';
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
@@ -31,6 +33,9 @@ class DomainsDetailActiveScreen extends Component {
 		isOwner: PropTypes.bool,
 		isLuminoNode: PropTypes.bool,
 		isRifStorage: PropTypes.bool,
+    navigateBack: PropTypes.func.isRequired,
+    showDomainsDetailPage: PropTypes.func.isRequired,
+    displayToast: PropTypes.func.isRequired,
 	}
 	constructor(props) {
 		super(props);
@@ -55,8 +60,8 @@ class DomainsDetailActiveScreen extends Component {
     this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
     await this.props.wait();
     this.showConfirmTransactionPage(() => {
-      // TODO: Rodrigo
-      // Send back, or wait
+      this.props.displayToast("Chain address added/modified, wait till it's confirmed");
+      this.props.showDomainsDetailPage(this.props.domain);
     });
 	}
   showModalAddChainAddress = () => {
@@ -89,8 +94,8 @@ class DomainsDetailActiveScreen extends Component {
         this.props.setNewResolver(this.props.domainName, address);
         await this.props.wait();
         this.showConfirmTransactionPage(() => {
-          // TODO: Rodrigo
-          // Send back, or wait
+          this.props.displayToast("Resolver settled, wait till it's confirmed");
+          this.props.showDomainsDetailPage(this.props.domain);
         });
         return;
       }
@@ -229,6 +234,9 @@ const mapDispatchToProps = dispatch => {
     showTransactionConfirmPage: (data) => dispatch(niftyActions.showConfTxPage(data)),
     wait: (time) => dispatch(rifActions.waitUntil(time)),
 		setAutoRenew: () => {},
+    showDomainsDetailPage: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, data)),
+    navigateBack: () => dispatch(rifActions.navigateBack()),
+    displayToast: (message) => dispatch(actions.displayToast(message)),
 	}
 }
 
