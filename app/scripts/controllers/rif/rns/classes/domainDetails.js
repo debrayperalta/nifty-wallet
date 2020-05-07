@@ -11,10 +11,6 @@
  * @attribute isLuminoNode: If the domain has a lumino node asociated
  * @attribute isRifStorage: If the domain has a rif storage asociated
  */
- /**
-  * Dev comment
-  * Use proptypes to validate this values, or some solution so it will always be the same format
- */
 export default class DomainDetails {
     constructor(domain, address, content, expiration, autoRenew, ownerAddress, status, selectedResolverAddress, isLuminoNode, isRifStorage) {
         this.domain = domain;

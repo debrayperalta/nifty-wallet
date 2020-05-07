@@ -1,10 +1,10 @@
 // Constant names, if you want to add a new token (icon), just go to constant.js and add one to the array, then add it to getNameTokenForIcon
-import { SLIP_NETWORK } from '../constants/slipNetworks'
+import { SLIP_ADDRESSES } from '../constants/slipAddresses'
 
-var getNetworkByNetworkAddress = function(networkAddress) {
-    return SLIP_NETWORK.find(network => network.chain === networkAddress);
+var getChainAddressByChainAddress = function(chainAddress) {
+    return SLIP_ADDRESSES.find(e => e.chain === chainAddress);
 }
 
 export {
-  getNetworkByNetworkAddress,
+  getChainAddressByChainAddress,
 }

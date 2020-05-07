@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
-import { getNetworkByNetworkAddress } from '../../../utils/utils';
+import { getChainAddressByChainAddress } from '../../../utils/utils';
 import { CustomButton, AddNewTokenNetworkAddress, DomainIcon, LuminoNodeIcon, RifStorageIcon, Menu } from '../../../components';
 import rifActions from '../../../actions';
 import { GET_RESOLVERS, DEFAULT_ICON } from '../../../constants';
-import { SLIP_NETWORK } from '../../../constants/slipNetworks';
+import { SLIP_ADDRESSES } from '../../../constants/slipAddresses';
 import niftyActions from '../../../../actions';
 
 class DomainsDetailActiveScreen extends Component {
@@ -15,7 +15,7 @@ class DomainsDetailActiveScreen extends Component {
 		addNewNetwork: PropTypes.func.isRequired,
     setNewResolver: PropTypes.func.isRequired,
 		setAutoRenew: PropTypes.func.isRequired,
-    getNetworkAddresses: PropTypes.func,
+    getChainAddresses: PropTypes.func,
     getUnapprovedTransactions: PropTypes.func,
     showTransactionConfirmPage: PropTypes.func,
     wait: PropTypes.func,
@@ -33,15 +33,15 @@ class DomainsDetailActiveScreen extends Component {
 	}
 	constructor(props) {
 		super(props);
-		// TODO: Rodrigo, assign correctly pls
-		let networks = SLIP_NETWORK;
+    let resolvers = Object.assign([], GET_RESOLVERS());
+    let slipChainAddresses = Object.assign([], SLIP_ADDRESSES);
 		this.state = {
-			resolvers: GET_RESOLVERS(),
+			resolvers: resolvers,
 			selectedResolverIndex: -1,
-			networks: networks,
-			selectedNetwork: networks[0].value,
+      slipChainAddresses: slipChainAddresses,
+			selectedChainAddress: slipChainAddresses[0].value,
 			insertedAddress: '',
-      networkAddresses: [],
+      chainAddresses: [],
 		};
 	}
 	updateNetwork = (selectedOption) => {
@@ -81,7 +81,7 @@ class DomainsDetailActiveScreen extends Component {
 		elements.push(<AddNewTokenNetworkAddress
 			updateNetwork={this.updateNetwork.bind(this)}
 			updateAddress={this.updateAddress.bind(this)}
-			networks={this.state.networks}
+      slipChainAddresses={this.state.slipChainAddresses}
 		/>);
 		let message = {
 			title: 'Add new network',
@@ -114,11 +114,11 @@ class DomainsDetailActiveScreen extends Component {
     }
   }
   componentDidMount () {
-    this.loadNetworkAddresses();
+    this.loadChainAddresses();
   }
-  async loadNetworkAddresses () {
-    const networkAddresses = await this.props.getNetworkAddresses(this.props.domainName);
-    this.setState({ networkAddresses: networkAddresses });
+  async loadChainAddresses () {
+    const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
+    this.setState({ chainAddresses: chainAddresses });
   }
 
   showConfirmTransactionPage (callback) {
@@ -140,7 +140,7 @@ class DomainsDetailActiveScreen extends Component {
 
 	render () {
 		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress } = this.props;
-		const { networkAddresses } = this.state;
+		const { chainAddresses } = this.state;
 		return (
       <div className={'body'}>
         <div id="headerName" className={'domain-name'}>
@@ -194,17 +194,16 @@ class DomainsDetailActiveScreen extends Component {
                   }
                 />
               </div>
-              <div id="resolverNetworksBody" className={'resolver-network'}>
+              <div id="resolverChainAddressBody" className={'resolver-chainaddress'}>
                 {
-                  networkAddresses.length <= 0 ? <div></div> :
-                  networkAddresses.map((networkAddress, index) => {
-                    console.log('NetworkAddress', networkAddress);
-                    const network = getNetworkByNetworkAddress(networkAddress.chain);
-                    const icon = network.icon ? network.icon : DEFAULT_ICON;
-                    return <div key={index} className={'resolver-network-description'}>
+                  chainAddresses.length <= 0 ? <div></div> :
+                    chainAddresses.map((chainAddress, index) => {
+                    const address = getChainAddressByChainAddress(chainAddress.chain);
+                    const icon = address.icon ? address.icon : DEFAULT_ICON;
+                    return <div key={index} className={'resolver-chainaddress-description'}>
                       <FontAwesomeIcon icon={icon.icon} color={icon.color} className={'domain-icon'}/>
-                      <span>{network.symbol}</span>
-                      <span className={'resolver-network-description-address'}>{networkAddress.address}</span>
+                      <span>{address.symbol}</span>
+                      <span className={'resolver-chainaddress-description-address'}>{chainAddress.address}</span>
                     </div>
                   })
                 }
@@ -241,7 +240,7 @@ const mapDispatchToProps = dispatch => {
 	return {
 		addNewNetwork: (message) => dispatch(rifActions.showModal(message)),
     setNewResolver: (domainName, resolverAddress) => dispatch(rifActions.setResolverAddress(domainName, resolverAddress)),
-    getNetworkAddresses: (domainName) => dispatch(rifActions.getNetworkAddresses(domainName)),
+    getChainAddresses: (domainName) => dispatch(rifActions.getChainAddresses(domainName)),
     getUnapprovedTransactions: () => dispatch(rifActions.getUnapprovedTransactions()),
     showTransactionConfirmPage: (data) => dispatch(niftyActions.showConfTxPage(data)),
     wait: (time) => dispatch(rifActions.waitUntil(time)),

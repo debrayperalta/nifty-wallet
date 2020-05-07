@@ -8,14 +8,14 @@ class AddNewTokenNetworkAddress extends Component {
 	static propTypes = {
 		updateNetwork: PropTypes.func.isRequired,
 		updateAddress: PropTypes.func.isRequired,
-		networks: PropTypes.array.isRequired,
+    slipChainAddresses: PropTypes.array.isRequired,
 	}
     constructor(props) {
         super(props);
-		const networks = [...props.networks]
-		this.state = { 
-            networks: networks,
-			selectedNetwork: networks[0],
+		const slipChainAddresses = [...props.slipChainAddresses]
+		this.state = {
+      slipChainAddresses: slipChainAddresses,
+			selectedChainAddress: slipChainAddresses[0],
 			insertedAddress: '',
 		};
 	}
@@ -27,7 +27,7 @@ class AddNewTokenNetworkAddress extends Component {
 		this.setState({ insertedAddress: e.target.value })
 		this.props.updateAddress(e.target.value)
 	}
-	
+
 	render () {
         const selectValue = ({value}) => {
 			return(
@@ -44,7 +44,7 @@ class AddNewTokenNetworkAddress extends Component {
 				<div
 					onMouseDown={(event) => {
 						event.preventDefault();
-						event.stopPropagation();	
+						event.stopPropagation();
 						props.onSelect(option, event)
 					}}
 					onMouseEnter={(event) => props.onFocus(option, event)}

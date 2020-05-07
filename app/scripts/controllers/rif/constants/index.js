@@ -6,3 +6,5 @@ export const DOMAIN_STATUSES = {
     EXPIRING: 'expiring',
     EXPIRED: 'expired',
 };
+
+export const RSK_CHAINID = '0x80000089';

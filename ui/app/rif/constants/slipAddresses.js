@@ -4,7 +4,7 @@ import {faCoins} from '@fortawesome/free-solid-svg-icons';
  * Add the icon to the array with this structure
  *   name: icon,
  */
-export const SLIP_NETWORK = [
+export const SLIP_ADDRESSES = [
   {
     chain: '0x80000000',
     symbol: 'BTC',

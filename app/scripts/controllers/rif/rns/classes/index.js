@@ -1,7 +1,7 @@
 import DomainDetails from './domainDetails';
-import ResolverNetwork from './resolverNetwork';
+import ChainAddress from './chainAddress';
 
 export {
   DomainDetails,
-  ResolverNetwork,
+  ChainAddress,
 }
