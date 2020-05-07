@@ -1,6 +1,6 @@
+import {TransactionListener} from '../transaction-listener'
 const nodeify = require('../../../lib/nodeify')
 import extend from 'xtend'
-import {global} from '../constants'
 /**
  * Delegate class to encapsulate all the logic related to delegates.
  */
@@ -89,7 +89,9 @@ export default class RnsDelegate {
    * @param methodName the contract method to invoke
    * @param parameters the method parameters array
    * @param transactionOptions optional, if you want to specify the gas for this transaction or another parameter
-   * @returns a Promise with the result of the transaction
+   * @returns a Promise that resolves when the user submit or reject the transaction on the confirmation page,
+   * this promise contains the listener to handle the transaction receipt after the
+   * transaction is mined on the chain.
    */
   send (contractInstance, methodName, parameters, transactionOptions = {from: this.address}) {
     if (contractInstance && methodName) {
@@ -99,22 +101,31 @@ export default class RnsDelegate {
             if (error) {
               reject(error);
             }
-            this.web3.eth.getTransactionReceipt(transactionHash, (error, transactionReceipt) => {
-              if (error) {
-                reject(error);
-              }
-              if (transactionReceipt && transactionReceipt.status === global.TRANSACTION_STATUS_OK) {
-                resolve(transactionReceipt);
-              } else {
-                reject(transactionReceipt);
-              }
+            const pendingTransaction = this.getPendingTransactionByHash(transactionHash);
+            const transactionListener = new TransactionListener({
+              web3: this.web3,
+              transactionId: pendingTransaction.id,
+              transactionHash,
+              transactionController: this.transactionController,
             });
+            transactionListener.listen();
+            resolve(transactionListener);
           })
         });
       }
       return Promise.reject('Invalid method for contract instance');
     }
     return Promise.reject('Contract and Method is needed');
+  }
+
+  /**
+   * Gets a pending transaction by hash, these transactions are those that are submitted
+   * @param transactionHash
+   * @returns the transaction
+   */
+  getPendingTransactionByHash (transactionHash) {
+    const pendingTransactions = this.transactionController.txStateManager.getPendingTransactions(this.address);
+    return pendingTransactions.find(transaction => transaction.hash === transactionHash);
   }
 
   /**

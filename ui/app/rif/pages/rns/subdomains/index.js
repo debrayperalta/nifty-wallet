@@ -94,14 +94,23 @@ class Subdomains extends Component {
       elements: inputs,
       confirmLabel: 'Next',
       confirmCallback: async () => {
-        await this.props.createSubdomain(this.props.domainInfo.domainName, this.state.newSubdomain.name, this.state.newSubdomain.owner, this.props.domainInfo.ownerAddress);
+        await this.props.createSubdomain(
+          this.props.domainInfo.domainName,
+          this.state.newSubdomain.name,
+          this.state.newSubdomain.owner,
+          this.props.domainInfo.ownerAddress,
+          (transactionReceipt) => {
+            this.loadSubdomains();
+          });
         this.props.showPopup('Confirmation', {
           text: 'Please confirm the operation in the next screen to create the subdomain.',
           hideCancel: true,
           confirmCallback: async () => {
             this.props.showTransactionConfirmPage({
               action: (payload) => {
-                this.loadSubdomains();
+                this.props.showThis({
+                  ...this.props,
+                });
               },
               payload: null,
             });
@@ -193,7 +202,8 @@ function mapDispatchToProps (dispatch) {
         hideCancel: opts.hideCancel,
       }));
     },
-    createSubdomain: (domainName, subdomain, ownerAddress, parentOwnerAddress) => dispatch(rifActions.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress)),
+    createSubdomain: (domainName, subdomain, ownerAddress, parentOwnerAddress, successCallback) =>
+      dispatch(rifActions.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress, successCallback)),
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
     isSubdomainAvailable: (domainName, subdomain) => dispatch(rifActions.isSubdomainAvailable(domainName, subdomain)),

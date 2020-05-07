@@ -42,20 +42,23 @@ export default class RnsRegister extends RnsJsDelegate {
             .then(commitment => {
               console.debug('Commitment received', commitment);
               this.send(this.fifsAddrRegistrarInstance, 'commit', [commitment])
-                .then(result => {
-                  console.debug('Commitment committed', result);
-                  const state = this.getStoreState();
-                  if (!state.register[this.address]) {
-                    state.register[this.address] = {
-                      domainRegister: [],
+                .then(transactionListener => {
+                  transactionListener.mined().then(transactionReceipt => {
+                    const state = this.getStoreState();
+                    if (!state.register[this.address]) {
+                      state.register[this.address] = {
+                        domainRegister: [],
+                      };
+                    }
+                    state.register[this.address].domainRegister[cleanDomainName] = {
+                      secret,
+                      yearsToRegister,
+                      rifCost,
                     };
-                  }
-                  state.register[this.address].domainRegister[cleanDomainName] = {
-                    secret,
-                    yearsToRegister,
-                    rifCost,
-                  };
-                  this.updateStoreState(state);
+                    this.updateStoreState(state);
+                  }).catch(transactionReceipt => {
+                    console.debug('Transaction Failed', transactionReceipt);
+                  });
                 }).catch(error => reject(error));
               resolve(commitment);
             }).catch(error => reject(error));
@@ -104,17 +107,19 @@ export default class RnsRegister extends RnsJsDelegate {
     if (registerByAddress) {
       const registerInformation = registerByAddress.domainRegister[cleanDomainName];
       if (registerInformation) {
-        return new Promise((resolve, reject) => {
-          const rifCost = registerInformation.rifCost;
-          const secret = registerInformation.secret;
-          const durationBN = this.web3.toBigNumber(registerInformation.yearsToRegister);
-          const data = this.getAddrRegisterData(cleanDomainName, this.address, secret, durationBN, this.address);
-          this.send(this.rifContractInstance, 'transferAndCall', [this.rifConfig.rns.contracts.fifsAddrRegistrar, rifCost.toString(), data])
-            .then(result => {
-              console.debug('Domain registered!', result);
-              resolve(result);
-            }).catch(error => reject(error));
-        });
+        const rifCost = registerInformation.rifCost;
+        const secret = registerInformation.secret;
+        const durationBN = this.web3.toBigNumber(registerInformation.yearsToRegister);
+        const data = this.getAddrRegisterData(cleanDomainName, this.address, secret, durationBN, this.address);
+        const result = this.send(this.rifContractInstance, 'transferAndCall', [this.rifConfig.rns.contracts.fifsAddrRegistrar, rifCost.toString(), data]);
+        result.then(transactionListener => {
+          transactionListener.mined().then(transactionReceipt => {
+            console.debug('Transaction success', transactionReceipt);
+          }).catch(transactionReceipt => {
+            console.debug('Transaction failed', transactionReceipt);
+          });
+        })
+        return result;
       } else {
         return Promise.reject('Invalid domainName, you need to use the same as the first request');
       }
@@ -193,8 +198,8 @@ export default class RnsRegister extends RnsJsDelegate {
     const node = namehash(domainName);
     const label = web3Utils.sha3(subdomain);
     const result = this.send(this.rnsContractInstance, 'setSubnodeOwner', [node, label, ownerAddress])
-    result.then(transactionReceipt => {
-      if (transactionReceipt) {
+    result.then(transactionListener => {
+      transactionListener.mined().then(transactionReceipt => {
         const subdomains = this.getSubdomains(domainName);
         subdomains.push({
           domainName,
@@ -203,7 +208,9 @@ export default class RnsRegister extends RnsJsDelegate {
           parentOwnerAddress,
         });
         this.updateSubdomains(domainName, subdomains);
-      }
+      }).catch(transactionReceipt => {
+        console.log('Transaction failed', transactionReceipt);
+      });
     }).catch(error => {
       console.log(error);
     });

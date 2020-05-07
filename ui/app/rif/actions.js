@@ -257,15 +257,19 @@ function getSubdomains (domainName) {
   };
 }
 
-function createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress) {
+function createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress, successCallback) {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve) => {
       dispatch(actions.hideLoadingIndication());
-      background.rif.rns.register.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress, (error) => {
+      background.rif.rns.register.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress, (error, transactionListener) => {
         if (error) {
           dispatch(actions.displayWarning(error));
         }
+        transactionListener.mined()
+          .then(transactionReceipt => {
+            successCallback(transactionReceipt);
+          });
       });
       return resolve();
     });
