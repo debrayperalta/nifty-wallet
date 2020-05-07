@@ -5,12 +5,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { getChainAddressByChainAddress } from '../../../utils/utils';
 import { CustomButton, AddNewChainAddressToResolver, DomainIcon, LuminoNodeIcon, RifStorageIcon, Menu } from '../../../components';
-import rifActions from '../../../actions';
 import { GET_RESOLVERS, DEFAULT_ICON } from '../../../constants';
 import { SLIP_ADDRESSES } from '../../../constants/slipAddresses';
 import niftyActions from '../../../../actions';
 import {pageNames} from '../../index';
-import actions from '../../../../actions';
+import rifActions from '../../../actions';
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
@@ -33,7 +32,6 @@ class DomainsDetailActiveScreen extends Component {
 		isOwner: PropTypes.bool,
 		isLuminoNode: PropTypes.bool,
 		isRifStorage: PropTypes.bool,
-    navigateBack: PropTypes.func.isRequired,
     showDomainsDetailPage: PropTypes.func.isRequired,
     displayToast: PropTypes.func.isRequired,
 	}
@@ -104,6 +102,13 @@ class DomainsDetailActiveScreen extends Component {
   componentDidMount () {
     this.loadChainAddresses();
   }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.domainName !== this.props.domainName) {
+      this.loadChainAddresses();
+    }
+  }
+
   async loadChainAddresses () {
     const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
     this.setState({ chainAddresses: chainAddresses });
@@ -235,8 +240,7 @@ const mapDispatchToProps = dispatch => {
     wait: (time) => dispatch(rifActions.waitUntil(time)),
 		setAutoRenew: () => {},
     showDomainsDetailPage: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, data)),
-    navigateBack: () => dispatch(rifActions.navigateBack()),
-    displayToast: (message) => dispatch(actions.displayToast(message)),
+    displayToast: (message) => dispatch(niftyActions.displayToast(message)),
 	}
 }
 
