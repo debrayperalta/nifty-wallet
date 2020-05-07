@@ -2,7 +2,10 @@ import {faBitcoin, faEthereum} from '@fortawesome/free-brands-svg-icons';
 import {faCoins} from '@fortawesome/free-solid-svg-icons';
 /**
  * Add the icon to the array with this structure
- *   name: icon,
+ *   icon: {
+ *    color: '#FFA500',
+ *    icon: faBitcoin,
+ *   },
  */
 export const SLIP_ADDRESSES = [
   {

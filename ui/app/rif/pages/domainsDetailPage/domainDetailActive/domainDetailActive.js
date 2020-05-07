@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { getChainAddressByChainAddress } from '../../../utils/utils';
-import { CustomButton, AddNewTokenNetworkAddress, DomainIcon, LuminoNodeIcon, RifStorageIcon, Menu } from '../../../components';
+import { CustomButton, AddNewChainAddressToResolver, DomainIcon, LuminoNodeIcon, RifStorageIcon, Menu } from '../../../components';
 import rifActions from '../../../actions';
 import { GET_RESOLVERS, DEFAULT_ICON } from '../../../constants';
 import { SLIP_ADDRESSES } from '../../../constants/slipAddresses';
@@ -12,7 +12,7 @@ import niftyActions from '../../../../actions';
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
-		addNewNetwork: PropTypes.func.isRequired,
+    addNewChainAddress: PropTypes.func.isRequired,
     setNewResolver: PropTypes.func.isRequired,
 		setAutoRenew: PropTypes.func.isRequired,
     getChainAddresses: PropTypes.func,
@@ -44,8 +44,8 @@ class DomainsDetailActiveScreen extends Component {
       chainAddresses: [],
 		};
 	}
-	updateNetwork = (selectedOption) => {
-		this.setState({ selectedNetwork: selectedOption.value });
+  updateChainAddress = (selectedOption) => {
+		this.setState({ selectedChainAddress: selectedOption.value });
 	}
 	updateAddress = (address) => {
 		this.setState({ insertedAddress: address });
@@ -76,15 +76,15 @@ class DomainsDetailActiveScreen extends Component {
 			});
 		}
 	}
-	showModalAddNetworkAddress = () => {
+  showModalAddChainAddress = () => {
 		let elements = [];
-		elements.push(<AddNewTokenNetworkAddress
-			updateNetwork={this.updateNetwork.bind(this)}
+		elements.push(<AddNewChainAddressToResolver
+      updateChainAddress={this.updateChainAddress.bind(this)}
 			updateAddress={this.updateAddress.bind(this)}
       slipChainAddresses={this.state.slipChainAddresses}
 		/>);
 		let message = {
-			title: 'Add new network',
+			title: 'Add new chain address',
 			body: {
 				elements: elements,
 			},
@@ -96,7 +96,7 @@ class DomainsDetailActiveScreen extends Component {
 			cancelCallback: () => {
 			},
 		};
-		this.props.addNewNetwork(message);
+		this.props.addNewChainAddress(message);
 	}
 
 	async onChangeComboResolvers (e) {
@@ -184,7 +184,7 @@ class DomainsDetailActiveScreen extends Component {
                 <CustomButton
                   icon={faPlusCircle}
                   text={'NEW'}
-                  onClick={() => this.showModalAddNetworkAddress()}
+                  onClick={() => this.showModalAddChainAddress()}
                   className={
                     {
                       button: 'domain-detail-new-button',
@@ -238,7 +238,7 @@ function mapStateToProps (state) {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		addNewNetwork: (message) => dispatch(rifActions.showModal(message)),
+		addNewChainAddress: (message) => dispatch(rifActions.showModal(message)),
     setNewResolver: (domainName, resolverAddress) => dispatch(rifActions.setResolverAddress(domainName, resolverAddress)),
     getChainAddresses: (domainName) => dispatch(rifActions.getChainAddresses(domainName)),
     getUnapprovedTransactions: () => dispatch(rifActions.getUnapprovedTransactions()),
