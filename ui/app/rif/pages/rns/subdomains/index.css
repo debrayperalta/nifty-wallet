@@ -36,3 +36,11 @@
   padding-bottom: 0.5em;
   margin-top: 1em;
 }
+.subdomain-popup-view>div>label {
+  font-weight: bold;
+  margin-right: 1em;
+}
+.subdomain-address {
+  overflow-wrap: break-word;
+  margin-right: 1em;
+}

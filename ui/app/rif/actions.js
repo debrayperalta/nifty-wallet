@@ -1,5 +1,4 @@
 const actions = require('../actions');
-
 import extend from 'xtend'
 
 const rifActions = {
@@ -25,6 +24,8 @@ const rifActions = {
   getSubdomains,
   createSubdomain,
   isSubdomainAvailable,
+  goToConfirmPageForLastTransaction,
+  waitForTransactionListener,
 }
 
 let background = null;
@@ -72,13 +73,13 @@ function requestDomainRegistration (domainName, yearsToRegister) {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve, reject) => {
-      background.rif.rns.register.requestRegistration(domainName, yearsToRegister, (error, commitment) => {
+      background.rif.rns.register.requestRegistration(domainName, yearsToRegister, (error, result) => {
         dispatch(actions.hideLoadingIndication());
         if (error) {
           dispatch(actions.displayWarning(error));
           return reject(error);
         }
-        return resolve(commitment);
+        return resolve(result);
       });
     });
   };
@@ -105,12 +106,12 @@ function finishRegistration (domainName) {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve) => {
       dispatch(actions.hideLoadingIndication());
-      background.rif.rns.register.finishRegistration(domainName, (error, result) => {
+      background.rif.rns.register.finishRegistration(domainName, (error, transactionListenerId) => {
         if (error) {
           dispatch(actions.displayWarning(error));
         }
+        return resolve(transactionListenerId);
       });
-      return resolve();
     });
   };
 }
@@ -256,17 +257,32 @@ function getSubdomains (domainName) {
   };
 }
 
+function waitForTransactionListener (transactionListenerId) {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.rns.register.waitForTransactionListener(transactionListenerId, (error, transactionReceipt) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(transactionReceipt);
+      });
+    });
+  };
+}
+
 function createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress) {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())
-    return new Promise((resolve) => {
-      dispatch(actions.hideLoadingIndication());
-      background.rif.rns.register.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress, (error) => {
+    return new Promise((resolve, reject) => {
+      background.rif.rns.register.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress, (error, transactionListenerId) => {
+        dispatch(actions.hideLoadingIndication());
         if (error) {
           dispatch(actions.displayWarning(error));
+          return reject(error);
         }
+        return resolve(transactionListenerId);
       });
-      return resolve();
     });
   };
 }
@@ -274,7 +290,7 @@ function createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddres
 function isSubdomainAvailable (domainName, subdomain) {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       dispatch(actions.hideLoadingIndication());
       background.rif.rns.register.isSubdomainAvailable(domainName, subdomain, (error, available) => {
         if (error) {
@@ -285,6 +301,21 @@ function isSubdomainAvailable (domainName, subdomain) {
       });
     });
   };
+}
+
+function goToConfirmPageForLastTransaction (afterApproval) {
+  return (dispatch) => {
+    dispatch(waitUntil(200)).then(() => {
+      dispatch(getUnapprovedTransactions())
+        .then(latestTransaction => {
+          dispatch(actions.showConfTxPage({
+            id: latestTransaction.id,
+            unapprovedTransactions: latestTransaction,
+            afterApproval,
+          }));
+      });
+    });
+  }
 }
 
 module.exports = rifActions
