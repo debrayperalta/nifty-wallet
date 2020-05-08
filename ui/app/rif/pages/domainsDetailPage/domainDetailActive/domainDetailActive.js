@@ -156,11 +156,11 @@ class DomainsDetailActiveScreen extends Component {
             <div><span className={'domain-description-field'}>Auto renew: <a href={this.props.setAutoRenew()}>{autoRenew ? 'on' : 'off'}</a></span></div>
             <div><span className={'domain-description-field'}>Owner:</span><span className={'domain-description-value label-spacing-left'}>{ownerAddress}</span></div>
           </div>
-          {(isOwner && this.state.resolvers) &&
+          {this.state.resolvers &&
             <div id="resolversBody" className={'resolvers-body'}>
               <div className="resolver-body-top">
                 <div id="selectResolver" className={'custom-select'}>
-                  <select id="comboResolvers" className="select-css" onChange={this.onChangeComboResolvers.bind(this)}>
+                  <select id="comboResolvers" className="select-css" disabled={!isOwner} onChange={isOwner && this.onChangeComboResolvers.bind(this)}>
                     <option disabled selected value hidden> Select Resolver </option>
                       {
                         this.state.resolvers.map((resolver, index) => {
@@ -174,18 +174,20 @@ class DomainsDetailActiveScreen extends Component {
                       }
                   </select>
                 </div>
-                <CustomButton
-                  icon={faPlusCircle}
-                  text={'NEW'}
-                  onClick={() => this.showModalAddChainAddress()}
-                  className={
-                    {
-                      button: 'domain-detail-new-button',
-                      icon: 'domain-icon centerY',
-                      text: 'center',
+                {isOwner &&
+                  <CustomButton
+                    icon={faPlusCircle}
+                    text={'NEW'}
+                    onClick={() => this.showModalAddChainAddress()}
+                    className={
+                      {
+                        button: 'domain-detail-new-button',
+                        icon: 'domain-icon centerY',
+                        text: 'center',
+                      }
                     }
-                  }
-                />
+                  />
+                }
               </div>
               <div id="resolverChainAddressBody" className={'resolver-chainaddress'}>
                 {
@@ -194,14 +196,30 @@ class DomainsDetailActiveScreen extends Component {
                     const address = getChainAddressByChainAddress(chainAddress.chain);
                     const icon = address.icon ? address.icon : DEFAULT_ICON;
                     return <div key={index} className={'resolver-chainaddress-description'}>
-                      <FontAwesomeIcon icon={icon.icon} color={icon.color} className={'domain-icon'}/>
-                      <span>{address.symbol}</span>
-                      <span className={'resolver-chainaddress-description-address'}>{chainAddress.address}</span>
+                      <div className={'resolver-chainaddress-description-chain'}>
+                        <FontAwesomeIcon icon={icon.icon} color={icon.color} className={'domain-icon'}/>
+                        <span>{address.symbol}</span>
+                      </div>
+                      <div className={'resolver-chainaddress-description-chain-address'}>
+                        <span>{chainAddress.address}</span>
+                      </div>
                     </div>
                   })
                 }
               </div>
             </div>
+          }
+          {!isOwner &&
+          <CustomButton
+            text={'WATCH & REGISTER'}
+            onClick={() => {}}
+            className={
+              {
+                button: 'domain-detail-watch-and-register',
+                text: 'center',
+              }
+            }
+          />
           }
           <Menu />
         </div>
