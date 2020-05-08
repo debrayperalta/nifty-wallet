@@ -111,13 +111,13 @@ class DomainsDetailActiveScreen extends Component {
       isRifStorage,
       content,
     };
-		let networks = this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
+		const networks = this.state.resolvers && this.state.resolvers[this.state.selectedResolverIndex] ? this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
 			return <div key={index} className={'resolver-network-description'}>
 					<FontAwesomeIcon icon={getIconForToken(network.networkIcon).icon} color={getIconForToken(network.networkIcon).color} className={'domain-icon'}/>
 					<span>{network.networkName}</span>
 					<span className={'resolver-network-description-address'}>{network.address}</span>
 				</div>
-			})
+			}) : [];
 		return (
 		<div className={'body'}>
             <DomainHeader domainName={domainName}

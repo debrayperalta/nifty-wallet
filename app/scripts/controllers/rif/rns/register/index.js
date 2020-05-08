@@ -2,6 +2,7 @@ import FIFSRegistrar from '../abis/FIFSRegistrar.json'
 import RnsJsDelegate from '../rnsjs-delegate'
 import web3Utils from 'web3-utils';
 import {generateRandomSecret, numberToUint32, utf8ToHexString} from '../../utils/rns'
+import {namehash} from '@rsksmart/rns/lib/utils'
 
 /**
  * This is a delegate to manage all the RNS register operations.
@@ -19,6 +20,7 @@ export default class RnsRegister extends RnsJsDelegate {
       finishRegistration: this.bindOperation(this.finishRegistration, this),
       canFinishRegistration: this.bindOperation(this.canFinishRegistration, this),
       getDomainCost: this.bindOperation(this.getDomainCost, this),
+      createSubdomain: this.bindOperation(this.createSubdomain, this),
       ...rnsJsApi,
     }
   }
@@ -30,7 +32,7 @@ export default class RnsRegister extends RnsJsDelegate {
    * @returns {Promise<string>} commitment that helps is to check if you can finish registration or you still have to wait.
    */
   requestRegistration (domainName, yearsToRegister) {
-    const cleanDomainName = this.cleanDomainFromRskPrefix(domainName);
+    const cleanDomainName = this.cleanDomainFromRskSuffix(domainName);
     const domainHash = web3Utils.sha3(cleanDomainName);
     const secret = generateRandomSecret();
     return new Promise((resolve, reject) => {
@@ -69,7 +71,7 @@ export default class RnsRegister extends RnsJsDelegate {
    * @returns registration cost in RIF (wei)
    */
   getDomainCost (domainName, yearsToRegister) {
-    const cleanDomainName = this.cleanDomainFromRskPrefix(domainName);
+    const cleanDomainName = this.cleanDomainFromRskSuffix(domainName);
     return this.call(this.fifsAddrRegistrarInstance, 'price', [cleanDomainName, 0, yearsToRegister]);
   }
 
@@ -96,7 +98,7 @@ export default class RnsRegister extends RnsJsDelegate {
    * @returns {Promise<void>}
    */
   finishRegistration (domainName) {
-    const cleanDomainName = this.cleanDomainFromRskPrefix(domainName);
+    const cleanDomainName = this.cleanDomainFromRskSuffix(domainName);
     const state = this.getStoreState();
     const registerByAddress = state.register[this.address];
     if (registerByAddress) {
@@ -178,6 +180,34 @@ export default class RnsRegister extends RnsJsDelegate {
     const dataName = utf8ToHexString(name);
 
     return `${dataSignature}${dataOwner}${dataSecret}${dataDuration}${dataName}`;
+  }
+
+  /**
+   * Overrides the parent operation because rns-js is failing on this, we invoke the contract directly.
+   */
+  createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress) {
+    domainName = this.addRskSuffix(domainName);
+    if (!ownerAddress) {
+      ownerAddress = this.address;
+    }
+    const node = namehash(domainName);
+    const label = web3Utils.sha3(subdomain);
+    const result = this.send(this.rnsContractInstance, 'setSubnodeOwner', [node, label, ownerAddress])
+    result.then(transactionReceipt => {
+      if (transactionReceipt) {
+        const subdomains = this.getSubdomains(domainName);
+        subdomains.push({
+          domainName,
+          name: subdomain,
+          ownerAddress,
+          parentOwnerAddress,
+        });
+        this.updateSubdomains(domainName, subdomains);
+      }
+    }).catch(error => {
+      console.log(error);
+    });
+    return result;
   }
 
 }

@@ -20,13 +20,22 @@ class CustomModal extends Component {
     this.props.dispatch(rifActions.hideModal());
   }
 
-  cancel () {
-    this.props.message.cancelCallback();
+  async cancel () {
+    if (this.props.message.cancelCallback) {
+      this.props.message.cancelCallback();
+    }
     this.closeModal();
   }
 
-  confirm () {
-    this.props.message.confirmCallback();
+  async confirm () {
+    if (this.props.message.validateConfirm) {
+      if (!await this.props.message.validateConfirm()) {
+        return;
+      }
+    }
+    if (this.props.message.confirmCallback) {
+      this.props.message.confirmCallback();
+    }
     this.closeModal();
   }
 

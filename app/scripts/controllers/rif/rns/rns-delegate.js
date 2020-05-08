@@ -113,8 +113,18 @@ export default class RnsDelegate {
    * @param domainName the domain name to clear.
    * @returns the cleared domain name
    */
-  cleanDomainFromRskPrefix (domainName) {
+  cleanDomainFromRskSuffix (domainName) {
     return (domainName && domainName.indexOf('.rsk') !== -1) ? domainName.replace('.rsk', '') : domainName;
+  }
+
+  /**
+   * Returns the domain name with .rsk, this is because rns-js expects domains with .rsk suffix and the top level call
+   * has for example infuy without the .rsk
+   * @param domainName the domain name to change.
+   * @returns the domain name with the rsk suffix
+   */
+  addRskSuffix (domainName) {
+    return (domainName && domainName.indexOf('.rsk') === -1) ? (domainName + '.rsk') : domainName;
   }
 
   /**

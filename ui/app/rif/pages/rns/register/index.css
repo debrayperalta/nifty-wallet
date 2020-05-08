@@ -132,10 +132,10 @@
 .domainRegisterProgress>div>article {
   border-radius: 50%;
   background-size: 88%;
-  height: 10em;
+  height: 7em;
   padding-bottom: 31%;
   position: relative;
-  width: 10em;
+  width: 7em;
   border: solid 0.2em #00a344;
   margin: 2em;
 }
