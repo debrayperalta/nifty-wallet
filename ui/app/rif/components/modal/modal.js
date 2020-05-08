@@ -23,8 +23,12 @@ class CustomModal extends Component {
   async cancel () {
     if (this.props.message.cancelCallback) {
       this.props.message.cancelCallback();
+      if (this.props.message.closeAfterCancelCallback) {
+        this.closeModal();
+      }
+    } else {
+      this.closeModal();
     }
-    this.closeModal();
   }
 
   async confirm () {
@@ -35,13 +39,19 @@ class CustomModal extends Component {
     }
     if (this.props.message.confirmCallback) {
       this.props.message.confirmCallback();
+      if (this.props.message.closeAfterConfirmCallback) {
+        this.closeModal();
+      }
+    } else {
+      this.closeModal();
     }
-    this.closeModal();
   }
 
   getButtons () {
-    let cancelButton = (<button onClick={this.cancel.bind(this)}>{this.props.message.cancelLabel}</button>);
-    let confirmButton = (<button onClick={this.confirm.bind(this)}>{this.props.message.confirmLabel}</button>);
+    let cancelButton = (<button className={this.props.message.cancelButtonClass ? this.props.message.cancelButtonClass : ''}
+                                onClick={this.cancel.bind(this)}>{this.props.message.cancelLabel}</button>);
+    let confirmButton = (<button className={this.props.message.confirmButtonClass ? this.props.message.confirmButtonClass : ''}
+                                 onClick={this.confirm.bind(this)}>{this.props.message.confirmLabel}</button>);
     if (this.props.message.hideCancel) {
       cancelButton = null;
     }

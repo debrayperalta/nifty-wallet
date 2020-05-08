@@ -29,6 +29,10 @@
 .subdomains .list>ul {
   width: 100%;
 }
+.subdomains .list .list-item {
+  display: flex;
+  justify-content: space-between;
+}
 .subdomains .list>ul>li {
   font-weight: bold;
   font-size: 1.3em;

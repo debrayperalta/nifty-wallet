@@ -3,6 +3,7 @@ import RnsJsDelegate from '../rnsjs-delegate'
 import web3Utils from 'web3-utils';
 import {generateRandomSecret, numberToUint32, utf8ToHexString} from '../../utils/rns'
 import {namehash} from '@rsksmart/rns/lib/utils'
+import {rns} from '../../constants'
 
 /**
  * This is a delegate to manage all the RNS register operations.
@@ -21,6 +22,7 @@ export default class RnsRegister extends RnsJsDelegate {
       canFinishRegistration: this.bindOperation(this.canFinishRegistration, this),
       getDomainCost: this.bindOperation(this.getDomainCost, this),
       createSubdomain: this.bindOperation(this.createSubdomain, this),
+      deleteSubdomain: this.bindOperation(this.deleteSubdomain, this),
       ...rnsJsApi,
     }
   }
@@ -214,6 +216,33 @@ export default class RnsRegister extends RnsJsDelegate {
       console.log('Transaction failed', transactionReceiptOrError);
     });
     return Promise.resolve(transactionListener.id);
+  }
+
+  deleteSubdomain (domainName, subdomain) {
+    // TODO: implement using call contract directly because rnsjs doesn't work for send operations.
+    domainName = this.addRskSuffix(domainName);
+    let subdomains = this.getSubdomains(domainName);
+    if (subdomains.filter(sd => sd.name === subdomain).length > 0) {
+      return new Promise((resolve, reject) => {
+        this.rnsJs.subdomains.setOwner(domainName, subdomain, rns.defaultAddress)
+          .then(transactionReceipt => {
+            if (transactionReceipt.status) {
+              console.debug('Transaction Success', transactionReceipt);
+              subdomains = subdomains.filter(sd => sd.name !== subdomain);
+              this.updateSubdomains(domainName, subdomains);
+              resolve(transactionReceipt);
+            } else {
+              console.debug('Transaction Failed', transactionReceipt);
+              reject(transactionReceipt);
+            }
+          }).catch(error => {
+          console.debug(error);
+          reject(error);
+        });
+      });
+    } else {
+      return Promise.reject('No subdomain found!');
+    }
   }
 
 }
