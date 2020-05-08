@@ -19,6 +19,7 @@ class Subdomains extends Component {
     subdomains: PropTypes.array,
     showPopup: PropTypes.func,
     createSubdomain: PropTypes.func,
+    waitForListener: PropTypes.func,
     showToast: PropTypes.func,
     showTransactionConfirmPage: PropTypes.func,
     isSubdomainAvailable: PropTypes.func,
@@ -77,6 +78,30 @@ class Subdomains extends Component {
     });
   }
 
+  showCreationSuccess () {
+    this.props.showPopup('Created Successfully', {
+      elements: [
+        (
+          <svg key="ok-animation"
+            className="checkmark"
+            xmlns="http://www.w3.org/2000/svg"
+            width="96"
+            height="96"
+            viewBox="0 0 52 52">
+            <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+            <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+          </svg>
+        ),
+        (<span key="ok-text">Your subdomain is ready!</span>),
+      ],
+      hideCancel: true,
+      confirmLabel: 'Close',
+      confirmCallback: () => {
+        this.loadSubdomains();
+      },
+    });
+  }
+
   openNewSubdomainPopup () {
     const inputs = [
       (<input key="subdomain-name" type="text" placeholder="Subdomain Name" onChange={(e) => {
@@ -94,14 +119,14 @@ class Subdomains extends Component {
       elements: inputs,
       confirmLabel: 'Next',
       confirmCallback: async () => {
-        await this.props.createSubdomain(
+        const transactionListenerId = await this.props.createSubdomain(
           this.props.domainInfo.domainName,
-          this.state.newSubdomain.name,
+          this.state.newSubdomain.name.toLowerCase(),
           this.state.newSubdomain.owner,
-          this.props.domainInfo.ownerAddress,
-          (transactionReceipt) => {
-            this.loadSubdomains();
-          });
+          this.props.domainInfo.ownerAddress);
+        this.props.waitForListener(transactionListenerId).then(tranactionReceipt => {
+          this.showCreationSuccess();
+        });
         this.props.showPopup('Confirmation', {
           text: 'Please confirm the operation in the next screen to create the subdomain.',
           hideCancel: true,
@@ -111,6 +136,7 @@ class Subdomains extends Component {
                 this.props.showThis({
                   ...this.props,
                 });
+                this.props.showToast('Waiting Confirmation');
               },
               payload: null,
             });
@@ -164,9 +190,7 @@ function mapStateToProps (state) {
   // params is the params value or object passed to rifActions.navigateTo('pageName', params)
   const params = state.appState.currentView.params;
   return {
-    domainInfo: params.domainInfo,
-    subdomains: params.subdomains,
-    newSubdomain: state.newSubdomain,
+    ...params,
   }
 }
 
@@ -202,8 +226,8 @@ function mapDispatchToProps (dispatch) {
         hideCancel: opts.hideCancel,
       }));
     },
-    createSubdomain: (domainName, subdomain, ownerAddress, parentOwnerAddress, successCallback) =>
-      dispatch(rifActions.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress, successCallback)),
+    createSubdomain: (domainName, subdomain, ownerAddress, parentOwnerAddress) => dispatch(rifActions.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress)),
+    waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
     isSubdomainAvailable: (domainName, subdomain) => dispatch(rifActions.isSubdomainAvailable(domainName, subdomain)),

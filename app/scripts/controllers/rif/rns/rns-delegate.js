@@ -1,6 +1,7 @@
 import {TransactionListener} from '../transaction-listener'
 const nodeify = require('../../../lib/nodeify')
 import extend from 'xtend'
+
 /**
  * Delegate class to encapsulate all the logic related to delegates.
  */
@@ -15,6 +16,7 @@ export default class RnsDelegate {
     this.rifContractInstance = props.rifContractInstance;
     this.address = props.address;
     this.store = props.store;
+    this.transactionListeners = {};
     this.initialize();
   }
 
@@ -38,6 +40,7 @@ export default class RnsDelegate {
     return {
       getUnapprovedTransactions: this.bindOperation(this.getUnapprovedTransactions, this),
       getSelectedAddress: this.bindOperation(this.getSelectedAddress, this),
+      waitForTransactionListener: this.bindOperation(this.waitForTransactionListener, this),
     }
   }
 
@@ -89,33 +92,37 @@ export default class RnsDelegate {
    * @param methodName the contract method to invoke
    * @param parameters the method parameters array
    * @param transactionOptions optional, if you want to specify the gas for this transaction or another parameter
-   * @returns a Promise that resolves when the user submit or reject the transaction on the confirmation page,
-   * this promise contains the listener to handle the transaction receipt after the
-   * transaction is mined on the chain.
+   * @returns a Promise that resolves with the listener to handle the transaction receipt after the
+   * transaction is confirmed on the node.
    */
   send (contractInstance, methodName, parameters, transactionOptions = {from: this.address}) {
     if (contractInstance && methodName) {
       if (contractInstance[methodName]) {
-        return new Promise((resolve, reject) => {
-          contractInstance[methodName].sendTransaction(...parameters, transactionOptions, (error, transactionHash) => {
-            if (error) {
-              reject(error);
-            }
-            const pendingTransaction = this.getPendingTransactionByHash(transactionHash);
-            const transactionListener = new TransactionListener({
-              web3: this.web3,
-              transactionId: pendingTransaction.id,
-              transactionHash,
-              transactionController: this.transactionController,
-            });
-            transactionListener.listen();
-            resolve(transactionListener);
-          })
+        const transactionListener = new TransactionListener({
+          web3: this.web3,
+          transactionController: this.transactionController,
+          afterClean: (transactionListenerId) => {
+            delete this.transactionListeners[transactionListenerId];
+          },
         });
+        const transactionListenerId = transactionListener.id;
+        contractInstance[methodName].sendTransaction(...parameters, transactionOptions, (error, transactionHash) => {
+          if (error) {
+            this.transactionListeners[transactionListenerId].error(error);
+            this.transactionListeners[transactionListenerId].clean();
+          } else {
+            const pendingTransaction = this.getPendingTransactionByHash(transactionHash)
+            this.transactionListeners[transactionListenerId].transactionId = pendingTransaction.id;
+            this.transactionListeners[transactionListenerId].transactionHash = transactionHash;
+            this.transactionListeners[transactionListenerId].listen();
+          }
+        });
+        this.transactionListeners[transactionListenerId] = transactionListener;
+        return this.transactionListeners[transactionListenerId];
       }
-      return Promise.reject('Invalid method for contract instance');
+      throw new Error('Invalid method for contract instance');
     }
-    return Promise.reject('Contract and Method is needed');
+    throw new Error('Contract and Method is needed');
   }
 
   /**
@@ -126,6 +133,26 @@ export default class RnsDelegate {
   getPendingTransactionByHash (transactionHash) {
     const pendingTransactions = this.transactionController.txStateManager.getPendingTransactions(this.address);
     return pendingTransactions.find(transaction => transaction.hash === transactionHash);
+  }
+
+  /**
+   * Waits for a transaction to be confirmed and then resolves the promise with the transaction receipt or an error.
+   * @param transactionListenerId to listen
+   * @returns {Promise<TransactionReceipt or Error>}
+   */
+  waitForTransactionListener (transactionListenerId) {
+    return new Promise((resolve, reject) => {
+      const listener = this.transactionListeners[transactionListenerId];
+      if (listener) {
+        listener.transactionConfirmed().then(transactionReceipt => {
+          resolve(transactionReceipt);
+        }).catch(transactionReceiptOrError => {
+          reject(transactionReceiptOrError);
+        });
+      } else {
+        reject('No listener found for this id' + transactionListenerId);
+      }
+    });
   }
 
   /**

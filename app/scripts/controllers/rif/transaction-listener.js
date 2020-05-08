@@ -1,5 +1,6 @@
 import EventEmitter from 'safe-event-emitter'
 import {global} from './constants'
+import createId from '../../lib/random-id'
 
 /**
  * Listener for pending mining transactions to handle events
@@ -11,7 +12,18 @@ export class TransactionListener extends EventEmitter {
     this.transactionId = props.transactionId;
     this.transactionHash = props.transactionHash;
     this.transactionController = props.transactionController;
-    this.transactionMined = false;
+    this.confirmed = false;
+    this.currentListeners = 0;
+    this.afterClean = props.afterClean;
+    this.id = createId();
+  }
+
+  /**
+   * Handles the error when the user submits the operation and for some reason it fails.
+   * @param error
+   */
+  error (error) {
+    this.emit('submitError', error);
   }
 
   /**
@@ -21,8 +33,8 @@ export class TransactionListener extends EventEmitter {
    */
   listen () {
     this.transactionController.on(`tx:status-update`, (txId, status) => {
-      if (this.transactionId === txId) {
-        this.transactionMined = true;
+      if (this.transactionId === txId && !this.confirmed) {
+        this.confirmed = true;
         if (status === 'confirmed' || status === 'failed') {
           this.getTransactionReceipt().then(transactionReceipt => {
             if (transactionReceipt &&
@@ -43,7 +55,7 @@ export class TransactionListener extends EventEmitter {
    * @returns {Promise<TransactionReceipt>}
    */
   getTransactionReceipt () {
-    if (this.transactionMined) {
+    if (this.confirmed) {
       return new Promise((resolve, reject) => {
         this.web3.eth.getTransactionReceipt(this.transactionHash, (error, transactionReceipt) => {
           if (error) {
@@ -57,18 +69,45 @@ export class TransactionListener extends EventEmitter {
   }
 
   /**
-   * It returns a promise that resolves when the transaction is successfully mined and the status is 0x1, otherwise it rejects.
-   * In both cases it retrieves the transaction receipt
+   * It returns a promise that resolves when the transaction is successfully confirmed and the status is 0x1, otherwise it rejects.
+   * In both cases it retrieves the transaction receipt or an error if the submission fails.
    * @returns {Promise<TransactionReceipt>}
    */
-  mined () {
+  transactionConfirmed () {
+    this.currentListeners++;
     return new Promise((resolve, reject) => {
       this.on('transactionSuccess', (transactionReceipt) => {
+        this.currentListeners--;
+        this.shouldClean();
         resolve(transactionReceipt);
       });
       this.on('transactionFailed', (transactionReceipt) => {
+        this.currentListeners--;
+        this.shouldClean();
         reject(transactionReceipt);
       });
+      this.on('submitError', (error) => {
+        this.currentListeners--;
+        this.shouldClean();
+        reject(error);
+      });
     });
+  }
+
+  /**
+   * This is an internal method to clean memory when all the listeners already received the confirmation.
+   */
+  shouldClean () {
+    if (this.currentListeners <= 0) {
+      this.clean();
+    }
+  }
+
+  /**
+   * Clean listener from memory
+   */
+  clean () {
+    this.removeAllListeners();
+    this.afterClean(this.id);
   }
 }

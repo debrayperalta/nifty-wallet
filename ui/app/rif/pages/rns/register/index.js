@@ -10,7 +10,6 @@ class DomainRegisterScreen extends Component {
 
   static propTypes = {
     domainName: PropTypes.string,
-    wait: PropTypes.func,
     requestRegistration: PropTypes.func,
     getCost: PropTypes.func,
     showThis: PropTypes.func,
@@ -25,10 +24,10 @@ class DomainRegisterScreen extends Component {
     registeringProgress: PropTypes.number,
     completeRegistration: PropTypes.func,
     canCompleteRegistration: PropTypes.func,
-    waitingForConfirmation: PropTypes.bool,
     viewDomainDetails: PropTypes.func,
     selectedAddress: PropTypes.string,
     getSelectedAddress: PropTypes.func,
+    waitForListener: PropTypes.func,
   }
 
   async componentDidMount () {
@@ -67,13 +66,13 @@ class DomainRegisterScreen extends Component {
     localStorage.setItem('rnsDomains', JSON.stringify(domains));
   }
 
+  // TODO: change this to use obs store, this is not safe, the user can go to another page and we will have errors
   changeDomainStatusAndStore () {
     const domains = JSON.parse(localStorage.getItem('rnsDomains'));
     const domain = domains.filter(domain => domain.domain === this.props.domainName)[0];
     domain.status = 'active';
     localStorage.setItem('rnsDomains', JSON.stringify(domains));
   }
-  // TODO: change this to use obs store
 
   showRegistration () {
     this.props.getCost(this.props.domainName, 1)
@@ -90,18 +89,25 @@ class DomainRegisterScreen extends Component {
   }
 
   async initiateRegistration () {
-    const commitment = await this.props.requestRegistration(this.props.domainName, this.props.yearsToRegister);
-    await this.props.wait();
-    this.showConfirmTransactionPage((commitment) => {
-      this.storePendingDomain();
-      this.afterCommitSubmission(commitment)
-    }, commitment);
+    const result = await this.props.requestRegistration(this.props.domainName, this.props.yearsToRegister);
+    this.props.waitForListener(result.transactionListenerId)
+      .then(transactionReceipt => {
+        this.afterCommitConfirmation(result.commitment);
+      });
+    this.props.showTransactionConfirmPage({
+      action: () => this.showWaitingForConfirmation(),
+    });
   }
 
   async completeRegistration () {
-    await this.props.completeRegistration(this.props.domainName);
-    await this.props.wait();
-    this.showConfirmTransactionPage(() => this.afterConfirmRegistration());
+    const transactionListenerId = await this.props.completeRegistration(this.props.domainName);
+    this.props.waitForListener(transactionListenerId)
+      .then(transactionReceipt => {
+        this.afterRegistration();
+      });
+    this.props.showTransactionConfirmPage({
+      action: () => this.afterRegistrationSubmit(),
+    });
   }
 
   viewDomainDetails () {
@@ -109,44 +115,34 @@ class DomainRegisterScreen extends Component {
   }
 
   afterRegistration () {
+    this.changeDomainStatusAndStore();
     this.props.showThis({
       ...this.props,
       currentStep: 'registered',
     });
-    this.changeDomainStatusAndStore();
   }
 
-  afterConfirmRegistration () {
+  afterRegistrationSubmit () {
     this.props.showThis({
       ...this.props,
-      currentStep: 'registerConfirmation',
+      currentStep: 'waitingForConfirmation',
     });
   }
 
-  showConfirmTransactionPage (callback, payload) {
-    this.props.getUnapprovedTransactions()
-      .then(latestTransaction => {
-        this.props.showTransactionConfirmPage({
-          id: latestTransaction.id,
-          unapprovedTransactions: latestTransaction,
-          afterApproval: {
-            action: (payload) => {
-              if (callback) {
-                  callback(payload);
-              }
-            },
-            payload: payload,
-          },
-        });
-      });
-  }
-
-  afterCommitSubmission (commitment, progress = 0) {
+  afterCommitConfirmation (commitment, progress = 0) {
+    this.storePendingDomain();
     this.props.showThis({
       ...this.props,
       currentStep: 'registering',
       commitment: commitment,
       registeringProgress: progress,
+    });
+  }
+
+  showWaitingForConfirmation () {
+    this.props.showThis({
+      ...this.props,
+      currentStep: 'waitingForConfirmation',
     });
   }
 
@@ -165,7 +161,6 @@ class DomainRegisterScreen extends Component {
   }
 
   getBody (currentStep) {
-    const waitingForConfirmation = this.props.waitingForConfirmation;
     const partials = {
       available: (
         <div className="domainRegisterAnimation">
@@ -220,7 +215,7 @@ class DomainRegisterScreen extends Component {
             <p>
               Waiting for confirmation. You need to wait while we secure your domain, then you need to confirm the registration at the final step
             </p>
-            {waitingForConfirmation ? (<progress/>) : (<progress max="120" value={this.props.registeringProgress}/>)}
+            <progress max="120" value={this.props.registeringProgress}/>
           </div>
         </div>
       ),
@@ -240,7 +235,7 @@ class DomainRegisterScreen extends Component {
           </div>
         </div>
       ),
-      registerConfirmation: (
+      waitingForConfirmation: (
         <div className="domainRegisterAnimation">
           <div>Waiting for confirmation...</div>
         </div>
@@ -265,7 +260,7 @@ class DomainRegisterScreen extends Component {
     };
     if (currentStep === 'registering' && this.props.registeringProgress <= 120) {
       const timeout = setTimeout(() => {
-        this.afterCommitSubmission(this.props.commitment, this.props.registeringProgress + 4);
+        this.afterCommitConfirmation(this.props.commitment, this.props.registeringProgress + 4);
         clearTimeout(timeout);
       }, registrationTimeouts.registering * 1000);
     } else if (currentStep === 'registering' && this.props.registeringProgress >= 120) {
@@ -279,7 +274,6 @@ class DomainRegisterScreen extends Component {
           } else {
             this.props.showThis({
               ...this.props,
-              waitingForConfirmation: true,
             });
           }
         });
@@ -335,16 +329,9 @@ class DomainRegisterScreen extends Component {
 }
 
 function mapStateToProps (state) {
+  const params = state.appState.currentView.params;
   return {
-    domainName: state.appState.currentView.params.domainName,
-    currentStep: state.appState.currentView.params.currentStep,
-    yearsToRegister: state.appState.currentView.params.yearsToRegister,
-    costInRif: state.appState.currentView.params.costInRif,
-    gasCost: state.appState.currentView.params.gasCost,
-    commitment: state.appState.currentView.params.commitment,
-    registeringProgress: state.appState.currentView.params.registeringProgress,
-    waitingForConfirmation: state.appState.currentView.params.waitingForConfirmation,
-    selectedAddress: state.appState.currentView.params.selectedAddress,
+    ...params,
   }
 }
 
@@ -359,13 +346,13 @@ const mapDispatchToProps = dispatch => {
     })),
     getCost: (domainName, yearsToRegister) => dispatch(rifActions.getRegistrationCost(domainName, yearsToRegister)),
     requestRegistration: (domainName, yearsToRegister) => dispatch(rifActions.requestDomainRegistration(domainName, yearsToRegister)),
-    wait: (time) => dispatch(rifActions.waitUntil(time)),
     getUnapprovedTransactions: () => dispatch(rifActions.getUnapprovedTransactions()),
-    showTransactionConfirmPage: (data) => dispatch(niftyActions.showConfTxPage(data)),
+    showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
     completeRegistration: (domainName) => dispatch(rifActions.finishRegistration(domainName)),
     canCompleteRegistration: (commitment) => dispatch(rifActions.canFinishRegistration(commitment)),
     viewDomainDetails: (domainName) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, domainName)),
     getSelectedAddress: () => dispatch(rifActions.getSelectedAddress()),
+    waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
   }
 }
 
