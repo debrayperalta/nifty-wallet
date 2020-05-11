@@ -2,7 +2,7 @@ import FIFSRegistrar from '../abis/FIFSRegistrar.json'
 import RnsJsDelegate from '../rnsjs-delegate'
 import web3Utils from 'web3-utils';
 import {generateRandomSecret, numberToUint32, utf8ToHexString} from '../../utils/rns'
-import {namehash} from '@rsksmart/rns/lib/utils'
+import {rns} from '../../constants'
 
 /**
  * This is a delegate to manage all the RNS register operations.
@@ -20,7 +20,6 @@ export default class RnsRegister extends RnsJsDelegate {
       finishRegistration: this.bindOperation(this.finishRegistration, this),
       canFinishRegistration: this.bindOperation(this.canFinishRegistration, this),
       getDomainCost: this.bindOperation(this.getDomainCost, this),
-      createSubdomain: this.bindOperation(this.createSubdomain, this),
       ...rnsJsApi,
     }
   }
@@ -187,33 +186,6 @@ export default class RnsRegister extends RnsJsDelegate {
     const dataName = utf8ToHexString(name);
 
     return `${dataSignature}${dataOwner}${dataSecret}${dataDuration}${dataName}`;
-  }
-
-  /**
-   * Overrides the parent operation because rns-js is failing on this, we invoke the contract directly.
-   */
-  createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress) {
-    domainName = this.addRskSuffix(domainName);
-    if (!ownerAddress) {
-      ownerAddress = this.address;
-    }
-    const node = namehash(domainName);
-    const label = web3Utils.sha3(subdomain);
-    const transactionListener = this.send(this.rnsContractInstance, 'setSubnodeOwner', [node, label, ownerAddress])
-    transactionListener.transactionConfirmed()
-      .then(transactionReceipt => {
-        const subdomains = this.getSubdomains(domainName);
-        subdomains.push({
-          domainName,
-          name: subdomain,
-          ownerAddress,
-          parentOwnerAddress,
-        });
-        this.updateSubdomains(domainName, subdomains);
-    }).catch(transactionReceiptOrError => {
-      console.log('Transaction failed', transactionReceiptOrError);
-    });
-    return Promise.resolve(transactionListener.id);
   }
 
 }

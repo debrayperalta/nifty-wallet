@@ -5,9 +5,8 @@ import PropTypes from 'prop-types'
 import rifActions from '../../../actions'
 import niftyActions from '../../../../actions'
 import {pageNames} from '../../../pages/index'
-import {faPlusCircle, faCopy} from '@fortawesome/free-solid-svg-icons'
+import {faCopy, faPlusCircle, faTimes} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import extend from 'xtend'
 import copyToClipboard from 'copy-to-clipboard'
 
 class Subdomains extends Component {
@@ -23,6 +22,7 @@ class Subdomains extends Component {
     showToast: PropTypes.func,
     showTransactionConfirmPage: PropTypes.func,
     isSubdomainAvailable: PropTypes.func,
+    deleteSubdomain: PropTypes.func,
   }
 
   constructor (props) {
@@ -73,7 +73,12 @@ class Subdomains extends Component {
     ];
     this.props.showPopup('Subdomain Details', {
       elements: details,
-      hideConfirm: true,
+      confirmLabel: 'Delete',
+      closeAfterConfirmCallback: false,
+      confirmButtonClass: 'delete-button',
+      confirmCallback: () => {
+        this.openDeletePopup(subdomain);
+      },
       cancelLabel: 'Close',
     });
   }
@@ -153,12 +158,40 @@ class Subdomains extends Component {
     });
   }
 
+  openDeletePopup (subdomain) {
+    this.props.showPopup('Delete Subdomain', {
+      text: 'Are you sure you want to delete the subdomain ' + subdomain.name + '?',
+      confirmCallback: async () => {
+        const transactionListenerId = await this.props.deleteSubdomain(subdomain.domainName, subdomain.name);
+        this.props.waitForListener(transactionListenerId).then(transactionReceipt => {
+          this.loadSubdomains();
+        });
+        this.props.showTransactionConfirmPage({
+          action: () => {
+            this.props.showThis({
+              ...this.props,
+            });
+            this.props.showToast('Waiting for confirmation');
+          },
+        });
+      },
+      confirmButtonClass: 'delete-button',
+    });
+  }
+
   getList () {
     const listItems = [];
     if (this.props.subdomains) {
       this.props.subdomains.forEach((subdomain, index) => {
         listItems.push((
-          <li className="hand-over" key={'subdomain-' + index} onClick={() => this.openSubdomainPopup(subdomain)}>{subdomain.name}</li>
+          <li className="hand-over list-item" key={'subdomain-' + index} onClick={() => this.openSubdomainPopup(subdomain)}>
+            <span>{subdomain.name}</span>
+            <FontAwesomeIcon onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              this.openDeletePopup(subdomain);
+            }} icon={faTimes}/>
+          </li>
         ))
       })
     }
@@ -187,7 +220,6 @@ class Subdomains extends Component {
   }
 }
 function mapStateToProps (state) {
-  // params is the params value or object passed to rifActions.navigateTo('pageName', params)
   const params = state.appState.currentView.params;
   return {
     ...params,
@@ -199,31 +231,9 @@ function mapDispatchToProps (dispatch) {
     getSubdomains: (domainName) => dispatch(rifActions.getSubdomains(domainName)),
     showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.subdomains, params)),
     showPopup: (title, opts) => {
-      const defaultOpts = {
-        text: null,
-        elements: null,
-        confirmLabel: 'Confirm',
-        cancelLabel: 'Cancel',
-        confirmCallback: () => {},
-        cancelCallback: () => {},
-        validateConfirm: null,
-        hideConfirm: false,
-        hideCancel: false,
-      };
-      opts = extend(defaultOpts, opts);
       dispatch(rifActions.showModal({
         title,
-        body: {
-          elements: opts.elements,
-          text: opts.text,
-        },
-        confirmLabel: opts.confirmLabel,
-        confirmCallback: opts.confirmCallback,
-        cancelLabel: opts.cancelLabel,
-        cancelCallback: opts.cancelCallback,
-        validateConfirm: opts.validateConfirm,
-        hideConfirm: opts.hideConfirm,
-        hideCancel: opts.hideCancel,
+        ...opts,
       }));
     },
     createSubdomain: (domainName, subdomain, ownerAddress, parentOwnerAddress) => dispatch(rifActions.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress)),
@@ -231,6 +241,7 @@ function mapDispatchToProps (dispatch) {
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
     isSubdomainAvailable: (domainName, subdomain) => dispatch(rifActions.isSubdomainAvailable(domainName, subdomain)),
+    deleteSubdomain: (domainName, subdomain) => dispatch(rifActions.deleteSubdomain(domainName, subdomain)),
   }
 }
 module.exports = connect(mapStateToProps, mapDispatchToProps)(Subdomains)

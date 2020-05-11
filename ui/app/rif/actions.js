@@ -26,6 +26,7 @@ const rifActions = {
   isSubdomainAvailable,
   goToConfirmPageForLastTransaction,
   waitForTransactionListener,
+  deleteSubdomain,
 }
 
 let background = null;
@@ -43,12 +44,46 @@ function hideModal () {
   }
 }
 
-function showModal (message, modalName = 'generic-modal') {
+function showModal (opts, modalName = 'generic-modal') {
+  const defaultOpts = {
+    title: null,
+    text: null,
+    elements: null,
+    confirmLabel: 'Confirm',
+    cancelLabel: 'Cancel',
+    confirmButtonClass: null,
+    confirmCallback: () => {},
+    closeAfterConfirmCallback: true,
+    cancelButtonClass: null,
+    cancelCallback: () => {},
+    closeAfterCancelCallback: true,
+    validateConfirm: null,
+    hideConfirm: false,
+    hideCancel: false,
+  };
+  opts = extend(defaultOpts, opts);
   return {
     type: rifActions.SHOW_MODAL,
     currentModal: {
       name: modalName,
-      message,
+      message: {
+        title: opts.title,
+        body: opts.body ? opts.body : {
+          elements: opts.elements,
+          text: opts.text,
+        },
+        confirmLabel: opts.confirmLabel,
+        confirmCallback: opts.confirmCallback,
+        closeAfterConfirmCallback: opts.closeAfterConfirmCallback,
+        cancelLabel: opts.cancelLabel,
+        cancelCallback: opts.cancelCallback,
+        closeAfterCancelCallback: opts.closeAfterCancelCallback,
+        validateConfirm: opts.validateConfirm,
+        hideConfirm: opts.hideConfirm,
+        hideCancel: opts.hideCancel,
+        confirmButtonClass: opts.confirmButtonClass,
+        cancelButtonClass: opts.cancelButtonClass,
+      },
     },
   }
 }
@@ -305,7 +340,7 @@ function isSubdomainAvailable (domainName, subdomain) {
 
 function goToConfirmPageForLastTransaction (afterApproval) {
   return (dispatch) => {
-    dispatch(waitUntil(200)).then(() => {
+    dispatch(waitUntil()).then(() => {
       dispatch(getUnapprovedTransactions())
         .then(latestTransaction => {
           dispatch(actions.showConfTxPage({
@@ -316,6 +351,22 @@ function goToConfirmPageForLastTransaction (afterApproval) {
       });
     });
   }
+}
+
+function deleteSubdomain (domainName, subdomain) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      background.rif.rns.register.deleteSubdomain(domainName, subdomain, (error, transactionListenerId) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(transactionListenerId);
+      });
+    });
+  };
 }
 
 module.exports = rifActions

@@ -8,4 +8,5 @@ export const rns = {
     resolver: 'resolver',
     transfer: 'transfer',
   },
+  defaultAddress: '0x0000000000000000000000000000000000000000',
 }
