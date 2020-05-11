@@ -357,13 +357,13 @@ function deleteSubdomain (domainName, subdomain) {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve, reject) => {
-      background.rif.rns.register.deleteSubdomain(domainName, subdomain, (error, transactionReceipt) => {
+      background.rif.rns.register.deleteSubdomain(domainName, subdomain, (error, transactionListenerId) => {
         dispatch(actions.hideLoadingIndication());
         if (error) {
           dispatch(actions.displayWarning(error));
           return reject(error);
         }
-        return resolve(transactionReceipt);
+        return resolve(transactionListenerId);
       });
     });
   };

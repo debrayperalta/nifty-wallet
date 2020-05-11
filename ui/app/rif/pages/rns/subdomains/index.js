@@ -161,13 +161,18 @@ class Subdomains extends Component {
   openDeletePopup (subdomain) {
     this.props.showPopup('Delete Subdomain', {
       text: 'Are you sure you want to delete the subdomain ' + subdomain.name + '?',
-      confirmCallback: () => {
-        this.props.deleteSubdomain(subdomain.domainName, subdomain.name);
-        this.props.showTransactionConfirmPage(() => {
-          this.props.showThis({
-            ...this.props,
-          });
-          this.props.showToast('Waiting for confirmation');
+      confirmCallback: async () => {
+        const transactionListenerId = await this.props.deleteSubdomain(subdomain.domainName, subdomain.name);
+        this.props.waitForListener(transactionListenerId).then(transactionReceipt => {
+          this.loadSubdomains();
+        });
+        this.props.showTransactionConfirmPage({
+          action: () => {
+            this.props.showThis({
+              ...this.props,
+            });
+            this.props.showToast('Waiting for confirmation');
+          },
         });
       },
       confirmButtonClass: 'delete-button',

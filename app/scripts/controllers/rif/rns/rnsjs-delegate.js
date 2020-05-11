@@ -2,6 +2,8 @@ import RnsDelegate from './rns-delegate'
 import RNS from '@rsksmart/rns'
 import rifConfig from './../../../../../rif.config';
 import {rns} from '../constants'
+import {namehash} from '@rsksmart/rns/lib/utils'
+import web3Utils from 'web3-utils'
 
 /**
  * This class encapsulates all the RNSJS logic, it initializes rnsjs library and uses it as a wrapper.
@@ -111,20 +113,44 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @param domainName Parent .rsk domain. For example, wallet.rsk
    * @param subdomain Subdomain to register. For example, alice
    * @param ownerAddress The new owner’s address
+   * @param parentOwnerAddress the parent domain owner address
    * @returns {Promise<>}
    */
-  setSubdomainOwner (domainName, subdomain, ownerAddress) {
+  setSubdomainOwner (domainName, subdomain, ownerAddress, parentOwnerAddress) {
     domainName = this.addRskSuffix(domainName);
-    const result = this.rnsJs.subdomains.setOwner(domainName, subdomain, ownerAddress);
-    result.then(transactionReceipt => {
-      if (transactionReceipt && transactionReceipt.status === true) {
-        const subdomains = this.getSubdomains(domainName);
+    if (!ownerAddress) {
+      ownerAddress = parentOwnerAddress;
+    }
+    const node = namehash(domainName);
+    const label = web3Utils.sha3(subdomain);
+    const transactionListener = this.send(this.rnsContractInstance, 'setSubnodeOwner', [node, label, ownerAddress])
+    transactionListener.transactionConfirmed()
+      .then(transactionReceipt => {
+        let subdomains = this.getSubdomains(domainName);
         const foundSubdomain = subdomains.find(sd => sd.name === subdomain);
-        foundSubdomain.ownerAddress = ownerAddress;
+        if (foundSubdomain) {
+          // existent subdomain
+          if (ownerAddress === rns.defaultAddress) {
+            // deleting subdomain
+            subdomains = subdomains.filter(sd => sd.name !== subdomain);
+          } else {
+            // updating subdomain
+            foundSubdomain.ownerAddress = ownerAddress;
+          }
+        } else {
+          // new subdomain
+          subdomains.push({
+            domainName,
+            name: subdomain,
+            ownerAddress,
+            parentOwnerAddress,
+          });
+        }
         this.updateSubdomains(domainName, subdomains);
-      }
-    })
-    return result;
+      }).catch(transactionReceiptOrError => {
+      console.log('Transaction failed', transactionReceiptOrError);
+    });
+    return Promise.resolve(transactionListener.id);
   }
 
   /**

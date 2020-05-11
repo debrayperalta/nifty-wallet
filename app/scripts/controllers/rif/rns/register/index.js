@@ -2,7 +2,6 @@ import FIFSRegistrar from '../abis/FIFSRegistrar.json'
 import RnsJsDelegate from '../rnsjs-delegate'
 import web3Utils from 'web3-utils';
 import {generateRandomSecret, numberToUint32, utf8ToHexString} from '../../utils/rns'
-import {namehash} from '@rsksmart/rns/lib/utils'
 import {rns} from '../../constants'
 
 /**
@@ -195,54 +194,11 @@ export default class RnsRegister extends RnsJsDelegate {
    * Overrides the parent operation because rns-js is failing on this, we invoke the contract directly.
    */
   createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress) {
-    domainName = this.addRskSuffix(domainName);
-    if (!ownerAddress) {
-      ownerAddress = this.address;
-    }
-    const node = namehash(domainName);
-    const label = web3Utils.sha3(subdomain);
-    const transactionListener = this.send(this.rnsContractInstance, 'setSubnodeOwner', [node, label, ownerAddress])
-    transactionListener.transactionConfirmed()
-      .then(transactionReceipt => {
-        const subdomains = this.getSubdomains(domainName);
-        subdomains.push({
-          domainName,
-          name: subdomain,
-          ownerAddress,
-          parentOwnerAddress,
-        });
-        this.updateSubdomains(domainName, subdomains);
-    }).catch(transactionReceiptOrError => {
-      console.log('Transaction failed', transactionReceiptOrError);
-    });
-    return Promise.resolve(transactionListener.id);
+    return this.setSubdomainOwner(domainName, subdomain, ownerAddress, parentOwnerAddress);
   }
 
   deleteSubdomain (domainName, subdomain) {
-    // TODO: implement using call contract directly because rnsjs doesn't work for send operations.
-    domainName = this.addRskSuffix(domainName);
-    let subdomains = this.getSubdomains(domainName);
-    if (subdomains.filter(sd => sd.name === subdomain).length > 0) {
-      return new Promise((resolve, reject) => {
-        this.rnsJs.subdomains.setOwner(domainName, subdomain, rns.defaultAddress)
-          .then(transactionReceipt => {
-            if (transactionReceipt.status) {
-              console.debug('Transaction Success', transactionReceipt);
-              subdomains = subdomains.filter(sd => sd.name !== subdomain);
-              this.updateSubdomains(domainName, subdomains);
-              resolve(transactionReceipt);
-            } else {
-              console.debug('Transaction Failed', transactionReceipt);
-              reject(transactionReceipt);
-            }
-          }).catch(error => {
-          console.debug(error);
-          reject(error);
-        });
-      });
-    } else {
-      return Promise.reject('No subdomain found!');
-    }
+    return this.setSubdomainOwner(domainName, subdomain, rns.defaultAddress, this.address);
   }
 
 }
