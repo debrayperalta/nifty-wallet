@@ -286,6 +286,14 @@ module.exports = class MetamaskController extends EventEmitter {
       this.isClientOpenAndUnlocked = memState.isUnlocked && this._isClientOpen
     })
 
+    // RIF
+    this.rifController = new RifController({
+      initState: initState.RifController,
+      preferencesController: this.preferencesController,
+      networkController: this.networkController,
+      transactionController: this.txController,
+    });
+
     this.store.updateStructure({
       TransactionController: this.txController.store,
       KeyringController: this.keyringController.store,
@@ -299,6 +307,7 @@ module.exports = class MetamaskController extends EventEmitter {
       CachedBalancesController: this.cachedBalancesController.store,
       // PermissionsController: this.permissionsController.permissions,
       // PermissionsMetadata: this.permissionsController.store,
+      RifController: this.rifController.store,
     })
 
     this.memStore = new ComposableObservableStore(null, {
@@ -323,17 +332,9 @@ module.exports = class MetamaskController extends EventEmitter {
       InfuraController: this.infuraController.store,
       // PermissionsController: this.permissionsController.permissions,
       // PermissionsMetadata: this.permissionsController.store,
+      RifController: this.rifController.store,
     })
     this.memStore.subscribe(this.sendUpdate.bind(this))
-
-    // RIF
-    this.rifController = new RifController({
-      preferencesController: this.preferencesController,
-      networkController: this.networkController,
-      transactionController: this.txController,
-      memoryStore: this.memStore,
-      metamaskStore: this.store,
-    });
 
   }
 

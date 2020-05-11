@@ -658,7 +658,7 @@ function reduceApp (state, action) {
 
     case actions.HIDE_TOAST:
       return extend(appState, {
-        toastMsg: undefined,
+        toast: undefined,
       })
 
     case actions.DISPLAY_WARNING:

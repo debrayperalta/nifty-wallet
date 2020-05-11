@@ -20,17 +20,52 @@ class CustomModal extends Component {
     this.props.dispatch(rifActions.hideModal());
   }
 
-  cancel () {
-    this.props.message.cancelCallback();
-    this.closeModal();
+  async cancel () {
+    if (this.props.message.cancelCallback) {
+      this.props.message.cancelCallback();
+      if (this.props.message.closeAfterCancelCallback) {
+        this.closeModal();
+      }
+    } else {
+      this.closeModal();
+    }
   }
 
-  confirm () {
-    this.props.message.confirmCallback();
-    this.closeModal();
+  async confirm () {
+    if (this.props.message.validateConfirm) {
+      if (!await this.props.message.validateConfirm()) {
+        return;
+      }
+    }
+    if (this.props.message.confirmCallback) {
+      this.props.message.confirmCallback();
+      if (this.props.message.closeAfterConfirmCallback) {
+        this.closeModal();
+      }
+    } else {
+      this.closeModal();
+    }
+  }
+
+  getButtons () {
+    let cancelButton = (<button className={this.props.message.cancelButtonClass ? this.props.message.cancelButtonClass : ''}
+                                onClick={this.cancel.bind(this)}>{this.props.message.cancelLabel}</button>);
+    let confirmButton = (<button className={this.props.message.confirmButtonClass ? this.props.message.confirmButtonClass : ''}
+                                 onClick={this.confirm.bind(this)}>{this.props.message.confirmLabel}</button>);
+    if (this.props.message.hideCancel) {
+      cancelButton = null;
+    }
+    if (this.props.message.hideConfirm) {
+      confirmButton = null;
+    }
+    return {
+      cancelButton,
+      confirmButton,
+    }
   }
 
   render () {
+    const buttons = this.getButtons();
     let body = null;
     if (this.props.message.body.text) {
       body = (<p>{this.props.message.body.text}</p>);
@@ -48,10 +83,12 @@ class CustomModal extends Component {
         className="modal">
         <div className="modal-message">
           <h1>{this.props.message.title}</h1>
-          {body}
+          <div className="modal-body">
+            {body}
+          </div>
           <div className="modal-buttons">
-            <button onClick={this.cancel.bind(this)}>{this.props.message.cancelLabel}</button>
-            <button onClick={this.confirm.bind(this)}>{this.props.message.confirmLabel}</button>
+            {buttons.cancelButton}
+            {buttons.confirmButton}
           </div>
         </div>
       </Modal>

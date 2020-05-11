@@ -10,7 +10,7 @@ class SellOnMKP extends Component {
   }
 }
 function mapStateToProps (state) {
-  // params is the params value or object passet to rifActions.navigateTo('pageName', params)
+  // params is the params value or object passed to rifActions.navigateTo('pageName', params)
   const params = state.appState.currentView.params;
   return {}
 }

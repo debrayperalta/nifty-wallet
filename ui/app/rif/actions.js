@@ -1,5 +1,4 @@
 const actions = require('../actions');
-
 import extend from 'xtend'
 
 const rifActions = {
@@ -26,6 +25,12 @@ const rifActions = {
   navigateBack,
   showModal,
   hideModal,
+  getSubdomains,
+  createSubdomain,
+  isSubdomainAvailable,
+  goToConfirmPageForLastTransaction,
+  waitForTransactionListener,
+  deleteSubdomain,
 }
 
 let background = null;
@@ -43,12 +48,46 @@ function hideModal () {
   }
 }
 
-function showModal (message, modalName = 'generic-modal') {
+function showModal (opts, modalName = 'generic-modal') {
+  const defaultOpts = {
+    title: null,
+    text: null,
+    elements: null,
+    confirmLabel: 'Confirm',
+    cancelLabel: 'Cancel',
+    confirmButtonClass: null,
+    confirmCallback: () => {},
+    closeAfterConfirmCallback: true,
+    cancelButtonClass: null,
+    cancelCallback: () => {},
+    closeAfterCancelCallback: true,
+    validateConfirm: null,
+    hideConfirm: false,
+    hideCancel: false,
+  };
+  opts = extend(defaultOpts, opts);
   return {
     type: rifActions.SHOW_MODAL,
     currentModal: {
       name: modalName,
-      message,
+      message: {
+        title: opts.title,
+        body: opts.body ? opts.body : {
+          elements: opts.elements,
+          text: opts.text,
+        },
+        confirmLabel: opts.confirmLabel,
+        confirmCallback: opts.confirmCallback,
+        closeAfterConfirmCallback: opts.closeAfterConfirmCallback,
+        cancelLabel: opts.cancelLabel,
+        cancelCallback: opts.cancelCallback,
+        closeAfterCancelCallback: opts.closeAfterCancelCallback,
+        validateConfirm: opts.validateConfirm,
+        hideConfirm: opts.hideConfirm,
+        hideCancel: opts.hideCancel,
+        confirmButtonClass: opts.confirmButtonClass,
+        cancelButtonClass: opts.cancelButtonClass,
+      },
     },
   }
 }
@@ -138,13 +177,13 @@ function requestDomainRegistration (domainName, yearsToRegister) {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve, reject) => {
-      background.rif.rns.register.requestRegistration(domainName, yearsToRegister, (error, commitment) => {
+      background.rif.rns.register.requestRegistration(domainName, yearsToRegister, (error, result) => {
         dispatch(actions.hideLoadingIndication());
         if (error) {
           dispatch(actions.displayWarning(error));
           return reject(error);
         }
-        return resolve(commitment);
+        return resolve(result);
       });
     });
   };
@@ -171,12 +210,12 @@ function finishRegistration (domainName) {
     dispatch(actions.showLoadingIndication())
     return new Promise((resolve) => {
       dispatch(actions.hideLoadingIndication());
-      background.rif.rns.register.finishRegistration(domainName, (error, result) => {
+      background.rif.rns.register.finishRegistration(domainName, (error, transactionListenerId) => {
         if (error) {
           dispatch(actions.displayWarning(error));
         }
+        return resolve(transactionListenerId);
       });
-      return resolve();
     });
   };
 }
@@ -270,7 +309,8 @@ function navigateBack () {
       backNavigated = true;
     }
     if (navigationStack.length > 0) {
-      return navigationStack.pop();
+      const navigation = navigationStack.pop();
+      return navigateTo(navigation.data.screenName, navigation.data.params);
     }
   }
   // go to home since we don't have any other page to go to.
@@ -297,9 +337,105 @@ function navigateTo (screenName, params) {
       params,
     },
   }
-  navigationStack.push(currentNavigation);
+  const alreadyNavigatedTo = navigationStack.find(navigation => navigation.data.screenName === screenName);
+  if (!alreadyNavigatedTo) {
+    navigationStack.push(currentNavigation);
+  }
   backNavigated = false;
   return currentNavigation;
+}
+
+function getSubdomains (domainName) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      dispatch(actions.hideLoadingIndication());
+      background.rif.rns.register.getSubdomainsForDomain(domainName, (error, result) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(result);
+      });
+    });
+  };
+}
+
+function waitForTransactionListener (transactionListenerId) {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.rns.register.waitForTransactionListener(transactionListenerId, (error, transactionReceipt) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(transactionReceipt);
+      });
+    });
+  };
+}
+
+function createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      background.rif.rns.register.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress, (error, transactionListenerId) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(transactionListenerId);
+      });
+    });
+  };
+}
+
+function isSubdomainAvailable (domainName, subdomain) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      dispatch(actions.hideLoadingIndication());
+      background.rif.rns.register.isSubdomainAvailable(domainName, subdomain, (error, available) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(available);
+      });
+    });
+  };
+}
+
+function goToConfirmPageForLastTransaction (afterApproval) {
+  return (dispatch) => {
+    dispatch(waitUntil()).then(() => {
+      dispatch(getUnapprovedTransactions())
+        .then(latestTransaction => {
+          dispatch(actions.showConfTxPage({
+            id: latestTransaction.id,
+            unapprovedTransactions: latestTransaction,
+            afterApproval,
+          }));
+      });
+    });
+  }
+}
+
+function deleteSubdomain (domainName, subdomain) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      background.rif.rns.register.deleteSubdomain(domainName, subdomain, (error, transactionListenerId) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(transactionListenerId);
+      });
+    });
+  };
 }
 
 module.exports = rifActions

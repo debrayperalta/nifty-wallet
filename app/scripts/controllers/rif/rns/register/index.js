@@ -2,6 +2,7 @@ import FIFSRegistrar from '../abis/FIFSRegistrar.json'
 import RnsJsDelegate from '../rnsjs-delegate'
 import web3Utils from 'web3-utils';
 import {generateRandomSecret, numberToUint32, utf8ToHexString} from '../../utils/rns'
+import {rns} from '../../constants'
 
 /**
  * This is a delegate to manage all the RNS register operations.
@@ -30,7 +31,7 @@ export default class RnsRegister extends RnsJsDelegate {
    * @returns {Promise<string>} commitment that helps is to check if you can finish registration or you still have to wait.
    */
   requestRegistration (domainName, yearsToRegister) {
-    const cleanDomainName = this.cleanDomainFromRskPrefix(domainName);
+    const cleanDomainName = this.cleanDomainFromRskSuffix(domainName);
     const domainHash = web3Utils.sha3(cleanDomainName);
     const secret = generateRandomSecret();
     return new Promise((resolve, reject) => {
@@ -39,9 +40,9 @@ export default class RnsRegister extends RnsJsDelegate {
           this.call(this.fifsAddrRegistrarInstance, 'makeCommitment', [domainHash, this.address, secret])
             .then(commitment => {
               console.debug('Commitment received', commitment);
-              this.send(this.fifsAddrRegistrarInstance, 'commit', [commitment])
-                .then(result => {
-                  console.debug('Commitment committed', result);
+              const transactionListener = this.send(this.fifsAddrRegistrarInstance, 'commit', [commitment]);
+              transactionListener.transactionConfirmed()
+                .then(transactionReceipt => {
                   const state = this.getStoreState();
                   if (!state.register[this.address]) {
                     state.register[this.address] = {
@@ -54,8 +55,13 @@ export default class RnsRegister extends RnsJsDelegate {
                     rifCost,
                   };
                   this.updateStoreState(state);
-                }).catch(error => reject(error));
-              resolve(commitment);
+              }).catch(transactionReceiptOrError => {
+                console.debug('Transaction Failed', transactionReceiptOrError);
+              });
+              resolve({
+                commitment,
+                transactionListenerId: transactionListener.id,
+              });
             }).catch(error => reject(error));
         }).catch(error => reject(error));
     });
@@ -69,7 +75,7 @@ export default class RnsRegister extends RnsJsDelegate {
    * @returns registration cost in RIF (wei)
    */
   getDomainCost (domainName, yearsToRegister) {
-    const cleanDomainName = this.cleanDomainFromRskPrefix(domainName);
+    const cleanDomainName = this.cleanDomainFromRskSuffix(domainName);
     return this.call(this.fifsAddrRegistrarInstance, 'price', [cleanDomainName, 0, yearsToRegister]);
   }
 
@@ -96,23 +102,25 @@ export default class RnsRegister extends RnsJsDelegate {
    * @returns {Promise<void>}
    */
   finishRegistration (domainName) {
-    const cleanDomainName = this.cleanDomainFromRskPrefix(domainName);
+    const cleanDomainName = this.cleanDomainFromRskSuffix(domainName);
     const state = this.getStoreState();
     const registerByAddress = state.register[this.address];
     if (registerByAddress) {
       const registerInformation = registerByAddress.domainRegister[cleanDomainName];
       if (registerInformation) {
-        return new Promise((resolve, reject) => {
-          const rifCost = registerInformation.rifCost;
-          const secret = registerInformation.secret;
-          const durationBN = this.web3.toBigNumber(registerInformation.yearsToRegister);
-          const data = this.getAddrRegisterData(cleanDomainName, this.address, secret, durationBN, this.address);
-          this.send(this.rifContractInstance, 'transferAndCall', [this.rifConfig.rns.contracts.fifsAddrRegistrar, rifCost.toString(), data])
-            .then(result => {
-              console.debug('Domain registered!', result);
-              resolve(result);
-            }).catch(error => reject(error));
+        const rifCost = registerInformation.rifCost;
+        const secret = registerInformation.secret;
+        const durationBN = this.web3.toBigNumber(registerInformation.yearsToRegister);
+        const data = this.getAddrRegisterData(cleanDomainName, this.address, secret, durationBN, this.address);
+        const transactionListener = this.send(this.rifContractInstance, 'transferAndCall', [this.rifConfig.rns.contracts.fifsAddrRegistrar, rifCost.toString(), data]);
+        transactionListener.transactionConfirmed()
+          .then(transactionReceipt => {
+            // TODO: we have to add the domain to the store here instead of having it on the localStorage
+          console.debug('Transaction success', transactionReceipt);
+        }).catch(transactionReceipt => {
+          console.debug('Transaction failed', transactionReceipt);
         });
+        return Promise.resolve(transactionListener.id);
       } else {
         return Promise.reject('Invalid domainName, you need to use the same as the first request');
       }

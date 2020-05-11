@@ -1,5 +1,6 @@
-import RnsManager from './rns';
-import Web3 from 'web3';
+import RnsManager from './rns'
+import Web3 from 'web3'
+import ComposableObservableStore from './../../lib/ComposableObservableStore'
 
 /**
  * RIF Controller
@@ -27,38 +28,24 @@ export default class RifController {
       throw new Error('TransactionController has to be present');
     }
 
-    if (!props.metamaskStore) {
-      throw new Error('MetaMask store has to be present');
-    }
-
-    if (!props.memoryStore) {
-      throw new Error('Memory Store has to be present');
-    }
-
-    this.metamaskStore = props.metamaskStore;
-    this.memoryStore = props.memoryStore;
     this.preferencesController = props.preferencesController;
     this.networkController = props.networkController;
     this.transactionController = props.transactionController;
     this.web3 = new Web3(this.networkController._provider);
 
+    const initState = props.initState || {};
+
     this.rnsManager = new RnsManager({
+      initState: initState.RnsManager,
       preferencesController: this.preferencesController,
       networkController: this.networkController,
       transactionController: this.transactionController,
       web3: this.web3,
     });
 
-    const metamaskStoreConfig = {
-      ...this.metamaskStore.config,
-      RifController: this.rnsManager.store,
-    };
-    const memoryStoreConfig = {
-      ...this.memoryStore.config,
+    this.store = new ComposableObservableStore(props.initState, {
       RnsManager: this.rnsManager.store,
-    };
-    this.metamaskStore.updateStructure(metamaskStoreConfig);
-    this.memoryStore.updateStructure(memoryStoreConfig);
+    });
   }
 
   /**

@@ -4,13 +4,14 @@ import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { getChainAddressByChainAddress } from '../../../utils/utils';
-import { CustomButton, DomainIcon, LuminoNodeIcon, RifStorageIcon, Menu } from '../../../components';
-import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver';
-import { GET_RESOLVERS, DEFAULT_ICON } from '../../../constants';
-import { SLIP_ADDRESSES } from '../../../constants/slipAddresses';
-import niftyActions from '../../../../actions';
-import {pageNames} from '../../index';
-import rifActions from '../../../actions';
+import { CustomButton, DomainIcon, LuminoNodeIcon, RifStorageIcon, Menu } from '../../../components'
+import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver'
+import { GET_RESOLVERS, DEFAULT_ICON } from '../../../constants'
+import { SLIP_ADDRESSES } from '../../../constants/slipAddresses'
+import niftyActions from '../../../../actions'
+import {pageNames} from '../../index'
+import rifActions from '../../../actions'
+import DomainHeader from '../../../components/domain-header'
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
@@ -135,21 +136,23 @@ class DomainsDetailActiveScreen extends Component {
 
 	render () {
 		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress } = this.props;
+    const domainInfo = {
+      domainName,
+      expirationDate,
+      autoRenew,
+      ownerAddress,
+      isOwner,
+      isLuminoNode,
+      isRifStorage,
+      content,
+    };
 		const { chainAddresses } = this.state;
 		return (
       <div className={'body'}>
-        <div id="headerName" className={'domain-name'}>
-          <span>{domainName}</span>
-          {isOwner &&
-            <DomainIcon className={'domain-icon'}/>
-          }
-          {isLuminoNode &&
-            <LuminoNodeIcon className={'domain-icon'}/>
-          }
-          {isRifStorage &&
-            <RifStorageIcon className={'domain-icon'}/>
-          }
-        </div>
+        <DomainHeader domainName={domainName}
+                      showOwnerIcon={isOwner}
+                      showLuminoNodeIcon={isLuminoNode}
+                      showRifStorageIcon={isRifStorage}/>
         <div id="domainDetailBody" className={'domain-detail-body'}>
           <div id="bodyDescription" className={'domain-description'}>
             <div><span className={'domain-description-field'}>Address:</span><span className={'domain-description-value label-spacing-left'}>{address}</span></div>
@@ -223,7 +226,7 @@ class DomainsDetailActiveScreen extends Component {
             }
           />
           }
-          <Menu />
+          <Menu domainInfo={domainInfo} />
         </div>
       </div>
 		);
