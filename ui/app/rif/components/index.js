@@ -1,6 +1,5 @@
 import CustomButton from './customButton'
 import SearchDomains from './searchDomains'
-import AddNewChainAddressToResolver from '../pages/domainsDetailPage/domainDetailActive/addNewTokenNetworkAddress/addNewChainAddressToResolver'
 import {DomainIcon, LuminoNodeIcon, RifStorageIcon} from './commons'
 import Menu from './menu/index'
 import h from 'react-hyperscript'
@@ -23,7 +22,6 @@ function showModal (currentModal) {
 export {
   CustomButton,
   SearchDomains,
-  AddNewChainAddressToResolver,
   DomainIcon,
   LuminoNodeIcon,
   RifStorageIcon,
