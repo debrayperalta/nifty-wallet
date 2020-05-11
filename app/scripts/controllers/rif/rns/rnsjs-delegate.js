@@ -1,6 +1,9 @@
 import RnsDelegate from './rns-delegate'
 import RNS from '@rsksmart/rns'
 import rifConfig from './../../../../../rif.config';
+import {rns} from '../constants'
+import {namehash} from '@rsksmart/rns/lib/utils'
+import web3Utils from 'web3-utils'
 
 /**
  * This class encapsulates all the RNSJS logic, it initializes rnsjs library and uses it as a wrapper.
@@ -23,6 +26,8 @@ export default class RnsJsDelegate extends RnsDelegate {
       isSubdomainAvailable: this.bindOperation(this.isSubdomainAvailable, this),
       setSubdomainOwner: this.bindOperation(this.setSubdomainOwner, this),
       createSubdomain: this.bindOperation(this.createSubdomain, this),
+      deleteSubdomain: this.bindOperation(this.deleteSubdomain, this),
+      getSubdomainsForDomain: this.bindOperation(this.getSubdomainsForDomain, this),
     }
   }
 
@@ -46,6 +51,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<string>} the address resolution
    */
   getDomainAddress (domainName, chainId) {
+    domainName = this.addRskSuffix(domainName);
     return this.rnsJs.addr(domainName, chainId);
   }
 
@@ -65,6 +71,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<>} TransactionReceipt
    */
   setAddressToDomain (domainName, address) {
+    domainName = this.addRskSuffix(domainName);
     return this.rnsJs.setAddr(domainName, address);
   }
 
@@ -75,6 +82,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<>} TransactionReceipt
    */
   setDomainResolver (domainName, resolver) {
+    domainName = this.addRskSuffix(domainName);
     return this.rnsJs.setResolver(domainName, resolver);
   }
 
@@ -85,6 +93,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * or an array of available domains under possible TLDs if the parameter is a label
    */
   isDomainAvailable (domainName) {
+    domainName = this.addRskSuffix(domainName);
     return this.rnsJs.available(domainName);
   }
 
@@ -95,6 +104,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<boolean>} true if available, false if not
    */
   isSubdomainAvailable (domainName, subdomain) {
+    domainName = this.addRskSuffix(domainName);
     return this.rnsJs.subdomains.available(domainName, subdomain);
   }
 
@@ -104,10 +114,46 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @param domainName Parent .rsk domain. For example, wallet.rsk
    * @param subdomain Subdomain to register. For example, alice
    * @param ownerAddress The new owner’s address
+   * @param parentOwnerAddress the parent domain owner address
    * @returns {Promise<>}
    */
-  setSubdomainOwner (domainName, subdomain, ownerAddress) {
-    return this.rnsJs.subdomains.setOwner(domainName, subdomain, ownerAddress);
+  setSubdomainOwner (domainName, subdomain, ownerAddress, parentOwnerAddress) {
+    domainName = this.addRskSuffix(domainName);
+    if (!ownerAddress && !parentOwnerAddress) {
+      return Promise.reject('You need to specify ownerAddress or parentOwnerAddress');
+    } else if (!ownerAddress) {
+      ownerAddress = parentOwnerAddress;
+    }
+    const node = namehash(domainName);
+    const label = web3Utils.sha3(subdomain);
+    const transactionListener = this.send(this.rnsContractInstance, 'setSubnodeOwner', [node, label, ownerAddress])
+    transactionListener.transactionConfirmed()
+      .then(transactionReceipt => {
+        let subdomains = this.getSubdomains(domainName);
+        const foundSubdomain = subdomains.find(sd => sd.name === subdomain);
+        if (foundSubdomain) {
+          // existent subdomain
+          if (ownerAddress === rns.defaultAddress) {
+            // deleting subdomain
+            subdomains = subdomains.filter(sd => sd.name !== subdomain);
+          } else {
+            // updating subdomain
+            foundSubdomain.ownerAddress = ownerAddress;
+          }
+        } else {
+          // new subdomain
+          subdomains.push({
+            domainName,
+            name: subdomain,
+            ownerAddress,
+            parentOwnerAddress,
+          });
+        }
+        this.updateSubdomains(domainName, subdomains);
+      }).catch(transactionReceiptOrError => {
+      console.log('Transaction failed', transactionReceiptOrError);
+    });
+    return Promise.resolve(transactionListener.id);
   }
 
   /**
@@ -125,23 +171,70 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<>} TransactionReceipt of the latest transaction
    */
   createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress) {
-    return this.rnsJs.subdomains.create(domainName, subdomain, ownerAddress, parentOwnerAddress);
+    return this.setSubdomainOwner(domainName, subdomain, ownerAddress, parentOwnerAddress);
   }
 
   /**
-   * Updates the store state
-   * @param newState
+   * Deletes a subdomain, it sets the default address as the owner of the subdomain to release it.
+   * @param domainName the parent domain name
+   * @param subdomain the subdomain name
+   * @returns {Promise} containing the transaction listener id to track this operation.
    */
-  updateStoreState (newState) {
-    this.store.putState(newState);
+  deleteSubdomain (domainName, subdomain) {
+    return this.setSubdomainOwner(domainName, subdomain, rns.defaultAddress, this.address);
   }
 
   /**
-   * Gets the store state
-   * @returns the current state
+   * Gets the subdomains under a domain name
+   * @param domainName the domain name to query
+   * @returns the subdomains array
    */
-  getStoreState () {
-    return this.store.getState();
+  getSubdomains (domainName) {
+    domainName = this.addRskSuffix(domainName);
+    const state = this.getStateForContainer(rns.storeContainers.register);
+    if (!state || !state.domains || !state.domains[domainName] || !state.domains[domainName].subdomains) {
+      return [];
+    }
+    return state.domains[domainName].subdomains;
   }
+
+  /**
+   * Method to get the subdomains under a domain name, exposes the getSubdomains method
+   * @param domainName the domain name to query
+   * @returns the subdomains under the domain name
+   */
+  getSubdomainsForDomain (domainName) {
+    domainName = this.addRskSuffix(domainName);
+    return Promise.resolve(this.getSubdomains(domainName));
+  }
+
+  /**
+   * Updates the subdomains under a domain name
+   * @param domainName the domain to update
+   * @param subdomains the subdomains under the domain name
+   */
+  updateSubdomains (domainName, subdomains) {
+    domainName = this.addRskSuffix(domainName);
+    let state = this.getStateForContainer(rns.storeContainers.register);
+    if (!state) {
+      state = {
+        domains: [],
+      };
+    }
+    if (!state.domains) {
+      state.domains = {};
+    }
+    if (!state.domains[domainName]) {
+      state.domains[domainName] = {
+        subdomains: [],
+      };
+    }
+    if (!state.domains[domainName].subdomains) {
+      state.domains[domainName].subdomains = [];
+    }
+    state.domains[domainName].subdomains = subdomains;
+    this.updateStateForContainer(rns.storeContainers.register, state);
+  }
+
 
 }

@@ -1287,7 +1287,11 @@ function updateAndApproveTx (txData, afterApproval) {
         dispatch(actions.clearSend())
         if (afterApproval) {
           dispatch(actions.hideLoadingIndication())
-          afterApproval.action(afterApproval.payload);
+          if (afterApproval.payload) {
+            afterApproval.action(afterApproval.payload);
+          } else {
+            afterApproval.action();
+          }
         } else {
           dispatch(actions.completedTx(txData.id))
           dispatch(actions.hideLoadingIndication())

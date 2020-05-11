@@ -51,7 +51,7 @@ class ErrorComponent extends Component {
 
 function mapStateToProps (state) {
   return {
-    error: state.appState.warning,
+    error: state.appState.warning ? state.appState.warning.message : null,
   }
 }
 

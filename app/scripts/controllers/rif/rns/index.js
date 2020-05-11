@@ -1,10 +1,11 @@
-import RnsRegister from './register';
-import RnsResolver from './resolver';
-import RnsTransfer from './transfer';
-import rifConfig from './../../../../../rif.config';
-import RNS from './abis/RNS.json';
-import RIF from './abis/RIF.json';
-import ObservableStore from 'obs-store';
+import RnsRegister from './register'
+import RnsResolver from './resolver'
+import RnsTransfer from './transfer'
+import rifConfig from './../../../../../rif.config'
+import RNS from './abis/RNS.json'
+import RIF from './abis/RIF.json'
+import extend from 'xtend'
+import ObservableStore from 'obs-store'
 
 /**
  * This class encapsulates all the RNS operations, it initializes and call to all the delegates and exposes their operations.
@@ -30,11 +31,12 @@ export default class RnsManager {
     this.rifConfig = rifConfig;
     this.rnsContractInstance = this.web3.eth.contract(RNS).at(this.rifConfig.rns.contracts.rns);
     this.rifContractInstance = this.web3.eth.contract(RIF).at(this.rifConfig.rns.contracts.rif);
-    this.store = new ObservableStore({
+    const initState = extend({
       register: {},
       resolver: {},
       transfer: {},
-    });
+    }, props.initState);
+    this.store = new ObservableStore(initState);
 
     this.rnsRegister = new RnsRegister({
       web3: this.web3,

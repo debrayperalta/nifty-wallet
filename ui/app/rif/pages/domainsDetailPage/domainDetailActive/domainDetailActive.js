@@ -7,6 +7,7 @@ import { getIconForToken } from '../../../utils/utils'
 import { CustomButton, AddNewTokenNetworkAddress, DomainIcon, LuminoNodeIcon, RifStorageIcon, Menu } from '../../../components'
 import rifActions from '../../../actions'
 import { cryptos } from '../../../constants'
+import DomainHeader from '../../../components/domain-header'
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
@@ -98,30 +99,31 @@ class DomainsDetailActiveScreen extends Component {
 		}
 		this.props.addNewNetwork(message)
 	}
-
 	render () {
 		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage } = this.props
-		let networks = this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
+    const domainInfo = {
+      domainName,
+      expirationDate,
+      autoRenew,
+      ownerAddress,
+      isOwner,
+      isLuminoNode,
+      isRifStorage,
+      content,
+    };
+		const networks = this.state.resolvers && this.state.resolvers[this.state.selectedResolverIndex] ? this.state.resolvers[this.state.selectedResolverIndex].network.map((network, index) => {
 			return <div key={index} className={'resolver-network-description'}>
 					<FontAwesomeIcon icon={getIconForToken(network.networkIcon).icon} color={getIconForToken(network.networkIcon).color} className={'domain-icon'}/>
 					<span>{network.networkName}</span>
 					<span className={'resolver-network-description-address'}>{network.address}</span>
 				</div>
-			})
+			}) : [];
 		return (
 		<div className={'body'}>
-            <div id='headerName' className={'domain-name'}>
-                <span>{domainName}</span>
-                {isOwner &&
-                    <DomainIcon className={'domain-icon'}/>
-                }
-                {isLuminoNode &&
-                    <LuminoNodeIcon className={'domain-icon'}/>
-                }
-                {isRifStorage &&
-                    <RifStorageIcon className={'domain-icon'}/>
-                }
-            </div>
+            <DomainHeader domainName={domainName}
+                          showOwnerIcon={isOwner}
+                          showLuminoNodeIcon={isLuminoNode}
+                          showRifStorageIcon={isRifStorage}/>
             <div id='domainDetailBody' className={'domain-detail-body'}>
                 <div id='bodyDescription' className={'domain-description'}>
                     <div><span className={'domain-description-field'}>Address:</span><span className={'domain-description-value label-spacing-left'}>{address}</span></div>
@@ -159,7 +161,7 @@ class DomainsDetailActiveScreen extends Component {
                         </div>
                     </div>
                 }
-                <Menu />
+                <Menu domainInfo={domainInfo} />
             </div>
         </div>
 		)

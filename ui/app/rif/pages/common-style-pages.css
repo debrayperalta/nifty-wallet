@@ -15,3 +15,14 @@
 .hand-over {
   cursor: pointer;
 }
+.body {
+  width: 100%;
+  overflow: scroll;
+  height: 26.5em;
+  overflow-x: hidden;
+  font-family: Nunito Regular;
+}
+.delete-button {
+  background: #FF001F;
+  color: white;
+}

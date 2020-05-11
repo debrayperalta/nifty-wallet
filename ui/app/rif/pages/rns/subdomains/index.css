@@ -1,0 +1,50 @@
+.subdomains .list {
+  display: flex;
+  justify-content: left;
+  padding: 2em;
+}
+.subdomains .new-button {
+  border-radius: 0.2em;
+  border: solid #4a74b3 2px;
+  color: #4a74b3;
+  background: rgba(74, 116, 179, 0.1);
+  text-transform: uppercase;
+  font-weight: bold;
+  width: 40%;
+  height: 3em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.subdomains .new-button>svg {
+  margin-right: 0.8em;
+  width: 1.5em;
+  height: 1.5em;
+}
+.subdomains .new-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin: 1em;
+}
+.subdomains .list>ul {
+  width: 100%;
+}
+.subdomains .list .list-item {
+  display: flex;
+  justify-content: space-between;
+}
+.subdomains .list>ul>li {
+  font-weight: bold;
+  font-size: 1.3em;
+  border-bottom: solid 0.1em #bbbbbb;
+  padding-bottom: 0.5em;
+  margin-top: 1em;
+}
+.subdomain-popup-view>div>label {
+  font-weight: bold;
+  margin-right: 1em;
+}
+.subdomain-address {
+  overflow-wrap: break-word;
+  margin-right: 1em;
+}
