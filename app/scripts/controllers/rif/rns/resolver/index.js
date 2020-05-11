@@ -116,16 +116,16 @@ export default class RnsResolver extends RnsJsDelegate {
    * @param resolverAddress Address of the new resolver to be setted
    * @returns {Promise<unknown>}
    */
-  setResolver(domainName, resolverAddress) {
+  setResolver (domainName, resolverAddress) {
     return new Promise((resolve, reject) => {
-      this.send(this.rnsContractInstance, 'setResolver', [namehash.hash(domainName), resolverAddress])
-        .then(result => {
-        console.debug('setResolver success', result);
-        resolve(result);
-      }).catch(error => {
-        console.debug('Error when trying to set resolver', error);
-        reject(error);
-      });
+      const transactionListener = this.send(this.rnsContractInstance, 'setResolver', [namehash.hash(domainName), resolverAddress]);
+      transactionListener.transactionConfirmed()
+        .then(transactionReceipt => {
+          console.debug('setResolver success', transactionReceipt);
+        }).catch(transactionReceiptOrError => {
+          console.debug('Error when trying to set resolver', transactionReceiptOrError);
+        });
+      resolve(transactionListener.id);
     });
   }
 
@@ -181,14 +181,14 @@ export default class RnsResolver extends RnsJsDelegate {
    */
   setChainAddressForResolver (domainName, chain, chainAddress) {
     return new Promise((resolve, reject) => {
-      this.send(this.multiChainresolverContractInstance, 'setChainAddr', [namehash.hash(domainName), chain, chainAddress])
-        .then(result => {
-          console.debug('setChainAddressForResolver success', result);
-          resolve(result);
-        }).catch(error => {
-        console.debug('Error when trying to set chain address for resolver', error);
-        reject(error);
-      });
+      const transactionListener = this.send(this.multiChainresolverContractInstance, 'setChainAddr', [namehash.hash(domainName), chain, chainAddress])
+      transactionListener.transactionConfirmed()
+        .then(transactionReceipt => {
+          console.debug('setChainAddressForResolver success', transactionReceipt);
+        }).catch(transactionReceiptOrError => {
+          console.debug('Error when trying to set chain address for resolver', transactionReceiptOrError);
+        });
+      resolve(transactionListener.id);
     });
   }
 
