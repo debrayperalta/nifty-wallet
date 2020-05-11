@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {DomainIcon, LuminoNodeIcon, RifStorageIcon} from '../commons'
 import PropTypes from 'prop-types'
 
-class Index extends Component {
+class DomainHeader extends Component {
 
   static propTypes = {
     domainName: PropTypes.string,
@@ -29,4 +29,4 @@ class Index extends Component {
     );
   }
 }
-module.exports = Index;
+module.exports = DomainHeader;
