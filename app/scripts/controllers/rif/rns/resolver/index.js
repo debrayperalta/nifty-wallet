@@ -213,7 +213,7 @@ export default class RnsResolver extends RnsJsDelegate {
    */
   getExpirationRemaining (domainName) {
     return new Promise((resolve, reject) => {
-      const label = this.cleanDomainFromRskPrefix(domainName);
+      const label = this.cleanDomainFromRskSuffix(domainName);
       const hash = `0x${web3Utils.sha3(label)}`;
       this.call(this.rskOwnerContractInstance, 'expirationTime', [hash]).then(result => {
         const expirationTime = result;
