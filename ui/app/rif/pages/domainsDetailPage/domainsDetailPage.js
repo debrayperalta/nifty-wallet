@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import DomainsDetailActiveScreen from './domainDetailActive/domainDetailActive'
+import DomainExpired from './domainExpired/domainDetailActive'
 
 class DomainsDetailScreen extends Component {
 	static propTypes = {
