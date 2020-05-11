@@ -41,7 +41,6 @@ class DomainsDetailActiveScreen extends Component {
     let slipChainAddresses = Object.assign([], SLIP_ADDRESSES);
 		this.state = {
 			resolvers: resolvers,
-			selectedResolverIndex: -1,
       slipChainAddresses: slipChainAddresses,
       selectedChainAddress: slipChainAddresses[0].chain,
 			insertedAddress: '',
@@ -110,8 +109,10 @@ class DomainsDetailActiveScreen extends Component {
   }
 
   async loadChainAddresses () {
-    const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
-    this.setState({ chainAddresses: chainAddresses });
+    if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {
+      const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
+      this.setState({chainAddresses: chainAddresses});
+    }
   }
 
   showConfirmTransactionPage (callback) {
@@ -174,7 +175,7 @@ class DomainsDetailActiveScreen extends Component {
                       }
                   </select>
                 </div>
-                {isOwner &&
+                {(isOwner && this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) &&
                   <CustomButton
                     icon={faPlusCircle}
                     text={'NEW'}

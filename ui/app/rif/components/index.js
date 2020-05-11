@@ -1,6 +1,6 @@
 import CustomButton from './customButton'
 import SearchDomains from './searchDomains'
-import AddNewChainAddressToResolver from './modal/addNewTokenNetworkAddress/addNewChainAddressToResolver'
+import AddNewChainAddressToResolver from '../pages/domainsDetailPage/domainDetailActive/addNewTokenNetworkAddress/addNewChainAddressToResolver'
 import {DomainIcon, LuminoNodeIcon, RifStorageIcon} from './commons'
 import Menu from './menu/index'
 import h from 'react-hyperscript'

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Select from 'react-select'
-import {DEFAULT_ICON} from '../../../constants';
+import {DEFAULT_ICON} from '../../../../constants';
 
 class AddNewChainAddressToResolver extends Component {
   static propTypes = {
