@@ -29,8 +29,8 @@ export const registrationTimeouts = {
 }
 
 export function GET_RESOLVERS () {
-  return ({
+  return ([{
     name: 'Multi-Chain',
     address: rifConfig.rns.contracts.multiChainResolver,
-  });
+  }]);
 }
