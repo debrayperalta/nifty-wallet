@@ -26,6 +26,7 @@ export default class RnsJsDelegate extends RnsDelegate {
       isSubdomainAvailable: this.bindOperation(this.isSubdomainAvailable, this),
       setSubdomainOwner: this.bindOperation(this.setSubdomainOwner, this),
       createSubdomain: this.bindOperation(this.createSubdomain, this),
+      deleteSubdomain: this.bindOperation(this.deleteSubdomain, this),
       getSubdomainsForDomain: this.bindOperation(this.getSubdomainsForDomain, this),
     }
   }
@@ -118,7 +119,9 @@ export default class RnsJsDelegate extends RnsDelegate {
    */
   setSubdomainOwner (domainName, subdomain, ownerAddress, parentOwnerAddress) {
     domainName = this.addRskSuffix(domainName);
-    if (!ownerAddress) {
+    if (!ownerAddress && !parentOwnerAddress) {
+      return Promise.reject('You need to specify ownerAddress or parentOwnerAddress');
+    } else if (!ownerAddress) {
       ownerAddress = parentOwnerAddress;
     }
     const node = namehash(domainName);
@@ -168,28 +171,17 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise<>} TransactionReceipt of the latest transaction
    */
   createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress) {
-    domainName = this.addRskSuffix(domainName);
-    if (!ownerAddress && !parentOwnerAddress) {
-      return Promise.reject('You need to specify ownerAddress or parentOwnerAddress');
-    } else if (!ownerAddress) {
-      ownerAddress = parentOwnerAddress;
-    }
-    const result = this.rnsJs.subdomains.create(domainName, subdomain, ownerAddress, parentOwnerAddress);
-    result.then(transactionReceipt => {
-      if (transactionReceipt && transactionReceipt.status === true) {
-        const subdomains = this.getSubdomains(domainName);
-        subdomains.push({
-          domainName,
-          name: subdomain,
-          ownerAddress,
-          parentOwnerAddress,
-        });
-        this.updateSubdomains(domainName, subdomains);
-      }
-    }).catch(error => {
-      console.log(error);
-    });
-    return result;
+    return this.setSubdomainOwner(domainName, subdomain, ownerAddress, parentOwnerAddress);
+  }
+
+  /**
+   * Deletes a subdomain, it sets the default address as the owner of the subdomain to release it.
+   * @param domainName the parent domain name
+   * @param subdomain the subdomain name
+   * @returns {Promise} containing the transaction listener id to track this operation.
+   */
+  deleteSubdomain (domainName, subdomain) {
+    return this.setSubdomainOwner(domainName, subdomain, rns.defaultAddress, this.address);
   }
 
   /**

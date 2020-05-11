@@ -20,8 +20,6 @@ export default class RnsRegister extends RnsJsDelegate {
       finishRegistration: this.bindOperation(this.finishRegistration, this),
       canFinishRegistration: this.bindOperation(this.canFinishRegistration, this),
       getDomainCost: this.bindOperation(this.getDomainCost, this),
-      createSubdomain: this.bindOperation(this.createSubdomain, this),
-      deleteSubdomain: this.bindOperation(this.deleteSubdomain, this),
       ...rnsJsApi,
     }
   }
@@ -188,17 +186,6 @@ export default class RnsRegister extends RnsJsDelegate {
     const dataName = utf8ToHexString(name);
 
     return `${dataSignature}${dataOwner}${dataSecret}${dataDuration}${dataName}`;
-  }
-
-  /**
-   * Overrides the parent operation because rns-js is failing on this, we invoke the contract directly.
-   */
-  createSubdomain (domainName, subdomain, ownerAddress, parentOwnerAddress) {
-    return this.setSubdomainOwner(domainName, subdomain, ownerAddress, parentOwnerAddress);
-  }
-
-  deleteSubdomain (domainName, subdomain) {
-    return this.setSubdomainOwner(domainName, subdomain, rns.defaultAddress, this.address);
   }
 
 }
