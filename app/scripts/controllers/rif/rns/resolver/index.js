@@ -114,7 +114,7 @@ export default class RnsResolver extends RnsJsDelegate {
    * @returns {Promise<unknown>}
    */
   setResolver (domainName, resolverAddress) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const transactionListener = this.send(this.rnsContractInstance, 'setResolver', [namehash.hash(domainName), resolverAddress]);
       transactionListener.transactionConfirmed()
         .then(transactionReceipt => {
