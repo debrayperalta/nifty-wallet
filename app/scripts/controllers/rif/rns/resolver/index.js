@@ -98,9 +98,6 @@ export default class RnsResolver extends RnsJsDelegate {
   getResolver(domainName) {
     return new Promise((resolve, reject) => {
       this.call(this.rnsContractInstance, 'resolver', [namehash.hash(domainName)]).then(result => {
-        /* TODO: Rodrigo
-        * 0x0000000000000000000000000000000000000000 this is what it brings when no resolver is setted
-        */
         console.debug('getResolver resolved with', result);
         resolve(web3Utils.toChecksumAddress(result));
       }).catch(error => {

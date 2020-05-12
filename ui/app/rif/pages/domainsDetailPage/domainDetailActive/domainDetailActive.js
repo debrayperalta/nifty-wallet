@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { getChainAddressByChainAddress } from '../../../utils/utils';
-import { CustomButton, DomainIcon, LuminoNodeIcon, RifStorageIcon, Menu } from '../../../components'
+import { CustomButton, Menu } from '../../../components'
 import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver'
 import { GET_RESOLVERS, DEFAULT_ICON } from '../../../constants'
 import { SLIP_ADDRESSES } from '../../../constants/slipAddresses'
@@ -22,7 +22,6 @@ class DomainsDetailActiveScreen extends Component {
     getChainAddresses: PropTypes.func,
     getUnapprovedTransactions: PropTypes.func,
     showTransactionConfirmPage: PropTypes.func,
-    wait: PropTypes.func,
     domain: PropTypes.object.isRequired,
 		domainName: PropTypes.string.isRequired,
 		address: PropTypes.string.isRequired,
@@ -36,12 +35,16 @@ class DomainsDetailActiveScreen extends Component {
 		isRifStorage: PropTypes.bool,
     showDomainsDetailPage: PropTypes.func.isRequired,
     displayToast: PropTypes.func.isRequired,
+    waitForListener: PropTypes.func,
+    disableResolvers: PropTypes.bool,
 	}
 	constructor(props) {
 		super(props);
     let resolvers = Object.assign([], GET_RESOLVERS());
     let slipChainAddresses = Object.assign([], SLIP_ADDRESSES);
+    const enableComboResolvers = this.props.isOwner && !(props.disableResolvers || false);
 		this.state = {
+      disableCombo: !enableComboResolvers,
 			resolvers: resolvers,
       slipChainAddresses: slipChainAddresses,
       selectedChainAddress: slipChainAddresses[0].chain,
@@ -56,11 +59,13 @@ class DomainsDetailActiveScreen extends Component {
 		this.setState({ insertedAddress: address });
 	}
   async addAddress () {
-    this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
-    await this.props.wait();
-    this.showConfirmTransactionPage(() => {
-      this.props.displayToast("Chain address added/modified, wait till it's confirmed");
-      this.props.showDomainsDetailPage(this.props.domain);
+    const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
+    this.props.waitForListener(transactionListenerId)
+      .then(transactionReceipt => {
+        this.props.showDomainsDetailPage(this.props.domain);
+      });
+    this.props.showTransactionConfirmPage({
+      action: () => this.props.showDomainsDetailPage(this.props.domain),
     });
 	}
   showModalAddChainAddress = () => {
@@ -90,11 +95,18 @@ class DomainsDetailActiveScreen extends Component {
     for (let resolverItem of e.target.children) {
       if (resolverItem.value === e.target.value) {
         const address = resolverItem.getAttribute('data-address');
-        this.props.setNewResolver(this.props.domainName, address);
-        await this.props.wait();
-        this.showConfirmTransactionPage(() => {
-          this.props.displayToast("Resolver settled, wait till it's confirmed");
-          this.props.showDomainsDetailPage(this.props.domain);
+        const transactionListenerId = await this.props.setNewResolver(this.props.domainName, address);
+        let domain = this.props.domain;
+        this.props.waitForListener(transactionListenerId)
+          .then(transactionReceipt => {
+            domain.disableResolvers = false;
+            domain.selectedResolverAddress = address;
+            this.props.showDomainsDetailPage(domain);
+          });
+
+        domain.disableResolvers = true;
+        this.props.showTransactionConfirmPage({
+          action: () => this.props.showDomainsDetailPage(domain),
         });
         return;
       }
@@ -117,23 +129,6 @@ class DomainsDetailActiveScreen extends Component {
     }
   }
 
-  showConfirmTransactionPage (callback) {
-    this.props.getUnapprovedTransactions()
-      .then(latestTransaction => {
-        this.props.showTransactionConfirmPage({
-          id: latestTransaction.id,
-          unapprovedTransactions: latestTransaction,
-          afterApproval: {
-            action: (payload) => {
-              if (callback) {
-                callback(payload);
-              }
-            },
-          },
-        });
-      });
-  }
-
 	render () {
 		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress } = this.props;
     const domainInfo = {
@@ -146,7 +141,7 @@ class DomainsDetailActiveScreen extends Component {
       isRifStorage,
       content,
     };
-		const { chainAddresses } = this.state;
+		const { chainAddresses, disableCombo } = this.state;
 		return (
       <div className={'body'}>
         <DomainHeader domainName={domainName}
@@ -165,7 +160,7 @@ class DomainsDetailActiveScreen extends Component {
             <div id="resolversBody" className={'resolvers-body'}>
               <div className="resolver-body-top">
                 <div id="selectResolver" className={'custom-select'}>
-                  <select id="comboResolvers" className="select-css" disabled={!isOwner} onChange={isOwner && this.onChangeComboResolvers.bind(this)}>
+                  <select id="comboResolvers" className="select-css" disabled={disableCombo} onChange={!disableCombo && this.onChangeComboResolvers.bind(this)}>
                     <option disabled selected value hidden> Select Resolver </option>
                       {
                         this.state.resolvers.map((resolver, index) => {
@@ -248,6 +243,7 @@ function mapStateToProps (state) {
 		isLuminoNode: data.isLuminoNode,
 		isRifStorage: data.isRifStorage,
     selectedResolverAddress: data.selectedResolverAddress,
+    disableResolvers: data.disableResolvers,
 		domain: data,
 	}
 }
@@ -259,8 +255,8 @@ const mapDispatchToProps = dispatch => {
     getChainAddresses: (domainName) => dispatch(rifActions.getChainAddresses(domainName)),
     setChainAddressForResolver: (domainName, chain, chainAddress) => dispatch(rifActions.setChainAddressForResolver(domainName, chain, chainAddress)),
     getUnapprovedTransactions: () => dispatch(rifActions.getUnapprovedTransactions()),
-    showTransactionConfirmPage: (data) => dispatch(niftyActions.showConfTxPage(data)),
-    wait: (time) => dispatch(rifActions.waitUntil(time)),
+    showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
+    waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
 		setAutoRenew: () => {},
     showDomainsDetailPage: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, data)),
     displayToast: (message) => dispatch(niftyActions.displayToast(message)),
