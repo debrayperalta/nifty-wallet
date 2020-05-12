@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import DomainsDetailActiveScreen from './domainDetailActive/domainDetailActive'
+import DomainExpiring from './domainExpiring/domainExpiring'
 
 class DomainsDetailScreen extends Component {
 	static propTypes = {
@@ -14,7 +15,10 @@ class DomainsDetailScreen extends Component {
 			{status === 'active' &&
 				<DomainsDetailActiveScreen />
 			}
-			{status !== 'active' &&
+      {status === 'expiring' &&
+        <DomainExpiring />
+      }
+			{(status !== 'active' && status !== 'expiring') &&
 				<div>
 					Domain detail page still in progress for this status!
 				</div>
