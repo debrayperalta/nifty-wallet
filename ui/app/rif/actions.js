@@ -129,13 +129,13 @@ function setResolverAddress (domainName, resolverAddress) {
   return (dispatch) => {
     dispatch(actions.showLoadingIndication());
     return new Promise((resolve, reject) => {
-      background.rif.rns.resolver.setResolver(domainName, resolverAddress, (error, result) => {
+      background.rif.rns.resolver.setResolver(domainName, resolverAddress, (error, transactionListenerId) => {
         dispatch(actions.hideLoadingIndication());
         if (error) {
           dispatch(actions.displayWarning(error));
           return reject(error);
         }
-        return resolve(result);
+        return resolve(transactionListenerId);
       });
     })
   }
