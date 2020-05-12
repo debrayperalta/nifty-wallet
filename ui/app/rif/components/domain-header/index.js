@@ -9,10 +9,11 @@ class DomainHeader extends Component {
     showOwnerIcon: PropTypes.bool,
     showLuminoNodeIcon: PropTypes.bool,
     showRifStorageIcon: PropTypes.bool,
+    children: PropTypes.object,
   }
 
   render () {
-    const {showOwnerIcon, showLuminoNodeIcon, showRifStorageIcon, domainName} = this.props;
+    const {showOwnerIcon, showLuminoNodeIcon, showRifStorageIcon, domainName, children} = this.props;
     return (
       <div id="headerName" className="domain-name">
         <span>{domainName}</span>
@@ -25,6 +26,7 @@ class DomainHeader extends Component {
         {showRifStorageIcon &&
         <RifStorageIcon className="domain-icon"/>
         }
+        {children}
       </div>
     );
   }
