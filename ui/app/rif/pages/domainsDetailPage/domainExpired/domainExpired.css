@@ -12,6 +12,7 @@
   font-weight: bold;
   margin-top: 2em;
   text-align: center;
+  white-space: nowrap;
 }
 .domain-expired-icon {
   font-size: 5em;
