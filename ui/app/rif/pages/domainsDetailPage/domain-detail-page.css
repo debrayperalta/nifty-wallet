@@ -3,12 +3,12 @@
   font-size: 1rem;
 }
 .domain-name {
-  font-size: 1.5rem;
-  font-weight: bold;
-  width: 100%;
-  height: 3.125rem;
-  padding: 0.625rem;
-  background-color: #A8C5EE;
+    font-size: 1.5rem;
+    font-weight: bold;
+    width: 100%;
+    height: 3.125rem;
+    padding: 0.625rem;
+    background-color: #A8C5EE;
 }
 .domain-name span {
   margin-right: 1rem;
@@ -24,7 +24,6 @@
   border-radius: 0.625rem;
   margin: 5%;
   padding: 0.625rem;
-  padding-right: 0.625rem;
   white-space: nowrap;
 }
 .domain-description-value {
@@ -172,5 +171,5 @@
 }
 .resolver-chainaddress-description-chain-address span {
   font-size: 1rem;
-  margin-right: 0.2rem;;
+  margin-right: 0.2rem;
 }

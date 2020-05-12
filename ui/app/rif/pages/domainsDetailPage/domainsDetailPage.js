@@ -1,7 +1,9 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import DomainsDetailActiveScreen from './domainDetailActive/domainDetailActive'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
+import DomainsDetailActiveScreen from './domainDetailActive/domainDetailActive';
+import DomainExpiring from './domainExpiring/domainExpiring';
+import DomainExpired from './domainExpired/domainExpired';
 
 class DomainsDetailScreen extends Component {
 	static propTypes = {
@@ -14,7 +16,13 @@ class DomainsDetailScreen extends Component {
 			{status === 'active' &&
 				<DomainsDetailActiveScreen />
 			}
-			{status !== 'active' &&
+      {status === 'expiring' &&
+        <DomainExpiring />
+      }
+      {status === 'expired' &&
+        <DomainExpired />
+      }
+			{['active', 'expiring', 'expired'].indexOf(status) === -1 &&
 				<div>
 					Domain detail page still in progress for this status!
 				</div>
