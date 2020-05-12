@@ -29,7 +29,7 @@ class DomainsDetailActiveScreen extends Component {
 		expirationDate: PropTypes.string.isRequired,
 		autoRenew: PropTypes.bool.isRequired,
 		ownerAddress: PropTypes.string.isRequired,
-    selectedResolverAddress: PropTypes.string.isRequired,
+    selectedResolverAddress: PropTypes.string,
 		isOwner: PropTypes.bool,
 		isLuminoNode: PropTypes.bool,
 		isRifStorage: PropTypes.bool,
@@ -55,7 +55,7 @@ class DomainsDetailActiveScreen extends Component {
 		};
 	}
   updateChainAddress = (selectedOption) => {
-		this.setState({ selectedChainAddress: selectedOption });
+    this.setState({ selectedChainAddress: selectedOption });
 	}
 	updateAddress = (address) => {
 		this.setState({ insertedAddress: address });
@@ -166,7 +166,7 @@ class DomainsDetailActiveScreen extends Component {
             <div id="resolversBody" className={'resolvers-body'}>
               <div className="resolver-body-top">
                 <div id="selectResolver" className={'custom-select'}>
-                  <select id="comboResolvers" className="select-css" disabled={disableCombo} onChange={!disableCombo && this.onChangeComboResolvers.bind(this)}>
+                  <select id="comboResolvers" className="select-css" disabled={disableCombo} onChange={!disableCombo ? this.onChangeComboResolvers.bind(this) : () => {}}>
                     <option disabled selected value hidden> Select Resolver </option>
                       {
                         this.state.resolvers.map((resolver, index) => {
