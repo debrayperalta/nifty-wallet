@@ -5,14 +5,34 @@ import rifActions from '../../../actions';
 import DomainHeader from '../../../components/domain-header';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBan } from '@fortawesome/free-solid-svg-icons'
+import {pageNames} from '../../index';
+import {Menu} from '../../../components';
 
 class DomainExpired extends Component {
 	static propTypes = {
     domainName: PropTypes.string.isRequired,
+    content: PropTypes.string.isRequired,
+    expirationDate: PropTypes.string.isRequired,
+    autoRenew: PropTypes.bool.isRequired,
+    ownerAddress: PropTypes.string.isRequired,
+    isOwner: PropTypes.bool,
+    isLuminoNode: PropTypes.bool,
+    isRifStorage: PropTypes.bool,
+    showDomainRegisterPage: PropTypes.func.isRequired,
 	}
 
 	render () {
-    const { domainName } = this.props
+    const { domainName, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage } = this.props
+    const domainInfo = {
+      domainName,
+      expirationDate,
+      autoRenew,
+      ownerAddress,
+      isOwner,
+      isLuminoNode,
+      isRifStorage,
+      content,
+    };
 		return (
 		<div>
       <DomainHeader domainName={domainName}>
@@ -24,9 +44,10 @@ class DomainExpired extends Component {
           Your domain is expired
         </div>
         <div className="button-container">
-          <button onClick={() => {}}>Register Now!</button>
+          <button onClick={() => this.props.showDomainRegisterPage(this.props.domainName)}>Register Now!</button>
         </div>
       </div>
+      <Menu domainInfo={domainInfo} />
     </div>
 		)
 	}
@@ -37,12 +58,27 @@ function mapStateToProps (state) {
   return {
 		dispatch: state.dispatch,
     domainName: data.domain,
+    content: data.content,
+    expirationDate: data.expiration,
+    autoRenew: data.autoRenew,
+    ownerAddress: data.ownerAddress,
+    isOwner: state.metamask.selectedAddress.toLowerCase() === data.ownerAddress.toLowerCase(),
+    isLuminoNode: data.isLuminoNode,
+    isRifStorage: data.isRifStorage,
+    resolvers: data.resolvers,
+    domain: data,
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
 		addNewNetwork: (message) => dispatch(rifActions.showModal(message)),
+    showDomainRegisterPage: (domainName) => dispatch(rifActions.navigateTo(pageNames.rns.domainRegister, {
+      domainName,
+      navBar: {
+        title: 'Domain Register',
+      },
+    })),
 	}
 }
 
