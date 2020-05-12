@@ -27,6 +27,9 @@ const rifActions = {
   goToConfirmPageForLastTransaction,
   waitForTransactionListener,
   deleteSubdomain,
+  getDomains,
+  getDomain,
+  updateDomains,
 }
 
 let background = null;
@@ -261,6 +264,13 @@ function navigateTo (screenName, params) {
   params = extend(defaultParams, params);
   params.navBar = extend(defaultNavBarParams, params.navBar);
 
+  if (params.navBar.showBack === false) {
+    // we reset the navigation since we can't go back in the next page or any other after that
+    for (let index = 0; index < navigationStack.length; index++) {
+      navigationStack.pop();
+    }
+  }
+
   const currentNavigation = {
     type: rifActions.NAVIGATE_TO,
     data: {
@@ -364,6 +374,54 @@ function deleteSubdomain (domainName, subdomain) {
           return reject(error);
         }
         return resolve(transactionListenerId);
+      });
+    });
+  };
+}
+
+function getDomain (domainName) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      dispatch(actions.hideLoadingIndication());
+      background.rif.rns.register.getDomain(domainName, (error, domain) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(domain);
+      });
+    });
+  };
+}
+
+function getDomains () {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      dispatch(actions.hideLoadingIndication());
+      background.rif.rns.register.getDomains((error, domains) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(domains);
+      });
+    });
+  };
+}
+
+function updateDomains (domain) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      dispatch(actions.hideLoadingIndication());
+      background.rif.rns.register.updateDomain(domain, (error) => {
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve();
       });
     });
   };

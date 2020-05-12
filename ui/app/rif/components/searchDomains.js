@@ -13,21 +13,35 @@ class SearchDomains extends Component {
     checkDomainAvailable: PropTypes.func,
     showDomainRegisterPage: PropTypes.func,
     showDomainsDetailPage: PropTypes.func,
+    getStoredDomains: PropTypes.func,
+  }
+
+  componentDidMount () {
+    this.loadDomains();
+  }
+
+  loadDomains () {
+    this.props.getStoredDomains().then(domains => {
+      this.setState({
+        storedDomains: domains,
+      });
+    })
   }
 
   _handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       const typedDomain = cleanDomainName(e.target.value);
-      // There is a limitation in manager that domains with less 5 characters are blocked
+      // There is a limitation in rns that domains with less 5 characters are blocked
       if (typedDomain.length <= 5) {
         this.props.displayWarning('Domains with less than 5 characters are blocked.');
         return;
       }
 
-      const storedDomains = JSON.parse(localStorage.rnsDomains);
-      const existDomain = storedDomains.find(domain => domain.domain === typedDomain);
-      if (existDomain) {
-        return this.props.showDomainsDetailPage(existDomain);
+      const storedDomains = this.state.storedDomains;
+
+      if (storedDomains && storedDomains.find(storedDomain => storedDomain.name === typedDomain)) {
+        const storedDomain = storedDomains.find(storedDomain => storedDomain.name === typedDomain);
+        return this.props.showDomainsDetailPage({domain: storedDomain, status: storedDomain.status});
       } else {
         // Checks if the domain is available, so if it is, it need to render a screen so the user can register it
         this.props.checkDomainAvailable(typedDomain).then(domain => {
@@ -74,6 +88,7 @@ const mapDispatchToProps = dispatch => {
     })),
     checkDomainAvailable: (domainName) => dispatch(rifActions.checkDomainAvailable(domainName)),
     displayWarning: (message) => dispatch(actions.displayWarning(message)),
+    getStoredDomains: () => dispatch(rifActions.getDomains()),
   }
 }
 

@@ -43,18 +43,13 @@ export default class RnsRegister extends RnsJsDelegate {
               const transactionListener = this.send(this.fifsAddrRegistrarInstance, 'commit', [commitment]);
               transactionListener.transactionConfirmed()
                 .then(transactionReceipt => {
-                  const state = this.getStoreState();
-                  if (!state.register[this.address]) {
-                    state.register[this.address] = {
-                      domainRegister: [],
-                    };
-                  }
-                  state.register[this.address].domainRegister[cleanDomainName] = {
-                    secret,
-                    yearsToRegister,
-                    rifCost,
-                  };
-                  this.updateStoreState(state);
+                  const domain = this.createNewDomainObject(domainName);
+                  domain.registration.rifCost = rifCost;
+                  domain.registration.yearsToRegister = yearsToRegister;
+                  domain.registration.secret = secret;
+                  domain.registration.commitment = commitment;
+                  this.updateDomains(domain);
+                  this.startWatchingCommitment(domainName, commitment);
               }).catch(transactionReceiptOrError => {
                 console.debug('Transaction Failed', transactionReceiptOrError);
               });
@@ -65,6 +60,27 @@ export default class RnsRegister extends RnsJsDelegate {
             }).catch(error => reject(error));
         }).catch(error => reject(error));
     });
+  }
+
+  startWatchingCommitment (domainName, commitment) {
+    let time = 0;
+    const interval = setInterval(async () => {
+      const domain = this.getDomain(domainName);
+      if (domain && domain.registration) {
+        const readyToRegister = await this.canFinishRegistration(commitment);
+        if (readyToRegister) {
+          domain.registration.readyToRegister = true;
+          this.updateDomains(domain);
+          clearInterval(interval);
+        }
+      } else {
+        time += rns.domainRegister.secondsToUpdateCommitment * 1000;
+      }
+      if (time >= rns.domainRegister.minutesWaitingForCommitmentReveal * 60 * 1000) {
+        this.deleteDomain(domain.name);
+        clearInterval(interval);
+      }
+    }, rns.domainRegister.secondsToUpdateCommitment * 1000);
   }
 
   /**
@@ -103,10 +119,9 @@ export default class RnsRegister extends RnsJsDelegate {
    */
   finishRegistration (domainName) {
     const cleanDomainName = this.cleanDomainFromRskSuffix(domainName);
-    const state = this.getStoreState();
-    const registerByAddress = state.register[this.address];
-    if (registerByAddress) {
-      const registerInformation = registerByAddress.domainRegister[cleanDomainName];
+    const pendingDomain = this.getDomain(domainName);
+    if (pendingDomain) {
+      const registerInformation = pendingDomain.registration;
       if (registerInformation) {
         const rifCost = registerInformation.rifCost;
         const secret = registerInformation.secret;
@@ -115,8 +130,10 @@ export default class RnsRegister extends RnsJsDelegate {
         const transactionListener = this.send(this.rifContractInstance, 'transferAndCall', [this.rifConfig.rns.contracts.fifsAddrRegistrar, rifCost.toString(), data]);
         transactionListener.transactionConfirmed()
           .then(transactionReceipt => {
-            // TODO: we have to add the domain to the store here instead of having it on the localStorage
-          console.debug('Transaction success', transactionReceipt);
+            console.debug('Transaction success', transactionReceipt);
+            pendingDomain.registration = null;
+            // TODO: we should get the details here and store them into the store to be accessible from the ui later
+            this.updateDomains(pendingDomain);
         }).catch(transactionReceipt => {
           console.debug('Transaction failed', transactionReceipt);
         });

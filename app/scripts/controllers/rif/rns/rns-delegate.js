@@ -205,7 +205,7 @@ export default class RnsDelegate {
    * @returns the current container state
    */
   getStateForContainer (containerName) {
-    return this.getStoreState() && this.getStoreState()[containerName] ? this.getStoreState()[containerName][this.address] : null;
+    return this.getStoreState() && this.getStoreState()[containerName] ? this.getStoreState()[containerName][this.address] : {};
   }
 
   /**

@@ -17,61 +17,74 @@ class DomainRegisterScreen extends Component {
     currentStep: PropTypes.string,
     yearsToRegister: PropTypes.number,
     costInRif: PropTypes.number,
-    gasCost: PropTypes.number,
     commitment: PropTypes.string,
     getUnapprovedTransactions: PropTypes.func,
     showTransactionConfirmPage: PropTypes.func,
-    registeringProgress: PropTypes.number,
     completeRegistration: PropTypes.func,
     canCompleteRegistration: PropTypes.func,
     viewDomainDetails: PropTypes.func,
-    selectedAddress: PropTypes.string,
-    getSelectedAddress: PropTypes.func,
     waitForListener: PropTypes.func,
+    getDomain: PropTypes.func,
+    updateDomains: PropTypes.func,
+    domain: PropTypes.object,
+    isDomainAvailable: PropTypes.func,
+    showToast: PropTypes.func,
+    showDomainList: PropTypes.func,
+    navBar: PropTypes.object,
+    showLoading: PropTypes.func,
   }
 
-  async componentDidMount () {
-    if (!this.props.selectedAddress) {
-      const address = await this.props.getSelectedAddress();
-      this.props.showThis({
-        ...this.props,
-        selectedAddress: address,
-      })
+  initialize () {
+    const {domain, currentStep} = this.props;
+    if (domain && !currentStep) {
+      if (domain.registration) {
+        if (domain.registration.readyToRegister) {
+          // domain not available, that means is pending or is already registered.
+          this.showReadyToRegister();
+        } else {
+          // domain not available, that means is pending or is already registered.
+          this.showWaitingForRegister();
+        }
+      } else {
+        this.props.showToast('Domain already registered!', false);
+        this.props.showDomainList();
+      }
+    } else if (!currentStep) {
+      // otherwise is available and ready for register
+      const available = this.props.isDomainAvailable(this.props.domainName);
+      if (!available) {
+        // is not available for registration so we redirect to domain list with a warning
+        this.props.showToast('Domain not available, can not be registered!', false);
+        this.props.showDomainList();
+      }
     }
   }
 
-  // TODO: change this to use obs store
-  storePendingDomain () {
-    let domains = JSON.parse(localStorage.getItem('rnsDomains'));
-    const expirationDate = new Date();
-    expirationDate.setFullYear(expirationDate.getFullYear() + this.props.yearsToRegister);
-    const pendingDomain = {
-      domain: this.props.domainName,
-      expiration: expirationDate.toDateString(),
-      autoRenew: false,
-      status: 'pending',
-      address: this.props.selectedAddress,
-      content: '',
-      ownerAddress: this.props.selectedAddress,
-      isLuminoNode: true,
-      isRifStorage: true,
-      resolvers: [],
-    };
-    if (!domains) {
-      domains = [];
-    }
-    if (domains.filter(domain => domain.domain === this.props.domainName).length <= 0) {
-      domains.push(pendingDomain);
-    }
-    localStorage.setItem('rnsDomains', JSON.stringify(domains));
+  showWaitingForRegister () {
+    this.props.showThis({
+      ...this.props,
+      currentStep: 'waitingForRegister',
+      navBar: {
+        showBack: false,
+        title: this.props.navBar.title,
+      },
+    });
   }
 
-  // TODO: change this to use obs store, this is not safe, the user can go to another page and we will have errors
-  changeDomainStatusAndStore () {
-    const domains = JSON.parse(localStorage.getItem('rnsDomains'));
-    const domain = domains.filter(domain => domain.domain === this.props.domainName)[0];
-    domain.status = 'active';
-    localStorage.setItem('rnsDomains', JSON.stringify(domains));
+  componentDidMount () {
+    this.props.showLoading();
+    this.initialize();
+    this.props.showLoading(false);
+  }
+
+  async getUpdatedDomain () {
+    return await this.props.getDomain(this.props.domainName);
+  }
+
+  async changeDomainStatus (status) {
+    const domain = await this.getUpdatedDomain();
+    domain.status = status;
+    await this.props.updateDomains(domain);
   }
 
   showRegistration () {
@@ -80,10 +93,9 @@ class DomainRegisterScreen extends Component {
         const costInRif = costInWei / 1e18;
         this.props.showThis({
           ...this.props,
-          currentStep: 'register',
+          currentStep: 'setupRegister',
           yearsToRegister: 1,
           costInRif: costInRif,
-          gasCost: 0,
         });
       });
   }
@@ -92,7 +104,7 @@ class DomainRegisterScreen extends Component {
     const result = await this.props.requestRegistration(this.props.domainName, this.props.yearsToRegister);
     this.props.waitForListener(result.transactionListenerId)
       .then(transactionReceipt => {
-        this.afterCommitConfirmation(result.commitment);
+        this.showWaitingForRegister();
       });
     this.props.showTransactionConfirmPage({
       action: () => this.showWaitingForConfirmation(),
@@ -114,8 +126,8 @@ class DomainRegisterScreen extends Component {
     this.props.viewDomainDetails(this.props.domainName);
   }
 
-  afterRegistration () {
-    this.changeDomainStatusAndStore();
+  async afterRegistration () {
+    await this.changeDomainStatus('active');
     this.props.showThis({
       ...this.props,
       currentStep: 'registered',
@@ -126,16 +138,6 @@ class DomainRegisterScreen extends Component {
     this.props.showThis({
       ...this.props,
       currentStep: 'waitingForConfirmation',
-    });
-  }
-
-  afterCommitConfirmation (commitment, progress = 0) {
-    this.storePendingDomain();
-    this.props.showThis({
-      ...this.props,
-      currentStep: 'registering',
-      commitment: commitment,
-      registeringProgress: progress,
     });
   }
 
@@ -152,10 +154,9 @@ class DomainRegisterScreen extends Component {
       const costInRif = costInWei / 1e18;
       this.props.showThis({
         ...this.props,
-        currentStep: 'register',
+        currentStep: 'setupRegister',
         yearsToRegister: yearsToRegister,
         costInRif: costInRif,
-        gasCost: 0,
       });
     }
   }
@@ -178,7 +179,7 @@ class DomainRegisterScreen extends Component {
           </div>
         </div>
       ),
-      register: (
+      setupRegister: (
         <div className="domainRegisterInitiate">
           <div>
             You are going to register <span className="bold">{this.props.domainName}</span>
@@ -196,12 +197,9 @@ class DomainRegisterScreen extends Component {
           <div>
             <span>Cost in RIF:</span><span>{this.props.costInRif}</span><span>RIF</span>
           </div>
-          <div>
-            <span>Gas Cost:</span><span>{this.props.gasCost}</span><span>RBTC</span>
-          </div>
         </div>
       ),
-      registering: (
+      waitingForRegister: (
         <div className="domainRegisterProgress">
           <div>
             <article className="clock">
@@ -215,7 +213,6 @@ class DomainRegisterScreen extends Component {
             <p>
               Waiting for confirmation. You need to wait while we secure your domain, then you need to confirm the registration at the final step
             </p>
-            <progress max="120" value={this.props.registeringProgress}/>
           </div>
         </div>
       ),
@@ -258,33 +255,30 @@ class DomainRegisterScreen extends Component {
         </div>
       ),
     };
-    if (currentStep === 'registering' && this.props.registeringProgress <= 120) {
+    if (currentStep === 'waitingForRegister') {
       const timeout = setTimeout(() => {
-        this.afterCommitConfirmation(this.props.commitment, this.props.registeringProgress + 4);
-        clearTimeout(timeout);
-      }, registrationTimeouts.registering * 1000);
-    } else if (currentStep === 'registering' && this.props.registeringProgress >= 120) {
-      this.props.canCompleteRegistration(this.props.commitment)
-        .then(canFinish => {
-          if (canFinish) {
-            this.props.showThis({
-              ...this.props,
-              currentStep: 'readyToRegister',
-            });
+        this.getUpdatedDomain().then(domain => {
+          if (domain.registration && domain.registration.readyToRegister) {
+            this.showReadyToRegister();
           } else {
-            this.props.showThis({
-              ...this.props,
-            });
+            this.showWaitingForRegister();
           }
+          clearTimeout(timeout);
         });
-    } else if (currentStep === 'registerConfirmation') {
-      // we wait a little until we show the done page to give time to get the confirmation.
-      const timeout = setTimeout(() => {
-        this.afterRegistration();
-        clearTimeout(timeout);
-      }, registrationTimeouts.registerConfirmation * 1000);
+      }, registrationTimeouts.secondsToCheckForCommitment * 1000);
     }
     return partials[currentStep];
+  }
+
+  showReadyToRegister () {
+    this.props.showThis({
+      ...this.props,
+      currentStep: 'readyToRegister',
+      navBar: {
+        showBack: false,
+        title: this.props.navBar.title,
+      },
+    });
   }
 
   getButtons (currentStep) {
@@ -294,7 +288,7 @@ class DomainRegisterScreen extends Component {
           <button onClick={() => this.showRegistration()}>Register Domain</button>
         </div>
       ),
-      register: (
+      setupRegister: (
         <div className="button-container">
           <button onClick={() => this.initiateRegistration()}>Initiate Registration</button>
         </div>
@@ -351,8 +345,13 @@ const mapDispatchToProps = dispatch => {
     completeRegistration: (domainName) => dispatch(rifActions.finishRegistration(domainName)),
     canCompleteRegistration: (commitment) => dispatch(rifActions.canFinishRegistration(commitment)),
     viewDomainDetails: (domainName) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, domainName)),
-    getSelectedAddress: () => dispatch(rifActions.getSelectedAddress()),
     waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
+    getDomain: (domainName) => dispatch(rifActions.getDomain(domainName)),
+    updateDomains: (domain) => dispatch(rifActions.updateDomains(domain)),
+    showToast: (text, success) => dispatch(niftyActions.displayToast(text, success)),
+    isDomainAvailable: (domainName) => dispatch(rifActions.checkDomainAvailable(domainName)),
+    showDomainList: () => dispatch(rifActions.navigateTo(pageNames.rns.domains)),
+    showLoading: (loading = true, message) => loading ? dispatch(niftyActions.showLoadingIndication(message)) : dispatch(niftyActions.hideLoadingIndication()),
   }
 }
 

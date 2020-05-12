@@ -28,6 +28,9 @@ export default class RnsJsDelegate extends RnsDelegate {
       createSubdomain: this.bindOperation(this.createSubdomain, this),
       deleteSubdomain: this.bindOperation(this.deleteSubdomain, this),
       getSubdomainsForDomain: this.bindOperation(this.getSubdomainsForDomain, this),
+      getDomains: this.bindOperation(this.getDomainsForUi, this),
+      getDomain: this.bindOperation(this.getDomainForUi, this),
+      updateDomain: this.bindOperation(this.updateDomainsForUi, this),
     }
   }
 
@@ -133,7 +136,7 @@ export default class RnsJsDelegate extends RnsDelegate {
         const foundSubdomain = subdomains.find(sd => sd.name === subdomain);
         if (foundSubdomain) {
           // existent subdomain
-          if (ownerAddress === rns.defaultAddress) {
+          if (ownerAddress === rns.zeroAddress) {
             // deleting subdomain
             subdomains = subdomains.filter(sd => sd.name !== subdomain);
           } else {
@@ -181,7 +184,7 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns {Promise} containing the transaction listener id to track this operation.
    */
   deleteSubdomain (domainName, subdomain) {
-    return this.setSubdomainOwner(domainName, subdomain, rns.defaultAddress, this.address);
+    return this.setSubdomainOwner(domainName, subdomain, rns.zeroAddress, this.address);
   }
 
   /**
@@ -196,6 +199,105 @@ export default class RnsJsDelegate extends RnsDelegate {
       return [];
     }
     return state.domains[domainName].subdomains;
+  }
+
+  /**
+   * Exposes the getDomain method to the ui
+   * @param domainName
+   * @returns {Promise<unknown>}
+   */
+  getDomainForUi (domainName) {
+    return Promise.resolve(this.getDomain(domainName));
+  }
+
+  /**
+   * Exposes the getDomains method to the ui
+   * @param domainName
+   * @returns {Promise<unknown>}
+   */
+  getDomainsForUi () {
+    return Promise.resolve(this.getDomains());
+  }
+
+  /**
+   * Gets a stored domain by name
+   * @param domainName
+   * @returns {*}
+   */
+  getDomain (domainName) {
+    const domains = this.getDomains();
+    return domains.find(domain => domain.name === domainName);
+  }
+
+  /**
+   * Gets the domains for the selected address
+   * @returns the domains array
+   */
+  getDomains () {
+    const domains = [];
+    const state = this.getStateForContainer(rns.storeContainers.register);
+    if (!state || !state.domains) {
+      return domains;
+    }
+    Object.keys(state.domains).forEach(domainName => {
+      domains.push(state.domains[domainName]);
+    })
+    return domains;
+  }
+
+  /**
+   * Creates a new domain object to populate
+   * @param domainName the domain name for this object
+   * @returns {{subdomains: [], name: *, registration: {readyToRegister: boolean, yearsToRegister: null, secret: null, rifCost: null}, details: null, status: string}}
+   */
+  createNewDomainObject (domainName) {
+    return {
+      name: domainName,
+      subdomains: [],
+      registration: {
+        secret: null,
+        yearsToRegister: null,
+        rifCost: null,
+        readyToRegister: false,
+        commitment: null,
+      },
+      status: 'pending',
+      details: null,
+    }
+  }
+
+  /**
+   * Exposes the updateDomains method to the ui
+   * @param domain
+   * @returns {Promise<void>}
+   */
+  updateDomainsForUi (domain) {
+    return Promise.resolve(this.updateDomains(domain));
+  }
+
+  /**
+   * Updates the stored domains
+   * @param domain to add
+   */
+  updateDomains (domain) {
+    const state = this.getStateForContainer(rns.storeContainers.register);
+    if (!state.domains) {
+      state.domains = {};
+    }
+    state.domains[domain.name] = domain;
+    this.updateStateForContainer(rns.storeContainers.register, state);
+  }
+
+  /**
+   * Deletes the domainName from storage
+   * @param domainName to delete
+   */
+  deleteDomain (domainName) {
+    const state = this.getStateForContainer(rns.storeContainers.register);
+    if (state.domains && state.domains[domainName]) {
+      delete state.domains[domainName];
+      this.updateStateForContainer(rns.storeContainers.register, state);
+    }
   }
 
   /**
