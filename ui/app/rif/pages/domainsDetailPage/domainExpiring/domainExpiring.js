@@ -6,6 +6,7 @@ import DomainHeader from '../../../components/domain-header';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import {Menu} from '../../../components';
+import {pageNames} from '../../index';
 
 class DomainExpiring extends Component {
   static propTypes = {
@@ -17,6 +18,7 @@ class DomainExpiring extends Component {
     isOwner: PropTypes.bool,
     isLuminoNode: PropTypes.bool,
     isRifStorage: PropTypes.bool,
+    navigateTo: PropTypes.func,
   }
 
   render () {
@@ -42,7 +44,7 @@ class DomainExpiring extends Component {
             Your domain is expiring
           </div>
           <div className="button-container">
-            <button onClick={() => {}}>Renew now!</button>
+            <button onClick={() => this.props.navigateTo(pageNames.rns.renew, 'Renew Domain')}>Renew now!</button>
           </div>
         </div>
         <Menu domainInfo={domainInfo} />
@@ -70,6 +72,16 @@ function mapStateToProps (state) {
 const mapDispatchToProps = dispatch => {
   return {
     addNewNetwork: (message) => dispatch(rifActions.showModal(message)),
+    navigateTo: (screenName, title, params) => {
+      dispatch(rifActions.navigateTo(screenName, {
+        ...params,
+        showDomainsSearch: true,
+        navBar: {
+          title,
+          backAction: () => dispatch(rifActions.navigateBack()),
+        },
+      }));
+    },
   }
 }
 
