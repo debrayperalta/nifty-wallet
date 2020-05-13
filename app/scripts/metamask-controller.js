@@ -292,6 +292,7 @@ module.exports = class MetamaskController extends EventEmitter {
       preferencesController: this.preferencesController,
       networkController: this.networkController,
       transactionController: this.txController,
+      keyringController: this.keyringController,
     });
 
     this.store.updateStructure({

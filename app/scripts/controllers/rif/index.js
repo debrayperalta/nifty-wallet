@@ -1,6 +1,7 @@
 import RnsManager from './rns'
 import Web3 from 'web3'
 import ComposableObservableStore from './../../lib/ComposableObservableStore'
+import {LuminoManager} from './lumino';
 
 /**
  * RIF Controller
@@ -28,12 +29,20 @@ export default class RifController {
       throw new Error('TransactionController has to be present');
     }
 
+    if (!props.keyringController) {
+      throw new Error('KeyringController has to be present');
+    }
+
     this.preferencesController = props.preferencesController;
     this.networkController = props.networkController;
     this.transactionController = props.transactionController;
+    this.keyringController = props.keyringController;
     this.web3 = new Web3(this.networkController._provider);
 
     const initState = props.initState || {};
+
+    this.address = this.preferencesController.store.getState().selectedAddress;
+    this.preferencesController.store.subscribe(updatedPreferences => this.preferencesUpdated(updatedPreferences));
 
     this.rnsManager = new RnsManager({
       initState: initState.RnsManager,
@@ -43,10 +52,20 @@ export default class RifController {
       web3: this.web3,
     });
 
+    this.luminoManager = new LuminoManager({
+      initState: initState.LuminoManager,
+      preferencesController: this.preferencesController,
+      web3: this.web3,
+      keyringController: this.keyringController,
+    });
+
     this.store = new ComposableObservableStore(props.initState, {
       RnsManager: this.rnsManager.store,
+      LuminoManager: this.luminoManager.store,
     });
   }
+
+
 
   /**
    * This method publishes all the operations available to call from the ui for RifController
