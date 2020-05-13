@@ -13,13 +13,14 @@ class SearchDomains extends Component {
     checkDomainAvailable: PropTypes.func,
     showDomainRegisterPage: PropTypes.func,
     showDomainsDetailPage: PropTypes.func,
+    getDomainDetails: PropTypes.func,
   }
 
   _handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       const typedDomain = cleanDomainName(e.target.value);
       // There is a limitation in manager that domains with less 5 characters are blocked
-      if (typedDomain.length <= 5) {
+      if (typedDomain.length < 5) {
         this.props.displayWarning('Domains with less than 5 characters are blocked.');
         return;
       }
@@ -35,7 +36,13 @@ class SearchDomains extends Component {
             this.props.showDomainRegisterPage(typedDomain);
           } else {
             // We need to put an else here, so we can redirect to details page, remember that the localstorage part of code, will not be anymore here
-            return this.props.showDomainsDetailPage(typedDomain);
+            this.props.getDomainDetails(typedDomain).then(details => {
+              console.debug('Details retrieved', details);
+              return this.props.showDomainsDetailPage(details);
+            }).catch(error => {
+              console.debug('Error retrieving domain details', error);
+              this.props.displayWarning('An error happend trying to get details from domain, please try again later.');
+            });
           }
         });
       }
@@ -73,6 +80,7 @@ const mapDispatchToProps = dispatch => {
       },
     })),
     checkDomainAvailable: (domainName) => dispatch(rifActions.checkDomainAvailable(domainName)),
+    getDomainDetails: (domainName) => dispatch(rifActions.getDomainDetails(domainName)),
     displayWarning: (message) => dispatch(actions.displayWarning(message)),
   }
 }

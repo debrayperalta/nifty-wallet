@@ -129,7 +129,7 @@ class Subdomains extends Component {
           this.state.newSubdomain.name.toLowerCase(),
           this.state.newSubdomain.owner,
           this.props.domainInfo.ownerAddress);
-        this.props.waitForListener(transactionListenerId).then(tranactionReceipt => {
+        this.props.waitForListener(transactionListenerId).then(transactionReceipt => {
           this.showCreationSuccess();
         });
         this.props.showPopup('Confirmation', {
