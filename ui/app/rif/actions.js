@@ -8,6 +8,10 @@ const rifActions = {
   setBackgroundConnection,
   // RNS
   checkDomainAvailable,
+  getDomainDetails,
+  setResolverAddress,
+  getChainAddresses,
+  setChainAddressForResolver,
   requestDomainRegistration,
   canFinishRegistration,
   finishRegistration,
@@ -93,18 +97,83 @@ function showModal (opts, modalName = 'generic-modal') {
 
 function checkDomainAvailable (domainName) {
   return (dispatch) => {
-    dispatch(actions.showLoadingIndication())
+    dispatch(actions.showLoadingIndication());
     return new Promise((resolve, reject) => {
       background.rif.rns.resolver.isDomainAvailable(domainName, (error, available) => {
+        dispatch(actions.hideLoadingIndication());
         if (error) {
           dispatch(actions.displayWarning(error));
           return reject(error);
         }
-        dispatch(actions.hideLoadingIndication());
         return resolve(available);
       });
     });
   };
+}
+
+function getDomainDetails (domainName) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication());
+    return new Promise((resolve, reject) => {
+        background.rif.rns.resolver.getDomainDetails(domainName, (error, details) => {
+          console.debug('This are the details bringed', details);
+          dispatch(actions.hideLoadingIndication());
+          if (error) {
+            dispatch(actions.displayWarning(error));
+            return reject(error);
+          }
+          return resolve(details);
+        });
+    })
+  }
+}
+
+function setResolverAddress (domainName, resolverAddress) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication());
+    return new Promise((resolve, reject) => {
+      background.rif.rns.resolver.setResolver(domainName, resolverAddress, (error, transactionListenerId) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(transactionListenerId);
+      });
+    })
+  }
+}
+
+function setChainAddressForResolver (domainName, chain, chainAddress) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication());
+    return new Promise((resolve, reject) => {
+      background.rif.rns.resolver.setChainAddressForResolver(domainName, chain, chainAddress, (error, result) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(result);
+      });
+    })
+  }
+}
+
+function getChainAddresses (domainName) {
+  return (dispatch) => {
+    dispatch(actions.showLoadingIndication());
+    return new Promise((resolve, reject) => {
+      background.rif.rns.resolver.getChainAddressForResolvers(domainName, (error, result) => {
+        dispatch(actions.hideLoadingIndication());
+        if (error) {
+          dispatch(actions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(result);
+      });
+    })
+  }
 }
 
 function requestDomainRegistration (domainName, yearsToRegister) {

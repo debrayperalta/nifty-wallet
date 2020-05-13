@@ -1,6 +1,6 @@
 .domain-detail-body {
-    width: 90%;
-    font-size: 1rem;
+  width: 90%;
+  font-size: 1rem;
 }
 .domain-name {
     font-size: 1.5rem;
@@ -11,10 +11,10 @@
     background-color: #A8C5EE;
 }
 .domain-name span {
-    margin-right: 1rem;
+  margin-right: 1rem;
 }
 .domain-icon {
-    margin-left: 0.5rem;
+  margin-left: 0.5rem;
 }
 .domain-description {
   font-weight: bold;
@@ -27,120 +27,149 @@
   white-space: nowrap;
 }
 .domain-description-value {
-    font-weight: bold;
-    font-weight: normal;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: inline-block;
-    width: 75%;
+  font-weight: bold;
+  font-weight: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  width: 75%;
 }
 .domain-description-field {
-    font-weight: bold;
-    overflow: hidden;
-    display: inline-block;
+  font-weight: bold;
+  overflow: hidden;
+  display: inline-block;
 }
 .domain-description a {
-    color: #3399FF;
-    font-weight: normal;
-    cursor: pointer;
+  color: #3399FF;
+  font-weight: normal;
+  cursor: pointer;
 }
 .domain-description a:hover {
-    color: #84C1FF;
+  color: #84C1FF;
 }
 .domain-description-plus-button {
-    color: #4280D9;
-    font-size: 3.5rem;
-    float: right;
-    margin: 5%;
-    cursor: pointer;
-    transition: all 0.2s;
+  color: #4280D9;
+  font-size: 3.5rem;
+  float: right;
+  margin: 5%;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 .domain-description-plus-button:hover {
-    transform: scale(1.1);
-    transition: all 0.2s;
+  transform: scale(1.1);
+  transition: all 0.2s;
 }
 .domain-detail-new-button {
-    cursor: pointer;
-    float: right;
-    width: 8rem;
-    height: 2.5rem;
-    color: #4280D9;
-    background-color: #C2D6F3;
-    border: 0.125rem solid #4280D9;
-    border-radius: 0.3rem;
-    font-size: 1.5rem;
-    font-weight: bold;
-    position: relative;
-    transition: all 0.2s;
+  cursor: pointer;
+  float: right;
+  width: 8rem;
+  height: 2.5rem;
+  color: #4280D9;
+  background-color: #C2D6F3;
+  border: 0.125rem solid #4280D9;
+  border-radius: 0.3rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  position: relative;
+  transition: all 0.2s;
 }
 .domain-detail-new-button:hover {
-    transition: all 0.2s;
-    border: 0.125rem solid #6799e0;
-    background-color: #AEC0DA;
-    color: #548CDC;
+  transition: all 0.2s;
+  border: 0.125rem solid #6799e0;
+  background-color: #AEC0DA;
+  color: #548CDC;
 }
 .domain-detail-new-button span {
-    font-size: 1.2rem;
-    margin-left: 0.3rem;
+  font-size: 1.2rem;
+  margin-left: 0.3rem;
+}
+.domain-detail-watch-and-register {
+  cursor: pointer;
+  width: 15rem;
+  height: 2.5rem;
+  color: #4280D9;
+  background-color: #C2D6F3;
+  border: 0.125rem solid #4280D9;
+  border-radius: 0.3rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  position: relative;
+  transition: all 0.2s;
+  white-space: nowrap;
+  transform: translate(25%, 0);
+}
+.domain-detail-watch-and-register:hover {
+  transition: all 0.2s;
+  border: 0.125rem solid #6799e0;
+  background-color: #AEC0DA;
+  color: #548CDC;
 }
 .center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
 }
 .centerY {
-    position: absolute;
-    top: 50%;
-    left: 5%;
-    transform: translateX(-50%) translateY(-50%);
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  transform: translateX(-50%) translateY(-50%);
 }
 .resolvers-body{
-    width: 100%;
-    margin: 5%;
-    padding: 0.625rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  width: 100%;
+  margin: 5%;
+  padding: 0.625rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .resolver-body-top {
-    width: 100%;
-    background-color: blue;
+  width: 100%;
+  background-color: blue;
 }
-.resolver-network {
-    width: 100%;
-    margin-top: 20%;
-}
+
 .custom-select{
-    width: 50%;
-    float: left;
+  width: 50%;
+  float: left;
 }
 .select-css {
-    background-color: white;
+  background-color: white;
 	font-size: 1rem;
 	line-height: 1.3;
-	padding: .6em 1.4em .5em .8em;
+  padding: 0.25rem 0rem 0.25rem 0.25rem;
 	width: 100%;
 	max-width: 100%;
-    border-top: 0;
-    border-left: 0;
-    border-right: 0;
-    outline: 0;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  outline: 0;
 	appearance: none;
 }
-.resolver-network-description {
-    font-size: 1.3rem;
-    margin-top: 1.5rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-bottom: 0.063rem solid #C0C0C0;
+.resolver-chainaddress {
+  width: 100%;
+  margin-top: 2rem;
 }
-.resolver-network-description span {
-    margin-left: 0.2rem;
+.resolver-chainaddress-description {
+  width: 100%;
+  float: left;
+  font-size: 1.3rem;
+  margin-top: 0.75rem;
+  border-bottom: 0.063rem solid #C0C0C0;
 }
-.resolver-network-description-address {
-    font-size: 1rem;
-    margin-right: 0.2rem;
-    float: right;
+.resolver-chainaddress-description-chain {
+  width: 30%;
+  float: left;
+}
+.resolver-chainaddress-description-chain-address {
+  width: 70%;
+  float: left;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.resolver-chainaddress-description-chain-address span {
+  font-size: 1rem;
+  margin-right: 0.2rem;
 }

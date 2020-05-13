@@ -16,7 +16,7 @@ export default class RnsDelegate {
     this.rifContractInstance = props.rifContractInstance;
     this.address = props.address;
     this.store = props.store;
-    this.transactionListeners = {};
+    this.store.transactionListeners = {};
     this.initialize();
   }
 
@@ -102,23 +102,22 @@ export default class RnsDelegate {
           web3: this.web3,
           transactionController: this.transactionController,
           afterClean: (transactionListenerId) => {
-            delete this.transactionListeners[transactionListenerId];
+            delete this.store.transactionListeners[transactionListenerId];
           },
         });
         const transactionListenerId = transactionListener.id;
         contractInstance[methodName].sendTransaction(...parameters, transactionOptions, (error, transactionHash) => {
           if (error) {
-            this.transactionListeners[transactionListenerId].error(error);
-            this.transactionListeners[transactionListenerId].clean();
+            this.store.transactionListeners[transactionListenerId].error(error);
           } else {
             const pendingTransaction = this.getPendingTransactionByHash(transactionHash)
-            this.transactionListeners[transactionListenerId].transactionId = pendingTransaction.id;
-            this.transactionListeners[transactionListenerId].transactionHash = transactionHash;
-            this.transactionListeners[transactionListenerId].listen();
+            this.store.transactionListeners[transactionListenerId].transactionId = pendingTransaction.id;
+            this.store.transactionListeners[transactionListenerId].transactionHash = transactionHash;
+            this.store.transactionListeners[transactionListenerId].listen();
           }
         });
-        this.transactionListeners[transactionListenerId] = transactionListener;
-        return this.transactionListeners[transactionListenerId];
+        this.store.transactionListeners[transactionListenerId] = transactionListener;
+        return this.store.transactionListeners[transactionListenerId];
       }
       throw new Error('Invalid method for contract instance');
     }
@@ -142,7 +141,7 @@ export default class RnsDelegate {
    */
   waitForTransactionListener (transactionListenerId) {
     return new Promise((resolve, reject) => {
-      const listener = this.transactionListeners[transactionListenerId];
+      const listener = this.store.transactionListeners[transactionListenerId];
       if (listener) {
         listener.transactionConfirmed().then(transactionReceipt => {
           resolve(transactionReceipt);
