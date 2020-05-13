@@ -123,7 +123,17 @@ class DomainRegisterScreen extends Component {
   }
 
   viewDomainDetails () {
-    this.props.viewDomainDetails(this.props.domainName);
+    this.props.getDomain(this.props.domainName)
+      .then(domain => {
+        this.props.viewDomainDetails({
+          domain: domain,
+          status: domain.details.status,
+          navBar: {
+            title: 'Domain Detail',
+            showBack: false,
+          },
+        });
+      })
   }
 
   async afterRegistration () {
@@ -145,6 +155,10 @@ class DomainRegisterScreen extends Component {
     this.props.showThis({
       ...this.props,
       currentStep: 'waitingForConfirmation',
+      navBar: {
+        showBack: false,
+        title: this.props.navBar.title,
+      },
     });
   }
 
@@ -344,7 +358,12 @@ const mapDispatchToProps = dispatch => {
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
     completeRegistration: (domainName) => dispatch(rifActions.finishRegistration(domainName)),
     canCompleteRegistration: (commitment) => dispatch(rifActions.canFinishRegistration(commitment)),
-    viewDomainDetails: (domainName) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, domainName)),
+    viewDomainDetails: (params) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, {
+      navBar: {
+        title: 'Domain Details',
+      },
+      ...params,
+    })),
     waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
     getDomain: (domainName) => dispatch(rifActions.getDomain(domainName)),
     updateDomains: (domain) => dispatch(rifActions.updateDomains(domain)),

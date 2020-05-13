@@ -80,9 +80,9 @@ export default class RnsResolver extends RnsJsDelegate {
       const getOwner = this.getOwner(domainNameWSuffix);
       const getResolver = this.getResolver(domainNameWSuffix);
       Promise.all([getDomainAddress, content, expiration, getOwner, getResolver]).then(values => {
-        let expirationDate = new Date();
+        const expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + values[2]);
-        let status = this.getStatus(values[2]);
+        const status = this.getStatus(values[2]);
         resolve(new DomainDetails(domainNameWSuffix, values[0], values[1], getDateFormatted(expirationDate), false, values[3], status, values[4], false, false));
       }).catch(error => {
         reject(error);
@@ -95,7 +95,7 @@ export default class RnsResolver extends RnsJsDelegate {
    * @param domainName with the .rsk extension
    * @returns {Promise<unknown>}
    */
-  getResolver(domainName) {
+  getResolver (domainName) {
     return new Promise((resolve, reject) => {
       this.call(this.rnsContractInstance, 'resolver', [namehash.hash(domainName)]).then(result => {
         console.debug('getResolver resolved with', result);
@@ -118,6 +118,11 @@ export default class RnsResolver extends RnsJsDelegate {
       const transactionListener = this.send(this.rnsContractInstance, 'setResolver', [namehash.hash(domainName), resolverAddress]);
       transactionListener.transactionConfirmed()
         .then(transactionReceipt => {
+          this.getDomainDetails(domainName).then(domainDetails => {
+            const domain = this.getDomain(domainName);
+            domain.details = domainDetails;
+            this.updateDomains(domain);
+          });
           console.debug('setResolver success', transactionReceipt);
         }).catch(transactionReceiptOrError => {
           console.debug('Error when trying to set resolver', transactionReceiptOrError);
@@ -137,18 +142,17 @@ export default class RnsResolver extends RnsJsDelegate {
       const chainAddrChangedEvent = this.multiChainresolverContractInstance.ChainAddrChanged({node: namehash.hash(domainName)}, {fromBlock: 0, toBlock: 'latest'});
       const arrChains = [];
       const errorLogs = [];
-      addrChangedEvent.get(function(error, result){
+      addrChangedEvent.get(function (error, result){
         if (error) {
           console.debug('Error when trying to get addrChangedEvent for resolver', error);
           errorLogs.push(error);
         }
         result.forEach(event => {
-          const chainAddrToPush = new ChainAddress(ChainId.RSK, event.args.addr)
-          arrChains[0] = chainAddrToPush;
+          arrChains[0] = new ChainAddress(ChainId.RSK, event.args.addr);
         });
         console.debug('getChainAddressForResolvers success', arrChains);
       });
-      chainAddrChangedEvent.get(function(error, result){
+      chainAddrChangedEvent.get(function (error, result){
         if (error) {
           console.debug('Error when trying to get chainAddrChangedEvent for resolver', error);
           errorLogs.push(error);
@@ -193,7 +197,7 @@ export default class RnsResolver extends RnsJsDelegate {
   * Returns a status for the days remaining of a domain
   * @param {int} daysRemaining
   */
-  getStatus(daysRemaining) {
+  getStatus (daysRemaining) {
    let retStatus = DOMAIN_STATUSES.ACTIVE
    if (daysRemaining <= 0) {
      retStatus = DOMAIN_STATUSES.EXPIRED;

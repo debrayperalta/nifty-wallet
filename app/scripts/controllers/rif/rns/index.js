@@ -6,6 +6,7 @@ import RNS from './abis/RNS.json'
 import RIF from './abis/RIF.json'
 import extend from 'xtend'
 import ObservableStore from 'obs-store'
+import {RnsContainer} from './container';
 
 /**
  * This class encapsulates all the RNS operations, it initializes and call to all the delegates and exposes their operations.
@@ -38,7 +39,7 @@ export default class RnsManager {
     }, props.initState);
     this.store = new ObservableStore(initState);
 
-    this.rnsRegister = new RnsRegister({
+    const register = new RnsRegister({
       web3: this.web3,
       preferencesController,
       networkController,
@@ -49,7 +50,7 @@ export default class RnsManager {
       address: this.address,
       store: this.store,
     });
-    this.rnsResolver = new RnsResolver({
+    const resolver = new RnsResolver({
       web3: this.web3,
       preferencesController,
       networkController,
@@ -60,7 +61,7 @@ export default class RnsManager {
       address: this.address,
       store: this.store,
     });
-    this.rnsTransfer = new RnsTransfer({
+    const transfer = new RnsTransfer({
       web3: this.web3,
       preferencesController,
       networkController,
@@ -70,6 +71,11 @@ export default class RnsManager {
       rifContractInstance: this.rifContractInstance,
       address: this.address,
       store: this.store,
+    });
+    this.container = new RnsContainer({
+      register,
+      resolver,
+      transfer,
     });
   }
 
@@ -92,9 +98,9 @@ export default class RnsManager {
    */
   updateAccount (address) {
     this.address = address;
-    this.rnsRegister.address = address;
-    this.rnsResolver.address = address;
-    this.rnsTransfer.address = address;
+    this.container.register.address = address;
+    this.container.resolver.address = address;
+    this.container.transfer.address = address;
   }
 
   /**
@@ -103,9 +109,9 @@ export default class RnsManager {
    */
   bindApi () {
     return {
-      register: this.rnsRegister.buildApi(),
-      resolver: this.rnsResolver.buildApi(),
-      transfer: this.rnsTransfer.buildApi(),
+      register: this.container.register.buildApi(),
+      resolver: this.container.resolver.buildApi(),
+      transfer: this.container.transfer.buildApi(),
     }
   }
 }

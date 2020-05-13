@@ -21,6 +21,14 @@ export default class RnsDelegate {
   }
 
   /**
+   * Sets the rns container to allow access between operations inside the different delegates
+   * @param container
+   */
+  setContainer (container) {
+    this.container = container;
+  }
+
+  /**
    * This is executed by the end of the constructor to initialize everything, a child can override this.
    */
   initialize () {}
@@ -204,7 +212,10 @@ export default class RnsDelegate {
    * @returns the current container state
    */
   getStateForContainer (containerName) {
-    return this.getStoreState() && this.getStoreState()[containerName] ? this.getStoreState()[containerName][this.address] : {};
+    return this.getStoreState() &&
+      this.getStoreState()[containerName] &&
+        this.getStoreState()[containerName][this.address] ?
+          this.getStoreState()[containerName][this.address] : {};
   }
 
   /**

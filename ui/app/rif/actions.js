@@ -162,10 +162,8 @@ function setChainAddressForResolver (domainName, chain, chainAddress) {
 
 function getChainAddresses (domainName) {
   return (dispatch) => {
-    dispatch(actions.showLoadingIndication());
     return new Promise((resolve, reject) => {
       background.rif.rns.resolver.getChainAddressForResolvers(domainName, (error, result) => {
-        dispatch(actions.hideLoadingIndication());
         if (error) {
           dispatch(actions.displayWarning(error));
           return reject(error);

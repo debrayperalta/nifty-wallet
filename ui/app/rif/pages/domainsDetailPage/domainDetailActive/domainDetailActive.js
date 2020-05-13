@@ -12,6 +12,7 @@ import niftyActions from '../../../../actions'
 import {pageNames} from '../../index'
 import rifActions from '../../../actions'
 import DomainHeader from '../../../components/domain-header'
+import {rns} from '../../../../../../rif.config'
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
@@ -38,11 +39,13 @@ class DomainsDetailActiveScreen extends Component {
     waitForListener: PropTypes.func,
     disableResolvers: PropTypes.bool,
     updateChains: PropTypes.bool,
+    getDomain: PropTypes.func,
+    showToast: PropTypes.func,
 	}
-	constructor(props) {
+	constructor (props) {
 		super(props);
-    let resolvers = Object.assign([], GET_RESOLVERS());
-    let slipChainAddresses = Object.assign([], SLIP_ADDRESSES);
+    const resolvers = Object.assign([], GET_RESOLVERS());
+    const slipChainAddresses = Object.assign([], SLIP_ADDRESSES);
     const enableComboResolvers = this.props.isOwner && !(props.disableResolvers || false);
 		this.state = {
       disableCombo: !enableComboResolvers,
@@ -71,13 +74,13 @@ class DomainsDetailActiveScreen extends Component {
     });
 	}
   showModalAddChainAddress = () => {
-		let elements = [];
+    const elements = [];
 		elements.push(<AddNewChainAddressToResolver
       updateChainAddress={this.updateChainAddress.bind(this)}
 			updateAddress={this.updateAddress.bind(this)}
       slipChainAddresses={this.state.slipChainAddresses}
 		/>);
-		let message = {
+    const message = {
 			title: 'Add new chain address',
 			body: {
 				elements: elements,
@@ -94,17 +97,29 @@ class DomainsDetailActiveScreen extends Component {
 	}
 
 	async onChangeComboResolvers (e) {
-    for (let resolverItem of e.target.children) {
+    for (const resolverItem of e.target.children) {
       if (resolverItem.value === e.target.value) {
         const address = resolverItem.getAttribute('data-address');
         const transactionListenerId = await this.props.setNewResolver(this.props.domainName, address);
         this.props.waitForListener(transactionListenerId)
           .then(transactionReceipt => {
-            this.props.showDomainsDetailPage({...this.props.domain, selectedResolverAddress: address, disableResolvers: false});
+            this.props.showDomainsDetailPage({
+              domain: this.props.domain,
+              status: this.props.domain.details.status,
+              disableResolvers: false,
+              selectedResolverAddress: address,
+            });
           });
-
         this.props.showTransactionConfirmPage({
-          action: () => this.props.showDomainsDetailPage({disableResolvers: true, ...this.props.domain}),
+          action: () => {
+            this.props.showDomainsDetailPage({
+              domain: this.props.domain,
+              status: this.props.domain.details.status,
+              disableResolvers: true,
+              selectedResolverAddress: address,
+            });
+            this.props.showToast('Waiting Confirmation');
+          },
         });
         return;
       }
@@ -114,7 +129,7 @@ class DomainsDetailActiveScreen extends Component {
     this.loadChainAddresses();
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate (prevProps, prevState) {
     if (prevProps.domainName !== this.props.domainName) {
       this.loadChainAddresses();
     } else if (this.props.updateChains) {
@@ -133,6 +148,14 @@ class DomainsDetailActiveScreen extends Component {
       const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
       this.setState({chainAddresses: chainAddresses});
     }
+  }
+
+  getDefaultSelectedValue (resolvers, selectedResolverAddress) {
+    const selectedResolver = resolvers.find(resolver => resolver.address === selectedResolverAddress);
+    if (selectedResolver) {
+      return selectedResolver.name;
+    }
+    return rns.contracts.publicResolver;
   }
 
 	render () {
@@ -166,13 +189,14 @@ class DomainsDetailActiveScreen extends Component {
             <div id="resolversBody" className={'resolvers-body'}>
               <div className="resolver-body-top">
                 <div id="selectResolver" className={'custom-select'}>
-                  <select id="comboResolvers" className="select-css" disabled={disableCombo} onChange={!disableCombo ? this.onChangeComboResolvers.bind(this) : () => {}}>
-                    <option disabled selected value hidden> Select Resolver </option>
+                  <select id="comboResolvers"
+                          defaultValue={this.getDefaultSelectedValue(this.state.resolvers, selectedResolverAddress)}
+                          className="select-css" disabled={disableCombo} onChange={!disableCombo ? this.onChangeComboResolvers.bind(this) : () => {}}>
+                    <option disabled value={rns.contracts.publicResolver} hidden> Select Resolver </option>
                       {
                         this.state.resolvers.map((resolver, index) => {
                           return (<option
                             key={index}
-                            selected={resolver.address === selectedResolverAddress}
                             value={resolver.name}
                             data-address={resolver.address}
                           >{resolver.name}</option>)
@@ -235,23 +259,25 @@ class DomainsDetailActiveScreen extends Component {
 }
 
 function mapStateToProps (state) {
-	const data = state.appState.currentView.params;
+	const params = state.appState.currentView.params;
+	const domain = params.domain;
+	const details = domain.details;
   return {
 		dispatch: state.dispatch,
-		status: data.status,
-		domainName: data.domain,
-		address: data.address,
-		content: data.content,
-		expirationDate: data.expiration,
-		autoRenew: data.autoRenew,
-		ownerAddress: data.ownerAddress,
-		isOwner: state.metamask.selectedAddress.toLowerCase() === data.ownerAddress.toLowerCase(),
-		isLuminoNode: data.isLuminoNode,
-		isRifStorage: data.isRifStorage,
-    selectedResolverAddress: data.selectedResolverAddress,
-    updateChains: data.updateChains,
-    disableResolvers: data.disableResolvers,
-		domain: data,
+		status: details.status,
+		domainName: details.name,
+		address: details.address,
+		content: details.content,
+		expirationDate: details.expiration,
+		autoRenew: details.autoRenew,
+		ownerAddress: details.ownerAddress,
+		isOwner: state.metamask.selectedAddress.toLowerCase() === details.ownerAddress.toLowerCase(),
+		isLuminoNode: details.isLuminoNode,
+		isRifStorage: details.isRifStorage,
+    selectedResolverAddress: params.selectedResolverAddress ? params.selectedResolverAddress : details.selectedResolverAddress,
+    updateChains: details.updateChains,
+    disableResolvers: details.disableResolvers,
+		domain: domain,
 	}
 }
 
@@ -265,8 +291,15 @@ const mapDispatchToProps = dispatch => {
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
     waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
 		setAutoRenew: () => {},
-    showDomainsDetailPage: (props) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, props)),
+    showDomainsDetailPage: (props) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, {
+      navBar: {
+        title: 'Domain Details',
+      },
+      ...props,
+    })),
     displayToast: (message) => dispatch(niftyActions.displayToast(message)),
+    getDomain: (domainName) => dispatch(rifActions.getDomain(domainName)),
+    showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
 	}
 }
 

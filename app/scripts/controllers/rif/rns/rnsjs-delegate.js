@@ -202,21 +202,55 @@ export default class RnsJsDelegate extends RnsDelegate {
   }
 
   /**
-   * Exposes the getDomain method to the ui
-   * @param domainName
-   * @returns {Promise<unknown>}
+   * Gets the domain by name with the details.
+   * @param domainName to query
+   * @returns the domain object
    */
   getDomainForUi (domainName) {
-    return Promise.resolve(this.getDomain(domainName));
+    const domain = this.getDomain(domainName);
+    if (!domain.details && !domain.registration) {
+      return new Promise((resolve, reject) => {
+        this.container.resolver.getDomainDetails(domainName)
+          .then(domainDetails => {
+            domain.details = domainDetails;
+            this.updateDomains(domain);
+            resolve(domain);
+          }).catch(error => reject(error));
+      });
+    }
+    return Promise.resolve(domain);
   }
 
   /**
-   * Exposes the getDomains method to the ui
-   * @param domainName
-   * @returns {Promise<unknown>}
+   * Gets the domains for the ui with their details.
+   * @returns the domains array
    */
   getDomainsForUi () {
-    return Promise.resolve(this.getDomains());
+    const domains = this.getDomains();
+    const domainsToUpdateDetails = [];
+    domains.forEach(domain => {
+      if (!domain.details && !domain.registration) {
+        domainsToUpdateDetails.push(domain);
+      }
+    });
+    if (domainsToUpdateDetails.length > 0) {
+      return new Promise((resolve, reject) => {
+        const detailRequests = [];
+        domainsToUpdateDetails.forEach(domain => {
+          detailRequests.push(this.container.resolver.getDomainDetails(domain.name));
+        });
+        Promise.all(detailRequests).then(results => {
+          results.forEach(result => {
+            const domain = domains.find(domain => domain.name === result.name);
+            domain.details = result;
+            this.updateDomains(domain);
+          });
+          resolve(domains);
+        }).catch(error => reject(error));
+      });
+    } else {
+      return Promise.resolve(domains);
+    }
   }
 
   /**
