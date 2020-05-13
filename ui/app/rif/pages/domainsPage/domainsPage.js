@@ -1,9 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import actions from '../../../actions'
 import rifActions from '../../actions'
-import {mockDomains} from '../../test/mocks'
 import {pageNames} from '../index'
 
 function statusStyle (status) {
@@ -20,42 +18,34 @@ function statusStyle (status) {
 }
 
 class DomainsScreen extends Component {
-  state = {
-    domains: [],
-  }
 
-  constructor (props) {
-    super(props)
-    // Mocking data
-    if (!localStorage.rnsDomains) {
-      localStorage.setItem('rnsDomains', JSON.stringify(mockDomains))
+  async componentDidMount () {
+    if (!this.props.domains) {
+      const domains = await this.props.getDomains();
+      this.props.showThis({
+        ...this.props,
+        domains,
+      })
     }
-    if (localStorage.rnsDomains) {
-      let domains = JSON.parse(localStorage.rnsDomains)
-      this.state = {
-        domains: domains,
-      }
-    }
-  }
-
-  navigateTo (url) {
-    global.platform.openWindow({url})
   }
 
   chiplet = (data, id) => {
     return <div id="chiplet" className={'chiplet'} key={id}>
       <div className={'chiplet-body'}>
         <div onClick={() => {
-          this.props.showDomainsDetailPage(data)
+          this.props.showDomainsDetailPage({
+            domain: data,
+            status: data.status,
+          })
         }} id="chipletTitle" className={'chiplet-title'}>
-          {data.domain}
+          {data.name}
         </div>
         <div id="chipletDescription" className={'chiplet-description'}>
           <div id="chipletExpiration">
-            <span>Expires on: {data.expiration}</span>
+            <span>Expires on: {data.details ? data.details.expiration : 'n/a'}</span>
           </div>
           <div id="chipletRenew">
-            <span>Auto-renew: <a href={this.props.setAutoRenew()}>{data.autoRenew ? 'on' : 'off'}</a></span>
+            <span>Auto-renew: <a href={data.details ? this.props.setAutoRenew() : () => {}}>{data.details ? (data.details.autoRenew ? 'on' : 'off') : 'n/a'}</a></span>
           </div>
         </div>
       </div>
@@ -68,25 +58,33 @@ class DomainsScreen extends Component {
   }
 
   render () {
-    return (
-      <div className={'body'}>
-        {this.state.domains.map((item, index) => {
-          return this.chiplet(item, index)
-        })}
-      </div>
-    )
+    if (this.props.domains) {
+      return (
+        <div className={'body'}>
+          {this.props.domains.map((item, index) => {
+            return this.chiplet(item, index)
+          })}
+        </div>
+      )
+    } else {
+      return (<div>Loading domains...</div>);
+    }
   }
 }
 
 DomainsScreen.propTypes = {
   showDomainsDetailPage: PropTypes.func.isRequired,
-  setAutoRenew: PropTypes.func.isRequired
-
+  setAutoRenew: PropTypes.func.isRequired,
+  domains: PropTypes.array,
+  getDomains: PropTypes.func,
+  showThis: PropTypes.func,
 }
 
 function mapStateToProps (state) {
+  const params = state.appState.currentView.params;
   return {
     dispatch: state.dispatch,
+    ...params,
   }
 }
 
@@ -96,10 +94,12 @@ const mapDispatchToProps = dispatch => {
       ...data,
       navBar: {
         title: 'Domain Detail',
+        showBack: true,
       },
     })),
-    setAutoRenew: (data) => {
-    },
+    setAutoRenew: (data) => {},
+    showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.domains, params)),
+    getDomains: () => dispatch(rifActions.getDomains()),
   }
 }
 

@@ -9,6 +9,11 @@ import {rns} from '../../constants'
  */
 export default class RnsRegister extends RnsJsDelegate {
 
+  constructor (props) {
+    super(props);
+    this.checkInitialPendingDomains();
+  }
+
   initialize () {
     this.fifsAddrRegistrarInstance = this.web3.eth.contract(FIFSRegistrar).at(this.rifConfig.rns.contracts.fifsAddrRegistrar);
   }
@@ -43,18 +48,13 @@ export default class RnsRegister extends RnsJsDelegate {
               const transactionListener = this.send(this.fifsAddrRegistrarInstance, 'commit', [commitment]);
               transactionListener.transactionConfirmed()
                 .then(transactionReceipt => {
-                  const state = this.getStoreState();
-                  if (!state.register[this.address]) {
-                    state.register[this.address] = {
-                      domainRegister: [],
-                    };
-                  }
-                  state.register[this.address].domainRegister[cleanDomainName] = {
-                    secret,
-                    yearsToRegister,
-                    rifCost,
-                  };
-                  this.updateStoreState(state);
+                  const domain = this.createNewDomainObject(domainName);
+                  domain.registration.rifCost = rifCost.toString();
+                  domain.registration.yearsToRegister = yearsToRegister;
+                  domain.registration.secret = secret;
+                  domain.registration.commitment = commitment;
+                  this.updateDomains(domain);
+                  this.startWatchingCommitment(domainName, commitment);
               }).catch(transactionReceiptOrError => {
                 console.debug('Transaction Failed', transactionReceiptOrError);
               });
@@ -65,6 +65,42 @@ export default class RnsRegister extends RnsJsDelegate {
             }).catch(error => reject(error));
         }).catch(error => reject(error));
     });
+  }
+
+  checkInitialPendingDomains () {
+    const domains = this.getDomains();
+    domains.forEach(domain => {
+      // this means that we have pending commitments that are not being watched, this can be because the browser was closed.
+      if (domain.registration && !domain.registration.readyToRegister) {
+        this.startWatchingCommitment(domain.name, domain.registration.commitment);
+      }
+    })
+  }
+
+  /**
+   * Watchs for commitment reveal status for a domain and updates the domain after is ready to reveal.
+   * @param domainName the domainName to check
+   * @param commitment the commitment to check for reveal
+   */
+  startWatchingCommitment (domainName, commitment) {
+    let time = 0;
+    const interval = setInterval(async () => {
+      const domain = this.getDomain(domainName);
+      if (domain && domain.registration) {
+        const readyToRegister = await this.canFinishRegistration(commitment);
+        if (readyToRegister) {
+          domain.registration.readyToRegister = true;
+          this.updateDomains(domain);
+          clearInterval(interval);
+        }
+      } else {
+        time += rns.domainRegister.secondsToUpdateCommitment * 1000;
+      }
+      if (time >= rns.domainRegister.minutesWaitingForCommitmentReveal * 60 * 1000) {
+        this.deleteDomain(domain.name);
+        clearInterval(interval);
+      }
+    }, rns.domainRegister.secondsToUpdateCommitment * 1000);
   }
 
   /**
@@ -103,20 +139,23 @@ export default class RnsRegister extends RnsJsDelegate {
    */
   finishRegistration (domainName) {
     const cleanDomainName = this.cleanDomainFromRskSuffix(domainName);
-    const state = this.getStoreState();
-    const registerByAddress = state.register[this.address];
-    if (registerByAddress) {
-      const registerInformation = registerByAddress.domainRegister[cleanDomainName];
+    const pendingDomain = this.getDomain(domainName);
+    if (pendingDomain) {
+      const registerInformation = pendingDomain.registration;
       if (registerInformation) {
         const rifCost = registerInformation.rifCost;
         const secret = registerInformation.secret;
         const durationBN = this.web3.toBigNumber(registerInformation.yearsToRegister);
         const data = this.getAddrRegisterData(cleanDomainName, this.address, secret, durationBN, this.address);
-        const transactionListener = this.send(this.rifContractInstance, 'transferAndCall', [this.rifConfig.rns.contracts.fifsAddrRegistrar, rifCost.toString(), data]);
+        const transactionListener = this.send(this.rifContractInstance, 'transferAndCall', [this.rifConfig.rns.contracts.fifsAddrRegistrar, rifCost, data]);
         transactionListener.transactionConfirmed()
           .then(transactionReceipt => {
-            // TODO: we have to add the domain to the store here instead of having it on the localStorage
-          console.debug('Transaction success', transactionReceipt);
+            console.debug('Transaction success', transactionReceipt);
+            pendingDomain.registration = null;
+            this.container.resolver.getDomainDetails(domainName).then(domainDetails => {
+              pendingDomain.details = domainDetails;
+              this.updateDomains(pendingDomain);
+            });
         }).catch(transactionReceipt => {
           console.debug('Transaction failed', transactionReceipt);
         });

@@ -8,5 +8,10 @@ export const rns = {
     resolver: 'resolver',
     transfer: 'transfer',
   },
-  defaultAddress: '0x0000000000000000000000000000000000000000',
+  zeroAddress: '0x0000000000000000000000000000000000000000',
+  domainRegister: {
+    secondsToRevealCommitment: 60,
+    secondsToUpdateCommitment: 2,
+    minutesWaitingForCommitmentReveal: 2,
+  },
 }

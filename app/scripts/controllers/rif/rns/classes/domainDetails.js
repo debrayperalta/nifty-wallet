@@ -12,8 +12,8 @@
  * @attribute isRifStorage: If the domain has a rif storage asociated
  */
 export default class DomainDetails {
-    constructor(domain, address, content, expiration, autoRenew, ownerAddress, status, selectedResolverAddress, isLuminoNode, isRifStorage) {
-        this.domain = domain;
+    constructor (domain, address, content, expiration, autoRenew, ownerAddress, status, selectedResolverAddress, isLuminoNode, isRifStorage) {
+        this.name = domain;
         this.address = address;
         this.content = content;
         this.expiration = expiration;
