@@ -2,7 +2,7 @@ import {LocalStorageHandler, Lumino} from '@rsksmart/lumino-light-client-sdk';
 import {lumino} from '../../../../../rif.config';
 import extend from 'xtend';
 import ObservableStore from 'obs-store';
-import {LuminoSignHandler} from './sign-handler';
+import {LuminoSigningHandler} from './signing-handler';
 import {AbstractManager} from '../abstract-manager';
 
 /**
@@ -22,11 +22,10 @@ export class LuminoManager extends AbstractManager {
       chainId: this.web3.eth.net.getId(),
       rskEndpoint: this.web3.currentProvider,
       hubEndpoint: lumino.hub.endpoint,
-      Address: this.address,
-      notifierEndPoint: lumino.notifier.endpoint,
+      address: this.address,
     };
 
-    this.signingHandler = new LuminoSignHandler({
+    this.signingHandler = new LuminoSigningHandler({
       address: this.address,
       keyringController: props.keyringController,
     });

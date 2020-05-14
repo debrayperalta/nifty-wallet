@@ -1,7 +1,7 @@
 /**
  * Custom signing handler for lumino client using our sign controller.
  */
-export class LuminoSignHandler {
+export class LuminoSigningHandler {
   constructor (props) {
     this.address = props.address;
     this.keyringController = props.keyringController;
