@@ -3,36 +3,33 @@
  */
 export class AbstractManager {
   constructor (props) {
+    this.web3 = props.web3;
+    this.transactionController = props.transactionController;
     this.preferencesController = props.preferencesController;
-    this.address = this.preferencesController.store.getState().selectedAddress;
-    this.preferencesController.store.subscribe(updatedPreferences => this.preferencesUpdated(updatedPreferences));
+    this.networkController = props.networkController;
+    this.unlocked = false;
   }
 
   /**
-   * When the preferences are updated and the account has changed this operation is called to update the selected
-   * address.
-   * @param preferences the updated preferences.
+   * Method to be overwritten by a child class to control the event when we change the address.
+   * @param network the new network.
    */
-  preferencesUpdated (preferences) {
-    // check if the account was changed and update the rns domains to show
-    if (this.address !== preferences.selectedAddress) {
-      // update
-      this.updateAddress(preferences.selectedAddress);
-    }
-  }
-
-  /**
-   * Updates the current address and calls a method that can be overwritten to manage that change.
-   * @param address
-   */
-  updateAddress (address) {
-    this.address = address;
-    this.onChangedAddress(address);
+  onNetworkChanged (network) {
+    this.network = network;
   }
 
   /**
    * Method to be overwritten by a child class to control the event when we change the address.
    * @param address the new address.
    */
-  onChangedAddress (address) {}
+  onAddressChanged (address) {
+    this.address = address;
+  }
+
+  /**
+   * This operation is executed when the user unlocks the wallet
+   */
+  onUnlock () {
+    this.unlocked = true;
+  }
 }

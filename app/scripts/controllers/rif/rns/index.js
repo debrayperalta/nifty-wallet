@@ -19,16 +19,6 @@ import {AbstractManager} from '../abstract-manager';
 export default class RnsManager extends AbstractManager {
   constructor (props) {
     super(props);
-    const preferencesController = props.preferencesController;
-    const networkController = props.networkController;
-    const transactionController = props.transactionController;
-
-    this.web3 = props.web3;
-
-    this.preferencesController = preferencesController;
-    this.networkController = networkController;
-    this.transactionController = transactionController;
-
     this.rifConfig = rifConfig;
     this.rnsContractInstance = this.web3.eth.contract(RNS).at(this.rifConfig.rns.contracts.rns);
     this.rifContractInstance = this.web3.eth.contract(RIF).at(this.rifConfig.rns.contracts.rif);
@@ -41,9 +31,9 @@ export default class RnsManager extends AbstractManager {
 
     const register = new RnsRegister({
       web3: this.web3,
-      preferencesController,
-      networkController,
-      transactionController,
+      preferencesController: this.preferencesController,
+      networkController: this.networkController,
+      transactionController: this.transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
       rifContractInstance: this.rifContractInstance,
@@ -52,9 +42,9 @@ export default class RnsManager extends AbstractManager {
     });
     const resolver = new RnsResolver({
       web3: this.web3,
-      preferencesController,
-      networkController,
-      transactionController,
+      preferencesController: this.preferencesController,
+      networkController: this.networkController,
+      transactionController: this.transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
       rifContractInstance: this.rifContractInstance,
@@ -63,9 +53,9 @@ export default class RnsManager extends AbstractManager {
     });
     const transfer = new RnsTransfer({
       web3: this.web3,
-      preferencesController,
-      networkController,
-      transactionController,
+      preferencesController: this.preferencesController,
+      networkController: this.networkController,
+      transactionController: this.transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
       rifContractInstance: this.rifContractInstance,
@@ -83,8 +73,8 @@ export default class RnsManager extends AbstractManager {
    * This updates all the addresses used by the manager and it's delegates.
    * @param address the new address.
    */
-  onChangedAddress (address) {
-    this.address = address;
+  onAddressChanged (address) {
+    super.onAddressChanged(address);
     this.container.register.address = address;
     this.container.resolver.address = address;
     this.container.transfer.address = address;

@@ -3,6 +3,11 @@ import {rns} from './rns'
 const global = {
   TRANSACTION_STATUS_OK: '0x1',
   TRANSACTION_STATUS_FAIL: '0x0',
+  networks: {
+    main: '30',
+    test: '31',
+    reg: '33',
+  },
 }
 
 const EXPIRING_REMAINING_DAYS = 30;

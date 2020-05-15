@@ -2,6 +2,7 @@ import RnsManager from './rns'
 import Web3 from 'web3'
 import ComposableObservableStore from './../../lib/ComposableObservableStore'
 import {LuminoManager} from './lumino';
+import ethUtils from 'ethereumjs-util';
 
 /**
  * RIF Controller
@@ -17,55 +18,114 @@ import {LuminoManager} from './lumino';
  */
 export default class RifController {
   constructor (props) {
-    if (!props.preferencesController) {
-      throw new Error('PreferencesController has to be present');
+    if (!props.metamaskController) {
+      throw new Error('MetamaskController has to be present');
     }
-
-    if (!props.networkController) {
-      throw new Error('NetworkController has to be present');
-    }
-
-    if (!props.transactionController) {
-      throw new Error('TransactionController has to be present');
-    }
-
-    if (!props.keyringController) {
-      throw new Error('KeyringController has to be present');
-    }
-
-    this.preferencesController = props.preferencesController;
-    this.networkController = props.networkController;
-    this.transactionController = props.transactionController;
-    this.keyringController = props.keyringController;
-    this.web3 = new Web3(this.networkController._provider);
+    this.metamaskController = props.metamaskController;
+    this.web3 = new Web3(this.metamaskController.networkController._provider);
 
     const initState = props.initState || {};
 
-    this.address = this.preferencesController.store.getState().selectedAddress;
-    this.preferencesController.store.subscribe(updatedPreferences => this.preferencesUpdated(updatedPreferences));
-
     this.rnsManager = new RnsManager({
       initState: initState.RnsManager,
-      preferencesController: this.preferencesController,
-      networkController: this.networkController,
-      transactionController: this.transactionController,
+      preferencesController: this.metamaskController.preferencesController,
+      networkController: this.metamaskController.networkController,
+      transactionController: this.metamaskController.transactionController,
       web3: this.web3,
     });
 
     this.luminoManager = new LuminoManager({
       initState: initState.LuminoManager,
-      preferencesController: this.preferencesController,
       web3: this.web3,
-      keyringController: this.keyringController,
+      keyringController: this.metamaskController.keyringController,
+      preferencesController: this.metamaskController.preferencesController,
+      networkController: this.metamaskController.networkController,
+      transactionController: this.metamaskController.transactionController,
     });
 
     this.store = new ComposableObservableStore(props.initState, {
       RnsManager: this.rnsManager.store,
       LuminoManager: this.luminoManager.store,
     });
+
+    this.metamaskController.preferencesController.store.subscribe(updatedPreferences => this.preferencesUpdated(updatedPreferences));
+    this.metamaskController.networkController.store.subscribe(updatedNetwork => this.networkUpdated(updatedNetwork));
+    this.metamaskController.on('update', (memState) => {
+      const unlocked = this.metamaskController.isUnlocked();
+      if (unlocked && !this.alreadyUnlocked) {
+        this.alreadyUnlocked = true;
+        this.unlocked();
+      }
+    });
   }
 
+  /**
+   * When the preferences are updated and the account has changed this operation is called to update the selected
+   * address.
+   * @param preferences the updated preferences.
+   */
+  preferencesUpdated (preferences) {
+    // check if the account was changed and update the rns domains to show
+    const newAddress = preferences.selectedAddress ? ethUtils.toChecksumAddress(preferences.selectedAddress) : null;
+    if (this.address !== newAddress) {
+      // update
+      this.address = newAddress;
+      this.onAddressChanged(this.address);
+    }
+  }
 
+  /**
+   * This operation is called when the user changes the network
+   * @param networkState the new network state: {
+                                                  provider: {
+                                                    nickname: ""
+                                                    rpcTarget: ""
+                                                    ticker: ""
+                                                    type: ""
+                                                  }
+                                                  network: ""
+                                                  settings: {
+                                                    network: ""
+                                                    chainId: ""
+                                                    rpcUrl: ""
+                                                    ticker: ""
+                                                    nickname: ""
+                                                  }
+                                                }
+   */
+  networkUpdated (networkState) {
+    this.network = {
+      id: networkState.network,
+      rskEndpoint: networkState.provider.rpcTarget,
+    };
+    this.onNetworkChanged(this.network);
+  }
+
+  /**
+   * Event executed when the user unlocks the wallet
+   */
+  unlocked () {
+    this.rnsManager.onUnlock();
+    this.luminoManager.onUnlock();
+  }
+
+  /**
+   * Event executed when the user changes the selected network
+   * @param network the new network state
+   */
+  onNetworkChanged (network) {
+    this.rnsManager.onNetworkChanged(network);
+    this.luminoManager.onNetworkChanged(network);
+  }
+
+  /**
+   * Event executed when the user changes the selected address
+   * @param address the new address
+   */
+  onAddressChanged (address) {
+    this.rnsManager.onAddressChanged(address);
+    this.luminoManager.onAddressChanged(address);
+  }
 
   /**
    * This method publishes all the operations available to call from the ui for RifController

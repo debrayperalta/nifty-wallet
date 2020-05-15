@@ -1,3 +1,4 @@
+import ethUtils from 'ethereumjs-util';
 /**
  * Custom signing handler for lumino client using our sign controller.
  */
@@ -8,13 +9,23 @@ export class LuminoSigningHandler {
   }
 
   sign (tx) {
-    return this.keyringController.signTransaction(tx, this.address);
+    const sign = this.keyringController.signTransaction(tx, this.address);
+    sign.then(signedTransaction => {
+      console.debug('Lumino Signed Transaction', signedTransaction);
+    });
+    return sign;
   }
 
-  offChainSign (byteMessage) {
-    return this.keyringController.signMessage({
+  offChainSign (plainMessage) {
+    const message = ethUtils.toBuffer(plainMessage);
+    const messageHash = ethUtils.hashPersonalMessage(message);
+    const offChainSign = this.keyringController.signMessage({
       from: this.address,
-      data: byteMessage,
+      data: messageHash,
     });
+    offChainSign.then(signedMessage => {
+      console.debug('Lumino Signed Message', signedMessage);
+    });
+    return offChainSign;
   }
 }
