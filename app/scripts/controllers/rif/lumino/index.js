@@ -16,6 +16,8 @@ export class LuminoManager extends AbstractManager {
   constructor (props) {
     super(props);
     this.lumino = Lumino;
+    this.operations = new LuminoOperations(this.lumino);
+    this.callbacks = new LuminoCallbacks(this.lumino);
     this.keyringController = props.keyringController;
     const initState = extend({}, props.initState);
     this.store = new ObservableStore(initState);
@@ -38,8 +40,6 @@ export class LuminoManager extends AbstractManager {
         offChainSign: (byteMessage) => this.signingHandler.offChainSign(byteMessage),
       }
       await this.lumino.init(signingHandler, LocalStorageHandler, configParams);
-      this.operations = new LuminoOperations(this.lumino);
-      this.callbacks = new LuminoCallbacks(this.lumino);
       await this.operations.onboarding();
     }
   };

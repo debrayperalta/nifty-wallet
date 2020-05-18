@@ -1,4 +1,5 @@
-import {rns} from './rns'
+import {rns} from './rns';
+import {lumino} from './lumino';
 
 const global = {
   TRANSACTION_STATUS_OK: '0x1',
@@ -23,6 +24,7 @@ const RSK_CHAINID = '0x80000089';
 
 export {
   rns,
+  lumino,
   global,
   EXPIRING_REMAINING_DAYS,
   DOMAIN_STATUSES,
