@@ -1,6 +1,6 @@
-import {TransactionListener} from '../transaction-listener'
-const nodeify = require('../../../lib/nodeify')
-import extend from 'xtend'
+import {TransactionListener} from '../transaction-listener';
+import extend from 'xtend';
+import {bindOperation} from '../utils/general';
 
 /**
  * Delegate class to encapsulate all the logic related to delegates.
@@ -67,7 +67,7 @@ export default class RnsDelegate {
    * @returns {function(...[*]=)}
    */
   bindOperation (operation, member) {
-    return nodeify(operation, member);
+    return bindOperation(operation, member);
   }
 
   /**

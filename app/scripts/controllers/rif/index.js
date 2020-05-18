@@ -135,6 +135,7 @@ export default class RifController {
   exposeApi () {
     return {
       rns: this.rnsManager.bindApi(),
+      lumino: this.luminoManager.bindApi(),
     }
   }
 }

@@ -4,7 +4,9 @@ import extend from 'xtend';
 import ObservableStore from 'obs-store';
 import {LuminoSigningHandler} from './signing-handler';
 import {AbstractManager} from '../abstract-manager';
-import {isRskNetwork} from '../utils/general';
+import {bindOperation, isRskNetwork} from '../utils/general';
+import {LuminoOperations} from './operations';
+import {LuminoCallbacks} from './callbacks';
 
 /**
  * Manager to control the access to lumino api
@@ -36,7 +38,9 @@ export class LuminoManager extends AbstractManager {
         offChainSign: (byteMessage) => this.signingHandler.offChainSign(byteMessage),
       }
       await this.lumino.init(signingHandler, LocalStorageHandler, configParams);
-      await this.lumino.get().actions.onboardingClient();
+      this.operations = new LuminoOperations(this.lumino);
+      this.callbacks = new LuminoCallbacks(this.lumino);
+      await this.operations.onboarding();
     }
   };
 
@@ -53,6 +57,19 @@ export class LuminoManager extends AbstractManager {
   onAddressChanged (address) {
     super.onAddressChanged(address);
     this.signingHandler.address = address;
+  }
+
+  bindApi () {
+    return {
+      onboarding: bindOperation(this.operations.onboarding, this.operations),
+      openChannel: bindOperation(this.operations.openChannel, this.operations),
+      closeChannel: bindOperation(this.operations.closeChannel, this.operations),
+      createDeposit: bindOperation(this.operations.createDeposit, this.operations),
+      createPayment: bindOperation(this.operations.createPayment, this.operations),
+      getChannels: bindOperation(this.operations.getChannels, this.operations),
+      getAvailableCallbacks: bindOperation(this.callbacks.getAvailableCallbacks, this.callbacks),
+      listenCallback: bindOperation(this.callbacks.listenForCallback, this.callbacks),
+    };
   }
 
 }

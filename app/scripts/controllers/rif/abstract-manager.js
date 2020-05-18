@@ -32,4 +32,10 @@ export class AbstractManager {
   onUnlock () {
     this.unlocked = true;
   }
+
+  /**
+   * It binds all the operations to be accessed from the outside.
+   * @returns an object like { operationName: function bind}
+   */
+  bindApi () {}
 }
