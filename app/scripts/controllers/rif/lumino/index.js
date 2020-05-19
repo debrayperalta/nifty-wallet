@@ -27,7 +27,7 @@ export class LuminoManager extends AbstractManager {
     });
   }
 
-  async initializeLumino () {
+  async initializeLumino (cleanApiKey = false) {
     if (this.unlocked && isRskNetwork(this.network.id)) {
       const configParams = {
         chainId: this.network.id,
@@ -41,7 +41,7 @@ export class LuminoManager extends AbstractManager {
       }
       await this.lumino.init(signingHandler, LocalStorageHandler, configParams);
       const state = this.store.getState();
-      if (state.apiKey) {
+      if (state.apiKey && !cleanApiKey) {
         await this.operations.setApiKey(state.apiKey);
       } else {
         await this.operations.onboarding();
@@ -58,12 +58,13 @@ export class LuminoManager extends AbstractManager {
 
   onNetworkChanged (network) {
     super.onNetworkChanged(network);
-    this.initializeLumino();
+    this.initializeLumino(true);
   }
 
   onAddressChanged (address) {
     super.onAddressChanged(address);
     this.signingHandler.address = address;
+    this.initializeLumino(true);
   }
 
   bindApi () {
