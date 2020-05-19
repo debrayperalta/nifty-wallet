@@ -1,6 +1,7 @@
 import * as niftyActions from '../../actions';
 import extend from 'xtend';
 import {lumino} from '../../../../app/scripts/controllers/rif/constants';
+import {CallbackHandlers} from './callback-handlers';
 
 const rifActions = {
   SHOW_MODAL: 'SHOW_MODAL',
@@ -506,7 +507,7 @@ function updateDomains (domain) {
 
 // Lumino
 
-function onboarding () {
+function onboarding (callbackHandlers = new CallbackHandlers()) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       background.rif.lumino.onboarding((error) => {
@@ -514,16 +515,30 @@ function onboarding () {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
         }
-        listenToSdkCallback(lumino.callbacks.CLIENT_ONBOARDING_SUCCESS, dispatch)
-          .then(result => {
-            dispatch(niftyActions.displayToast('Client successfully onboarded!'));
-          }).catch(error => {
-          dispatch(niftyActions.displayWarning(error));
-        });
+        if (callbackHandlers && callbackHandlers.requestHandler) {
+          handleSdkCallback(lumino.callbacks.REQUEST_CLIENT_ONBOARDING, dispatch, callbackHandlers.requestHandler);
+        }
+        if (callbackHandlers && callbackHandlers.successHandler) {
+          handleSdkCallback(lumino.callbacks.CLIENT_ONBOARDING_SUCCESS, dispatch, callbackHandlers.successHandler);
+        }
         return resolve();
       });
     });
   };
+}
+
+function handleSdkCallback (callbackName, dispatch, handler = null) {
+  listenToSdkCallback(callbackName, dispatch)
+    .then(result => {
+      if (handler) {
+        handler(result)
+      }
+    })
+    .catch(error => {
+      if (handler) {
+        handler(error);
+      }
+    });
 }
 
 function listenToSdkCallback (callbackName, dispatch) {
@@ -558,7 +573,7 @@ function getAvailableCallbacks () {
   };
 }
 
-function openChannel (partner, tokenAddress) {
+function openChannel (partner, tokenAddress, callbackHandlers = new CallbackHandlers()) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       background.rif.lumino.openChannel(partner, tokenAddress, (error) => {
@@ -566,13 +581,22 @@ function openChannel (partner, tokenAddress) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
         }
+        if (callbackHandlers && callbackHandlers.requestHandler) {
+          handleSdkCallback(lumino.callbacks.REQUEST_OPEN_CHANNEL, dispatch, callbackHandlers.requestHandler);
+        }
+        if (callbackHandlers && callbackHandlers.successHandler) {
+          handleSdkCallback(lumino.callbacks.OPEN_CHANNEL, dispatch, callbackHandlers.successHandler);
+        }
+        if (callbackHandlers && callbackHandlers.errorHandler) {
+          handleSdkCallback(lumino.callbacks.FAILED_OPEN_CHANNEL, dispatch, callbackHandlers.errorHandler);
+        }
         return resolve();
       });
     });
   };
 }
 
-function closeChannel (partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier) {
+function closeChannel (partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, callbackHandlers = new CallbackHandlers()) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       background.rif.lumino.closeChannel(partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, (error) => {
@@ -580,19 +604,14 @@ function closeChannel (partner, tokenAddress, address, tokenNetworkAddress, chan
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
         }
-        return resolve();
-      });
-    });
-  };
-}
-
-function createDeposit (partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, netAmount) {
-  return (dispatch) => {
-    return new Promise((resolve, reject) => {
-      background.rif.lumino.createDeposit(partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, netAmount, (error) => {
-        if (error) {
-          dispatch(niftyActions.displayWarning(error));
-          return reject(error);
+        if (callbackHandlers && callbackHandlers.requestHandler) {
+          handleSdkCallback(lumino.callbacks.REQUEST_CLOSE_CHANNEL, dispatch, callbackHandlers.requestHandler);
+        }
+        if (callbackHandlers && callbackHandlers.successHandler) {
+          handleSdkCallback(lumino.callbacks.CLOSE_CHANNEL, dispatch, callbackHandlers.successHandler);
+        }
+        if (callbackHandlers && callbackHandlers.errorHandler) {
+          handleSdkCallback(lumino.callbacks.FAILED_CLOSE_CHANNEL, dispatch, callbackHandlers.errorHandler);
         }
         return resolve();
       });
@@ -600,13 +619,46 @@ function createDeposit (partner, tokenAddress, address, tokenNetworkAddress, cha
   };
 }
 
-function createPayment (partner, tokenAddress, netAmount) {
+function createDeposit (partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, netAmount, callbackHandlers = new CallbackHandlers()) {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.lumino.createDeposit(partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, netAmount, (error) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        if (callbackHandlers && callbackHandlers.requestHandler) {
+          handleSdkCallback(lumino.callbacks.REQUEST_DEPOSIT_CHANNEL, dispatch, callbackHandlers.requestHandler);
+        }
+        if (callbackHandlers && callbackHandlers.successHandler) {
+          handleSdkCallback(lumino.callbacks.DEPOSIT_CHANNEL, dispatch, callbackHandlers.successHandler);
+        }
+        if (callbackHandlers && callbackHandlers.errorHandler) {
+          handleSdkCallback(lumino.callbacks.FAILED_DEPOSIT_CHANNEL, dispatch, callbackHandlers.errorHandler);
+        }
+        return resolve();
+      });
+    });
+  };
+}
+
+function createPayment (partner, tokenAddress, netAmount, callbackHandlers = new CallbackHandlers()) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       background.rif.lumino.createPayment(partner, tokenAddress, netAmount, (error) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
+        }
+        if (callbackHandlers && callbackHandlers.requestHandler) {
+          handleSdkCallback(lumino.callbacks.SENT_PAYMENT, dispatch, callbackHandlers.requestHandler);
+        }
+        if (callbackHandlers && callbackHandlers.successHandler) {
+          handleSdkCallback(lumino.callbacks.COMPLETED_PAYMENT, dispatch, callbackHandlers.successHandler);
+        }
+        if (callbackHandlers && callbackHandlers.errorHandler) {
+          handleSdkCallback(lumino.callbacks.FAILED_CREATE_PAYMENT, dispatch, callbackHandlers.errorHandler);
+          handleSdkCallback(lumino.callbacks.FAILED_PAYMENT, dispatch, callbackHandlers.errorHandler);
         }
         return resolve();
       });
