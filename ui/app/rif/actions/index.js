@@ -514,7 +514,7 @@ function onboarding () {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
         }
-        dispatch(this.listenCallback(lumino.callbacks.CLIENT_ONBOARDING_SUCCESS))
+        listenToSdkCallback(lumino.callbacks.CLIENT_ONBOARDING_SUCCESS, dispatch)
           .then(result => {
             dispatch(niftyActions.displayToast('Client successfully onboarded!'));
           }).catch(error => {
@@ -526,17 +526,21 @@ function onboarding () {
   };
 }
 
+function listenToSdkCallback (callbackName, dispatch) {
+  return new Promise((resolve, reject) => {
+    background.rif.lumino.listenCallback(callbackName, (error, result) => {
+      if (error) {
+        dispatch(niftyActions.displayWarning(error));
+        return reject(error);
+      }
+      return resolve(result);
+    });
+  });
+}
+
 function listenCallback (callbackName) {
   return (dispatch) => {
-    return new Promise((resolve, reject) => {
-      background.rif.lumino.listenCallback(callbackName, (result, error) => {
-        if (error) {
-          dispatch(niftyActions.displayWarning(error));
-          return reject(error);
-        }
-        return resolve(result);
-      });
-    });
+    return listenToSdkCallback(callbackName, dispatch);
   };
 }
 
