@@ -12,6 +12,17 @@ export class LuminoOperations {
     return Promise.resolve();
   }
 
+  getApiKey () {
+    console.debug('Getting api key');
+    return Promise.resolve(this.lumino.get().actions.getApiKey());
+  }
+
+  setApiKey (apiKey) {
+    console.debug('Setting api key', apiKey);
+    this.lumino.get().actions.setApiKey(apiKey);
+    return Promise.resolve();
+  }
+
   openChannel (partner, tokenAddress) {
     const params = {
       partner,

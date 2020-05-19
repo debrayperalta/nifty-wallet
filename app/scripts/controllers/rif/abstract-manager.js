@@ -1,13 +1,18 @@
+import extend from 'xtend';
+import ObservableStore from 'obs-store';
+
 /**
  * Abstract manager to encapsulate the logic to catch preferences updates and other stuff shared by managers.
  */
 export class AbstractManager {
-  constructor (props) {
+  constructor (props, initStoreState) {
     this.web3 = props.web3;
     this.transactionController = props.transactionController;
     this.preferencesController = props.preferencesController;
     this.networkController = props.networkController;
     this.unlocked = false;
+    const initState = extend(initStoreState || {}, props.initState);
+    this.store = new ObservableStore(initState);
   }
 
   /**

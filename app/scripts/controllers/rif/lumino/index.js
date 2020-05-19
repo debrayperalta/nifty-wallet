@@ -14,13 +14,13 @@ import {LuminoCallbacks} from './callbacks';
 export class LuminoManager extends AbstractManager {
 
   constructor (props) {
-    super(props);
+    super(props, {
+      apiKey: null,
+    });
     this.lumino = Lumino;
     this.operations = new LuminoOperations(this.lumino);
     this.callbacks = new LuminoCallbacks(this.lumino);
     this.keyringController = props.keyringController;
-    const initState = extend({}, props.initState);
-    this.store = new ObservableStore(initState);
     this.signingHandler = new LuminoSigningHandler({
       address: this.address,
       keyringController: this.keyringController,
@@ -40,7 +40,14 @@ export class LuminoManager extends AbstractManager {
         offChainSign: (byteMessage) => this.signingHandler.offChainSign(byteMessage),
       }
       await this.lumino.init(signingHandler, LocalStorageHandler, configParams);
-      await this.operations.onboarding();
+      const state = this.store.getState();
+      if (state.apiKey) {
+        await this.operations.setApiKey(state.apiKey);
+      } else {
+        await this.operations.onboarding();
+        state.apiKey = await this.operations.getApiKey();
+        this.store.putState(state);
+      }
     }
   };
 
@@ -67,6 +74,7 @@ export class LuminoManager extends AbstractManager {
       createDeposit: bindOperation(this.operations.createDeposit, this.operations),
       createPayment: bindOperation(this.operations.createPayment, this.operations),
       getChannels: bindOperation(this.operations.getChannels, this.operations),
+      getApiKey: bindOperation(this.operations.getApiKey, this.operations),
       getAvailableCallbacks: bindOperation(this.callbacks.getAvailableCallbacks, this.callbacks),
       listenCallback: bindOperation(this.callbacks.listenForCallback, this.callbacks),
     };
