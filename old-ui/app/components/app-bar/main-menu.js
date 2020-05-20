@@ -101,8 +101,9 @@ const mapDispatchToProps = dispatch => {
       pageNames.rns.pay,
       {
         navBar: {
-          showTitle: false,
+          title: 'Payments',
         },
+        showDomainsSearch: false,
       })),
   }
 }

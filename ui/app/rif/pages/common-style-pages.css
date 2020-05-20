@@ -26,3 +26,13 @@
   background: #FF001F;
   color: white;
 }
+
+.form-segment {
+  display: flex;
+  margin: 1em;
+}
+
+.form-segment>span {
+  width: 7em;
+  overflow-wrap: break-word;
+}
