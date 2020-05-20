@@ -1,12 +1,11 @@
 import {LocalStorageHandler, Lumino} from '@rsksmart/lumino-light-client-sdk';
 import {lumino} from '../../../../../rif.config';
-import extend from 'xtend';
-import ObservableStore from 'obs-store';
 import {LuminoSigningHandler} from './signing-handler';
 import {AbstractManager} from '../abstract-manager';
 import {bindOperation, isRskNetwork} from '../utils/general';
 import {LuminoOperations} from './operations';
 import {LuminoCallbacks} from './callbacks';
+import ethUtils from 'ethereumjs-util';
 
 /**
  * Manager to control the access to lumino api
@@ -33,7 +32,7 @@ export class LuminoManager extends AbstractManager {
         chainId: this.network.id,
         rskEndpoint: this.network.rskEndpoint,
         hubEndpoint: lumino.hub.endpoint,
-        address: this.address,
+        address: ethUtils.toChecksumAddress(this.address),
       };
       const signingHandler = {
         sign: (tx) => this.signingHandler.sign(tx),

@@ -2,7 +2,6 @@ import RnsManager from './rns'
 import Web3 from 'web3'
 import ComposableObservableStore from './../../lib/ComposableObservableStore'
 import {LuminoManager} from './lumino';
-import ethUtils from 'ethereumjs-util';
 
 /**
  * RIF Controller
@@ -66,7 +65,7 @@ export default class RifController {
    */
   preferencesUpdated (preferences) {
     // check if the account was changed and update the rns domains to show
-    const newAddress = preferences.selectedAddress ? ethUtils.toChecksumAddress(preferences.selectedAddress) : null;
+    const newAddress = preferences.selectedAddress;
     if (this.address !== newAddress) {
       // update
       this.address = newAddress;
