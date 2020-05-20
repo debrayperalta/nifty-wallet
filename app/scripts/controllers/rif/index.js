@@ -30,7 +30,7 @@ export default class RifController {
       initState: initState.RnsManager,
       preferencesController: this.metamaskController.preferencesController,
       networkController: this.metamaskController.networkController,
-      transactionController: this.metamaskController.transactionController,
+      transactionController: this.metamaskController.txController,
       web3: this.web3,
     });
 
@@ -40,7 +40,7 @@ export default class RifController {
       keyringController: this.metamaskController.keyringController,
       preferencesController: this.metamaskController.preferencesController,
       networkController: this.metamaskController.networkController,
-      transactionController: this.metamaskController.transactionController,
+      transactionController: this.metamaskController.txController,
     });
 
     this.store = new ComposableObservableStore(props.initState, {

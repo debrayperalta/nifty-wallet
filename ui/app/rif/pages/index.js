@@ -1,26 +1,24 @@
-import DomainsScreen from './domainsPage/domainsPage'
-import PaymentsScreen from './paymentsPage/paymentsPage'
-import DomainsDetailScreen from './domainsDetailPage/domainsDetailPage'
-import Subdomains from './rns/subdomains'
-import Exchange from './rns/exchange'
-import LuminoChannels from './rns/lumino-channels'
-import Pay from './rns/pay'
-import Renew from './rns/renew'
-import SellOnMKP from './rns/sell-on-mkp'
-import Transfer from './rns/transfer'
-import DomainRegisterScreen from './rns/register'
-import React from 'react'
-import SearchDomains from '../components/searchDomains'
-import rifActions from '../actions'
-import ToastComponent from '../../../../old-ui/app/components/toast'
-import ErrorComponent from '../../../../old-ui/app/components/error'
+import DomainsScreen from './domainsPage/domainsPage';
+import DomainsDetailScreen from './domainsDetailPage/domainsDetailPage';
+import Subdomains from './rns/subdomains';
+import Exchange from './rns/exchange';
+import LuminoChannels from './rns/lumino-channels';
+import Pay from './rns/pay';
+import Renew from './rns/renew';
+import SellOnMKP from './rns/sell-on-mkp';
+import Transfer from './rns/transfer';
+import DomainRegisterScreen from './rns/register';
+import React from 'react';
+import SearchDomains from '../components/searchDomains';
+import rifActions from '../actions';
+import ToastComponent from '../../../../old-ui/app/components/toast';
+import ErrorComponent from '../../../../old-ui/app/components/error';
 
 const pageNames = {
   rns: {
     domains: 'domains',
     domainsDetail: 'domainsDetail',
     domainRegister: 'domainRegister',
-    payments: 'payments',
     subdomains: 'subdomains',
     exchange: 'exchange',
     luminoChannels: 'lumino-channels',
@@ -94,8 +92,6 @@ function getPage (context, dispatch) {
       return buildScreen(<DomainsScreen/>, context, dispatch)
     case pageNames.rns.domainsDetail:
       return buildScreen(<DomainsDetailScreen/>, context, dispatch)
-    case pageNames.rns.payments:
-      return buildScreen(<PaymentsScreen/>, context, dispatch)
     case pageNames.rns.subdomains:
       return buildScreen(<Subdomains/>, context, dispatch)
     case pageNames.rns.exchange:

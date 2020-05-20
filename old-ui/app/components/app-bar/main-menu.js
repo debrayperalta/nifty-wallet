@@ -98,10 +98,10 @@ const mapDispatchToProps = dispatch => {
         },
       })),
     showPaymentsPage: () => dispatch(rifActions.navigateTo(
-      pageNames.rns.payments,
+      pageNames.rns.pay,
       {
         navBar: {
-          title: 'Payments',
+          showTitle: false,
         },
       })),
   }
