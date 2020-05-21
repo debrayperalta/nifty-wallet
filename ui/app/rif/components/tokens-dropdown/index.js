@@ -4,13 +4,19 @@ import {connect} from 'react-redux';
 import Select from 'react-select';
 import {DEFAULT_ICON} from '../../constants';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faTimes} from '@fortawesome/free-solid-svg-icons';
 
-class NetworkDropdownOption extends Select.Option {
+class TokensDropdownOption extends Select.Option {
   render () {
     const { option } = this.props;
+    let channelIcon = (<FontAwesomeIcon icon={faTimes} color={'#8b1a1a'}/>);
+    if (option.channels && option.channels.length > 0) {
+      channelIcon = (<FontAwesomeIcon icon={faTimes} color={'#3a9022'}/>);
+    }
     const icon = option.icon ? option.icon : DEFAULT_ICON;
     return (
       <div
+        className="tokens-dropdown-option"
         onMouseDown={(event) => {
           event.preventDefault();
           event.stopPropagation();
@@ -22,14 +28,17 @@ class NetworkDropdownOption extends Select.Option {
           this.props.onFocus(option, event)
         }}
       >
-        <FontAwesomeIcon className="add-new-multicrypto-select-value-icon" icon={icon.icon} color={icon.color}/>
-        <span className="label-spacing-left">{option.name}</span>
+        <div>
+          <FontAwesomeIcon className="add-new-multicrypto-select-value-icon" icon={icon.icon} color={icon.color}/>
+          <span className="label-spacing-left">{option.name}</span>
+        </div>
+        {channelIcon}
       </div>
     )
   }
 }
 
-class NetworkDropdownOptionSelected extends Component {
+class TokensDropdownOptionSelected extends Component {
   static propTypes = {
     value: PropTypes.object,
   }
@@ -39,7 +48,7 @@ class NetworkDropdownOptionSelected extends Component {
     return (
       <div className="add-new-multicrypto-select-value">
           <span>
-          <FontAwesomeIcon className="add-new-multicrypto-select-value-icon" icon={icon.icon} color={icon.color}/>
+            <FontAwesomeIcon className="add-new-multicrypto-select-value-icon" icon={icon.icon} color={icon.color}/>
             <span className="add-new-multicrypto-select-value-text">{value.name}</span>
           </span>
       </div>
@@ -47,28 +56,28 @@ class NetworkDropdownOptionSelected extends Component {
   }
 }
 
-class NetworksDropdown extends Component {
+class TokensDropdown extends Component {
 
   static propTypes = {
-    onSelectedNetwork: PropTypes.func,
-    defaultSelectedNetwork: PropTypes.object,
-    networks: PropTypes.array,
+    onSelectedToken: PropTypes.func,
+    defaultSelectedToken: PropTypes.object,
+    tokens: PropTypes.array,
   }
 
   constructor (props) {
     super(props);
     this.state = {};
-    if (props.defaultSelectedNetwork) {
-      this.state.selectedNetwork = props.defaultSelectedNetwork;
+    if (props.defaultSelectedToken) {
+      this.state.selectedToken = props.defaultSelectedToken;
     }
-    if (props.networks) {
-      this.state.networks = props.networks;
+    if (props.tokens) {
+      this.state.tokens = props.tokens;
     }
   }
 
-  onSelectedNetwork = (selectedNetwork) => {
-    this.setState({ selectedNetwork: selectedNetwork });
-    this.props.onSelectedNetwork(selectedNetwork);
+  onSelectedNetwork = (selectedToken) => {
+    this.setState({ selectedToken: selectedToken });
+    this.props.onSelectedToken(selectedToken);
   }
 
   render () {
@@ -78,15 +87,15 @@ class NetworksDropdown extends Component {
           searchable={false}
           arrowRenderer={() => <div className="combo-selector-triangle"/>}
           onChange={this.onSelectedNetwork}
-          optionComponent={NetworkDropdownOption}
-          options={this.state.networks}
+          optionComponent={TokensDropdownOption}
+          options={this.state.tokens}
           clearable={false}
-          value={this.state.selectedNetwork}
-          valueComponent={NetworkDropdownOptionSelected}
+          value={this.state.selectedToken}
+          valueComponent={TokensDropdownOptionSelected}
         />
       </div>
     );
   }
 }
 
-module.exports = connect()(NetworksDropdown)
+module.exports = connect()(TokensDropdown)

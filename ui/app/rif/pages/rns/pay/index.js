@@ -3,9 +3,12 @@ import {connect} from 'react-redux';
 import DomainHeader from '../../../components/domain-header';
 import PropTypes from 'prop-types';
 import NetworkDropdown from '../../../components/networks-dropdown';
+import TokenDropdown from '../../../components/tokens-dropdown';
 import {SLIP_ADDRESSES} from '../../../constants/slipAddresses';
 import rifActions from '../../../actions';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import mockedTokenList from './token-list-mock.json';
+import {CallbackHandlers} from '../../../actions/callback-handlers';
 
 class Pay extends Component {
 
@@ -24,13 +27,19 @@ class Pay extends Component {
     domainInfo: PropTypes.object,
     isOwner: PropTypes.bool,
     decimalSeparator: PropTypes.string,
-    sendPayment: PropTypes.func,
+    sendLuminoPayment: PropTypes.func,
+    sendNetworkPayment: PropTypes.func,
+    openChannel: PropTypes.func,
   }
 
   getAllowedNetworks () {
     return SLIP_ADDRESSES.filter(network => {
       return network.symbol === 'ETH' || network.symbol === 'RBTC';
     });
+  }
+
+  getAllowedTokens () {
+    return mockedTokenList;
   }
 
   getHeaderFragment () {
@@ -57,7 +66,13 @@ class Pay extends Component {
 
   onNetworkChange (selectedNetwork) {
     this.setState({
-      selectedNetwork,
+      network: selectedNetwork,
+    });
+  }
+
+  onTokenChange (selectedToken) {
+    this.setState({
+      token: selectedToken,
     });
   }
 
@@ -100,28 +115,104 @@ class Pay extends Component {
     });
   }
 
-  sendPayment () {
-    this.props.sendPayment({
-      network: this.state.selectedNetwork,
-      amount: this.state.amount,
-      destination: this.state.destination,
+  sendNetworkPayment () {
+    this.props.sendNetworkPayment(this.state.network, this.state.destination, this.state.amount);
+  }
+
+  sendLuminoPayment () {
+    const callbackHandlers = new CallbackHandlers();
+    callbackHandlers.successHandler = (result) => {
+      console.log('PAYMENT DONE!!!', result);
+    };
+    this.props.sendLuminoPayment(this.state.token, this.state.destination, this.state.amount, callbackHandlers);
+  }
+
+  checkNetworkPaymentReady () {
+    return this.state.amount && this.state.destination && this.state.network;
+  }
+
+  checkLuminoPaymentReady () {
+    return this.state.amount && this.state.destination && this.state.selectedToken
+  }
+
+  readyToPay () {
+    switch (this.state.tabIndex) {
+      case '1':
+        return this.checkNetworkPaymentReady();
+      case '2':
+        return this.checkLuminoPaymentReady();
+      default:
+        return this.checkNetworkPaymentReady();
+    }
+  }
+
+  onTabChange (index) {
+    this.setState({
+      tabIndex: index,
+      selectedToken: this.getAllowedTokens()[0],
     });
+  }
+
+  getTokenFragment (destination) {
+    if (this.state.token && this.state.token.channels && this.state.token.channels.length > 0) {
+      return (
+        <div>
+          <div className="form-segment">
+            <span>Amount:</span><input type="text" onKeyDown={event => this.filterInput(event)} onChange={event => this.changeAmount(event)} />
+          </div>
+          {destination}
+          <div className="form-segment">
+            <button disabled={!this.readyToPay()} onClick={() => this.sendLuminoPayment()}>Send</button>
+          </div>
+        </div>
+      );
+    } else {
+      // we show a message that the user need to open channels on this particular token
+      return (
+        <div className="open-channel-message">
+          <div>
+            You need to open a channel with this token before you can pay with it
+          </div>
+          <div>
+            <button onClick={() => this.openChannel()}>Open Channel</button>
+          </div>
+        </div>
+      );
+    }
+  }
+
+  openChannel () {
+    const callbackHandlers = new CallbackHandlers();
+    callbackHandlers.requestHandler = (result) => {
+      console.log('REQUEST OPEN CHANNEL!!!', result);
+    };
+    callbackHandlers.successHandler = (result) => {
+      console.log('OPEN CHANNEL!!!', result);
+    };
+    callbackHandlers.errorHandler = (result) => {
+      console.log('ERROR OPEN CHANNEL!!!', result);
+    };
+    const destination = window.prompt('Please input the partner address');
+    if (destination) {
+      this.props.openChannel(destination, this.state.selectedToken, callbackHandlers);
+    }
   }
 
   render () {
     const header = this.getHeaderFragment();
     const destination = this.getDestinationFragment();
+    const tokenFragment = this.getTokenFragment(destination);
     return (
       <div className="body">
         {header}
-        <Tabs>
+        <Tabs onSelect={(index) => this.onTabChange(index)}>
           <TabList>
-            <Tab>Pay</Tab>
-            <Tab>Pay with Lumino</Tab>
+            <Tab tabIndex="1">Pay</Tab>
+            <Tab tabIndex="2">Pay with Lumino</Tab>
           </TabList>
 
           <TabPanel>
-            <NetworkDropdown onSelectedNetwork={this.onNetworkChange}
+            <NetworkDropdown onSelectedNetwork={(selectedNetwork => this.onNetworkChange(selectedNetwork))}
                              defaultSelectedNetwork={this.getAllowedNetworks()[0]}
                              networks={this.getAllowedNetworks()}/>
             <div className="form-segment">
@@ -129,18 +220,14 @@ class Pay extends Component {
             </div>
             {destination}
             <div className="form-segment">
-              <button onClick={() => this.sendPayment()}>Send</button>
+              <button disabled={!this.readyToPay()} onClick={() => this.sendNetworkPayment()}>Send</button>
             </div>
           </TabPanel>
           <TabPanel>
-            TOKEN DROPDOWN
-            <div className="form-segment">
-              <span>Amount:</span><input type="text" onKeyDown={event => this.filterInput(event)} onChange={event => this.changeAmount(event)} />
-            </div>
-            {destination}
-            <div className="form-segment">
-              <button onClick={() => this.sendPayment()}>Send</button>
-            </div>
+            <TokenDropdown onSelectedToken={(selectedToken) => this.onTokenChange(selectedToken)}
+                           defaultSelectedToken={this.getAllowedTokens()[0]}
+                           tokens={this.getAllowedTokens()}/>
+            {tokenFragment}
           </TabPanel>
         </Tabs>
       </div>
@@ -156,9 +243,14 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    sendPayment: (params) => {
-      const {destination, tokenAddress, amount} = params;
-      return dispatch(rifActions.createPayment(destination, tokenAddress, amount));
+    sendLuminoPayment: (token, destination, amount, callbackHandlers) => {
+      return dispatch(rifActions.createPayment(destination, token.address, amount, callbackHandlers));
+    },
+    sendNetworkPayment: (network, destination, amount) => {
+      console.log('Network Payment', {network, destination, amount});
+    },
+    openChannel: (partner, token, callbackHandlers) => {
+      return dispatch(rifActions.openChannel(partner, token.address, callbackHandlers))
     },
   }
 }
