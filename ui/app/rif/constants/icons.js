@@ -1,4 +1,5 @@
 import { faCoins, faCheckCircle, faBolt, faArchive } from '@fortawesome/free-solid-svg-icons';
+import { faConnectdevelop } from '@fortawesome/free-brands-svg-icons';
 
 export const DEFAULT_ICON = {
   color: '#000080',
@@ -18,4 +19,24 @@ export const luminoNodeIconProps = {
 export const rifStorageIconProps = {
   color: '#AD3232',
   icon: faArchive,
+}
+
+export const brandConnections = {
+  color: '#AD3232',
+  icon: faConnectdevelop,
+}
+
+export const tokenIcons = {
+  rif: {
+    name: 'RIF',
+    icon: 'rif.png',
+  },
+  doc: {
+    name: 'DOC',
+    icon: 'doc.png',
+  },
+  luminotoken: {
+    name: 'RIF',
+    icon: 'rif.png',
+  },
 }

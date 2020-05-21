@@ -1,5 +1,5 @@
 import rifConfig from './../../../../rif.config';
-import { DEFAULT_ICON, domainIconProps, luminoNodeIconProps, rifStorageIconProps} from './icons';
+import { DEFAULT_ICON, domainIconProps, luminoNodeIconProps, rifStorageIconProps, tokenIcons} from './icons';
 
 export const registrationTimeouts = {
   // number of seconds to wait before updating the page for the clock waiting.
@@ -19,4 +19,5 @@ export {
   domainIconProps,
   luminoNodeIconProps,
   rifStorageIconProps,
+  tokenIcons,
 }
