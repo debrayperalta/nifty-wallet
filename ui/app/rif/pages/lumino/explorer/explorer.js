@@ -5,20 +5,34 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import rifActions from '../../../actions';
 import PropTypes from 'prop-types';
 import { tokenIcons, brandConnections, DEFAULT_ICON } from '../../../constants/icons';
+import {Menu} from '../../../components';
+
+const PATH_TO_RIF_IMAGES = '/images/rif/';
 
 class ExplorerPage extends Component {
   static propTypes = {
     tokens: PropTypes.array,
+    channels: PropTypes.array,
     showThis: PropTypes.func,
     getTokens: PropTypes.func,
+    getChannels: PropTypes.func,
   }
   async componentDidMount () {
     if (!this.props.tokens) {
-      const tokens = await this.props.getTokens();
-      if (tokens) {
+      let channels = [];
+      let tokens = [];
+      try {
+        tokens = await this.props.getTokens();
+        channels = await this.props.getChannels();
+      } catch (e) {
+
+      }
+
+      if (tokens && channels) {
         this.props.showThis({
           ...this.props,
           tokens,
+          channels,
         })
       }
     }
@@ -30,7 +44,7 @@ class ExplorerPage extends Component {
       return <div key={index} className={'token-chiplet align-left'}>
         <div id="Logo" className={'token-logo align-left'}>
           {icon ?
-            icon.icon
+            <img src={PATH_TO_RIF_IMAGES + icon.icon} className={'token-logo-png'}/>
             :
             <FontAwesomeIcon icon={DEFAULT_ICON.icon} color={DEFAULT_ICON.color} className={'token-logo-icon'}/>
           }
@@ -43,7 +57,7 @@ class ExplorerPage extends Component {
             <div className={'token-info-channels-icon align-left'}>
               <FontAwesomeIcon icon={brandConnections.icon} color={brandConnections.color} />
             </div>
-            <div className={'token-info-channels-channels align-left'}>{token.channels.length}</div>
+            <div className={'token-info-channels-channels align-right'}>{token.channels.length}</div>
           </div>
           <div id="TokenStatus" className={'token-info-status align-right ' + (joined ? 'token-info-status-joined' : 'token-info-status-unjoined')}>
             {joined ? 'JOINED' : 'NOT JOINED'}
@@ -51,13 +65,13 @@ class ExplorerPage extends Component {
         </div>
       </div>
     }
-    let joinedConst = false;
     if (tokens) {
       return (<div className={'body'}>
         {tokens.map((token, index) => {
-          joinedConst = !joinedConst;
-          return chiplet(token, joinedConst, index);
+          const joined = this.props.channels.find(channel => channel.token_address === token.address);
+          return chiplet(token, joined, index);
         })}
+        <Menu />
       </div>)
     } else {
       return (<div>Loading tokens...</div>);
@@ -77,6 +91,7 @@ const mapDispatchToProps = dispatch => {
   return {
     showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoExplorer, params)),
     getTokens: () => dispatch(rifActions.getTokens()),
+    getChannels: () => dispatch(rifActions.getChannels()),
   }
 }
 

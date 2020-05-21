@@ -11,9 +11,15 @@
 }
 .token-logo-icon {
   font-size: 2em;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 .token-logo-png {
-
+  width: 3em;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 .token-name {
   width: 20%;
@@ -32,13 +38,15 @@
   border-radius: 4em;
   font-size: 0.85em;
   background-color: #009edf;
+  position: relative;
 }
 .token-info-channels-icon {
-  width: 50%;
+  width: 62.5%;
   font-size: 1.25em;
   color: white;
   background-color: #009edf;
   border-radius: 4em;
+  position: absolute;
 }
 .token-info-channels-channels {
   width: 45%;

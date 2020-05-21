@@ -35,8 +35,4 @@ export const tokenIcons = {
     name: 'DOC',
     icon: 'doc.png',
   },
-  luminotoken: {
-    name: 'RIF',
-    icon: 'rif.png',
-  },
 }
