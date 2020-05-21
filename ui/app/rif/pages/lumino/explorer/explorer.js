@@ -22,7 +22,18 @@ class ExplorerPage extends Component {
     }
   }
   render () {
+    const { tokens } = this.props;
+    if (tokens){
+      return (<div>
+        {tokens.map((item, index) => {
+          return <div key={index}>
+            TokenAddress: <span>{item.address}</span>
+          </div>
+        })}
+      </div>)
+    } else {
       return (<div>Loading tokens...</div>);
+    }
   }
 }
 

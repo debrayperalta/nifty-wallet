@@ -48,8 +48,6 @@ export default class RifController {
       web3: this.web3,
     });
 
-    this.luminoExplorer.getTokens();
-
     this.store = new ComposableObservableStore(props.initState, {
       RnsManager: this.rnsManager.store,
       LuminoManager: this.luminoManager.store,
