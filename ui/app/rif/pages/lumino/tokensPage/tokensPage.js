@@ -9,7 +9,7 @@ import {Menu} from '../../../components';
 
 const PATH_TO_RIF_IMAGES = '/images/rif/';
 
-class ExplorerPage extends Component {
+class LuminoTokensPage extends Component {
   static propTypes = {
     tokens: PropTypes.array,
     channels: PropTypes.array,
@@ -23,6 +23,10 @@ class ExplorerPage extends Component {
       let tokens = [];
       try {
         tokens = await this.props.getTokens();
+      } catch (e) {
+
+      }
+      try {
         channels = await this.props.getChannels();
       } catch (e) {
 
@@ -89,10 +93,10 @@ function mapStateToProps (state) {
 
 const mapDispatchToProps = dispatch => {
   return {
-    showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoExplorer, params)),
+    showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokensPage, params)),
     getTokens: () => dispatch(rifActions.getTokens()),
     getChannels: () => dispatch(rifActions.getChannels()),
   }
 }
 
-module.exports = connect(mapStateToProps, mapDispatchToProps)(ExplorerPage)
+module.exports = connect(mapStateToProps, mapDispatchToProps)(LuminoTokensPage)

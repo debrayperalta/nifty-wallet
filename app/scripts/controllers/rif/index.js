@@ -2,7 +2,6 @@ import RnsManager from './rns'
 import Web3 from 'web3'
 import ComposableObservableStore from './../../lib/ComposableObservableStore'
 import {LuminoManager} from './lumino';
-import {LuminoExplorer} from './luminoExplorer';
 
 /**
  * RIF Controller
@@ -43,15 +42,9 @@ export default class RifController {
       transactionController: this.metamaskController.txController,
     });
 
-    this.luminoExplorer = new LuminoExplorer({
-      initState: initState.LuminoExplorer,
-      web3: this.web3,
-    });
-
     this.store = new ComposableObservableStore(props.initState, {
       RnsManager: this.rnsManager.store,
       LuminoManager: this.luminoManager.store,
-      LuminoExplorer: this.luminoExplorer.store,
     });
 
     this.metamaskController.preferencesController.store.subscribe(updatedPreferences => this.preferencesUpdated(updatedPreferences));
@@ -142,7 +135,6 @@ export default class RifController {
     return {
       rns: this.rnsManager.bindApi(),
       lumino: this.luminoManager.bindApi(),
-      luminoExplorer: this.luminoExplorer.bindApi(),
     }
   }
 }

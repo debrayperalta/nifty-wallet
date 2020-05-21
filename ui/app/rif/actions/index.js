@@ -686,7 +686,7 @@ function getChannels () {
 function getTokens () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      background.rif.luminoExplorer.getTokens((error, tokens) => {
+      background.rif.lumino.getTokens((error, tokens) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
