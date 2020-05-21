@@ -45,6 +45,7 @@ const rifActions = {
   listenCallback,
   createPayment,
   createDeposit,
+  getTokens,
 }
 
 let background = null;
@@ -111,6 +112,8 @@ function checkDomainAvailable (domainName) {
     dispatch(niftyActions.showLoadingIndication());
     return new Promise((resolve, reject) => {
       background.rif.rns.resolver.isDomainAvailable(domainName, (error, available) => {
+        console.debug('IM HERE', error);
+        console.debug('IM HERE TRUE', available);
         dispatch(niftyActions.hideLoadingIndication());
         if (error) {
           dispatch(niftyActions.displayWarning(error));
@@ -675,6 +678,20 @@ function getChannels () {
           return reject(error);
         }
         return resolve(channels);
+      });
+    });
+  };
+}
+
+function getTokens () {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.luminoExplorer.getTokens((tokens, error) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(tokens);
       });
     });
   };

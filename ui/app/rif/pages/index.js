@@ -8,6 +8,7 @@ import Renew from './rns/renew';
 import SellOnMKP from './rns/sell-on-mkp';
 import Transfer from './rns/transfer';
 import DomainRegisterScreen from './rns/register';
+import ExplorerPage from './lumino/explorer/explorer';
 import React from 'react';
 import SearchDomains from '../components/searchDomains';
 import rifActions from '../actions';
@@ -26,6 +27,7 @@ const pageNames = {
     renew: 'renew',
     sellOnMKP: 'sell-on-mkp',
     transfer: 'transfer',
+    luminoExplorer: 'luminoExplorer',
   },
 }
 
@@ -108,6 +110,8 @@ function getPage (context, dispatch) {
       return buildScreen(<Transfer/>, context, dispatch)
     case pageNames.rns.domainRegister:
       return buildScreen(<DomainRegisterScreen/>, context, dispatch)
+    case pageNames.rns.luminoExplorer:
+      return buildScreen(<ExplorerPage/>, context, dispatch)
   }
 }
 
