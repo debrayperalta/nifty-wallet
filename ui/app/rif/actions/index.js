@@ -563,7 +563,7 @@ function listenCallback (callbackName) {
 function getAvailableCallbacks () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      background.rif.lumino.getAvailableCallbacks((callbackNames, error) => {
+      background.rif.lumino.getAvailableCallbacks((error, callbackNames) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
@@ -670,7 +670,7 @@ function createPayment (partner, tokenAddress, netAmount, callbackHandlers = new
 function getChannels () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      background.rif.lumino.getChannels((channels, error) => {
+      background.rif.lumino.getChannels((error, channels) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
