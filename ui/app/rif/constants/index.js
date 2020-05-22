@@ -12,7 +12,7 @@ export function GET_RESOLVERS () {
     address: rifConfig.rns.contracts.multiChainResolver,
   }]);
 }
-
+const PATH_TO_RIF_IMAGES = '/images/rif/';
 
 export {
   DEFAULT_ICON,
@@ -20,4 +20,5 @@ export {
   luminoNodeIconProps,
   rifStorageIconProps,
   tokenIcons,
+  PATH_TO_RIF_IMAGES,
 }

@@ -25,6 +25,7 @@
   width: 20%;
   text-transform: uppercase;
   font: 1.5em bold;
+  cursor: pointer;
 }
 .token-info {
   width: 60%;
