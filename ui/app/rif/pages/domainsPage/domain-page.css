@@ -8,13 +8,13 @@
 .chiplet {
   display: flex;
   border-bottom: 1px solid var(--gray-soft);
-  padding: 10px 30px;
+  padding: 14px 30px;
 }
 
 .chiplet-title {
   color: var(--primary-color);
-  font-size: 18px;
-  font-weight: 400;
+  font-size: 20px;
+  font-weight: 300;
   cursor: pointer;
 }
 
@@ -63,14 +63,8 @@
   line-height: 1.2;
 }
 
-.chiplet-status-active .chiplet-status,
-.chiplet-status-active .chiplet-status-circle {
-    background-color: #008744;
-}
-
-.chiplet-status-active .chiplet-status-circle {
-  background-image: url("data:image/svg+xml,%3Csvg aria-hidden='true' focusable='false' data-prefix='fal' data-icon='check' role='img' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' class='svg-inline--fa fa-check fa-w-14' style=' color: white;%0A'%3E%3Cpath fill='currentColor' d='M413.505 91.951L133.49 371.966l-98.995-98.995c-4.686-4.686-12.284-4.686-16.971 0L6.211 284.284c-4.686 4.686-4.686 12.284 0 16.971l118.794 118.794c4.686 4.686 12.284 4.686 16.971 0l299.813-299.813c4.686-4.686 4.686-12.284 0-16.971l-11.314-11.314c-4.686-4.686-12.284-4.686-16.97 0z' class=''%3E%3C/path%3E%3C/svg%3E");
-  background-size: 12px auto;
+.chiplet-status-active  {
+  display: none;
 }
 
 .chiplet-status-pending .chiplet-status,
@@ -87,9 +81,6 @@
   top: 2px;
   right: 2px;
   border-radius: 0 20px 20px 0;
-}
-
-.chiplet-status-pending  .chiplet-status-circle {
 }
 
 .chiplet-status-expired .chiplet-status,
