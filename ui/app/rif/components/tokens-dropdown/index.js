@@ -10,7 +10,7 @@ class TokensDropdownOption extends Select.Option {
   render () {
     const { option } = this.props;
     let channelIcon = (<FontAwesomeIcon icon={faTimes} color={'#8b1a1a'}/>);
-    if (option.channels && option.channels.length > 0) {
+    if (option.joined) {
       channelIcon = (<FontAwesomeIcon icon={faCheck} color={'#3a9022'}/>);
     }
     const icon = option.icon ? option.icon : DEFAULT_ICON;

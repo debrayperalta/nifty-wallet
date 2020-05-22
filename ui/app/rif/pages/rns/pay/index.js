@@ -40,6 +40,8 @@ class Pay extends Component {
       this.props.getTokens().then(tokens => {
         this.setState({
           tokens,
+          selectedNetwork: this.getAllowedNetworks()[0],
+          selectedToken: tokens[0],
           loading: false,
         });
       });
@@ -164,14 +166,15 @@ class Pay extends Component {
     this.setState({
       tabIndex: index,
       selectedToken: this.getAllowedTokens()[0],
+      selectedNetwork: this.getAllowedNetworks()[0],
+      amount: '',
+      destination: '',
     });
   }
 
   tokenHasChannelOpened () {
     if (this.state.selectedToken) {
-      const tokenAddress = this.state.selectedToken.address;
-      const channels = this.state.selectedToken.channels.filter(channel => channel.token_address === tokenAddress);
-      return channels && channels.length > 0;
+      return this.state.selectedToken.joined ? this.state.selectedToken.joined : false;
     }
     return false;
   }
@@ -288,7 +291,7 @@ function mapDispatchToProps (dispatch) {
     openChannel: (partner, token, callbackHandlers) => {
       return dispatch(rifActions.openChannel(partner, token.address, callbackHandlers))
     },
-    getTokens: () => dispatch(rifActions.getTokens()),
+    getTokens: () => dispatch(rifActions.getTokensWithJoinedCheck()),
   }
 }
 module.exports = connect(mapStateToProps, mapDispatchToProps)(Pay)

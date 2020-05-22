@@ -2,6 +2,7 @@ import * as niftyActions from '../../actions';
 import extend from 'xtend';
 import {lumino} from '../../../../app/scripts/controllers/rif/constants';
 import {CallbackHandlers} from './callback-handlers';
+import ethUtils from 'ethereumjs-util';
 
 const rifActions = {
   SHOW_MODAL: 'SHOW_MODAL',
@@ -42,7 +43,7 @@ const rifActions = {
   closeChannel,
   getChannels,
   getAvailableCallbacks,
-  getTokensAndJoined,
+  getTokensWithJoinedCheck,
   listenCallback,
   createPayment,
   createDeposit,
@@ -696,20 +697,21 @@ function getTokens () {
   };
 }
 
-function getTokensAndJoined () {
+function getTokensWithJoinedCheck () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       dispatch(this.getTokens()).then(tokens => {
-        let tokensJoined = [];
-        dispatch(this.getChannels()).then(channels => {
+        const tokensJoined = [];
+        dispatch(this.getChannels()).then(channelObject => {
+          const channels = Object.keys(channelObject).map(channelKey => channelObject[channelKey]);
           tokens.map(token => {
-            let tokenJoined = token;
-            tokenJoined.joined = channels.find(channel => channel.token_address === token.address);
+            const tokenJoined = token;
+            tokenJoined.joined = !!channels.find(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
             tokensJoined.push(tokenJoined);
           });
           resolve(tokensJoined);
         }).catch(err => {
-          // If you have 0 channels oppened, it will go here, so we need to resolve with only the tokens
+          // If you have 0 channels opened, it will go here, so we need to resolve with only the tokens
           console.debug("Couldn't get channels", err);
           resolve(tokens);
         })

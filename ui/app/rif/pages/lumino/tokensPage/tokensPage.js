@@ -12,14 +12,14 @@ class LuminoTokensPage extends Component {
   static propTypes = {
     tokens: PropTypes.array,
     showThis: PropTypes.func,
-    getTokensAndJoined: PropTypes.func,
+    getTokensWithJoinedCheck: PropTypes.func,
     showTokenDetail: PropTypes.func,
   }
   async componentDidMount () {
     if (!this.props.tokens) {
       let tokens = [];
       try {
-        tokens = await this.props.getTokensAndJoined();
+        tokens = await this.props.getTokensWithJoinedCheck();
       } catch (e) {
 
       }
@@ -83,7 +83,7 @@ function mapStateToProps (state) {
 const mapDispatchToProps = dispatch => {
   return {
     showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokensPage, params)),
-    getTokensAndJoined: () => dispatch(rifActions.getTokensAndJoined()),
+    getTokensWithJoinedCheck: () => dispatch(rifActions.getTokensWithJoinedCheck()),
     showTokenDetail: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokensPage, params)),
   }
 }
