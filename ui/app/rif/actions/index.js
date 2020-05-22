@@ -42,6 +42,7 @@ const rifActions = {
   closeChannel,
   getChannels,
   getAvailableCallbacks,
+  getTokensAndJoined,
   listenCallback,
   createPayment,
   createDeposit,
@@ -691,6 +692,30 @@ function getTokens () {
         }
         return resolve(tokens);
       });
+    });
+  };
+}
+
+function getTokensAndJoined () {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      dispatch(this.getTokens()).then(tokens => {
+        let tokensJoined = [];
+        dispatch(this.getChannels()).then(channels => {
+          tokens.map(token => {
+            let tokenJoined = token;
+            tokenJoined.joined = channels.find(channel => channel.token_address === token.address);
+            tokensJoined.push(tokenJoined);
+          });
+          resolve(tokensJoined);
+        }).catch(err => {
+          // If you have 0 channels oppened, it will go here, so we need to resolve with only the tokens
+          console.debug("Couldn't get channels", err);
+          resolve(tokens);
+        })
+      }).catch(err => {
+        reject(err);
+      })
     });
   };
 }

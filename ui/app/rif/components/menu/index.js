@@ -28,7 +28,7 @@ class Menu extends Component {
       },
       {
         label: 'Pay',
-        action: () => this.props.navigateTo(pageNames.rns.pay, 'Pay'),
+        action: () => this.props.navigateTo(pageNames.rns.pay, 'Pay', {domainInfo: this.props.domainInfo}),
       },
       {
         label: 'Sell it on MKP',

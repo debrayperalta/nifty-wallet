@@ -1,4 +1,5 @@
-import {toWei} from 'web3-utils';
+import {toWei, toChecksumAddress} from 'web3-utils';
+import {checkRequiredParameters, checksumAddresses} from '../utils/general';
 
 export class LuminoOperations {
 
@@ -24,10 +25,16 @@ export class LuminoOperations {
   }
 
   openChannel (partner, tokenAddress) {
-    const params = {
+    const errors = checkRequiredParameters({
       partner,
-      settleTimeout: 500,
       tokenAddress,
+    });
+    if (errors.length > 0) {
+      return Promise.reject(errors);
+    }
+    const params = {
+      ...checksumAddresses({partner, tokenAddress}),
+      settleTimeout: 500,
     };
     console.debug(`Request to open a channel with partner ${partner} on token ${tokenAddress}`);
     this.lumino.get().actions.openChannel(params);
@@ -35,11 +42,18 @@ export class LuminoOperations {
   }
 
   closeChannel (partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier) {
-    const params = {
+    const errors = checkRequiredParameters({
       partner,
       tokenAddress,
       address,
       tokenNetworkAddress,
+      channelIdentifier,
+    });
+    if (errors.length > 0) {
+      return Promise.reject(errors);
+    }
+    const params = {
+      ...checksumAddresses({partner, tokenAddress, address, tokenNetworkAddress}),
       channelIdentifier,
     };
     console.debug('Requesting to close channel', params);
@@ -48,13 +62,22 @@ export class LuminoOperations {
   }
 
   createDeposit (partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, netAmount) {
+    const errors = checkRequiredParameters({
+      partner,
+      tokenAddress,
+      address,
+      tokenNetworkAddress,
+      channelIdentifier,
+      netAmount,
+    });
+    if (errors.length > 0) {
+      return Promise.reject(errors);
+    }
     const amount = toWei(netAmount);
     const params = {
-      tokenAddress,
-      tokenNetworkAddress,
+      ...checksumAddresses({partner, tokenAddress, address, tokenNetworkAddress}),
       amount,
       channelId: channelIdentifier,
-      partner,
     };
     console.debug(`Requested deposit of ${amount} on token ${tokenAddress} on channel ${channelIdentifier} with partner ${partner}`);
     this.lumino.get().actions.createDeposit(params);
@@ -62,10 +85,17 @@ export class LuminoOperations {
   }
 
   createPayment (partner, tokenAddress, netAmount) {
+    const errors = checkRequiredParameters({
+      partner,
+      tokenAddress,
+      netAmount,
+    });
+    if (errors.length > 0) {
+      return Promise.reject(errors);
+    }
     const amount = toWei(netAmount);
     const body = {
-      partner,
-      token_address: tokenAddress,
+      ...checksumAddresses({partner, token_address: tokenAddress}),
       amount,
     };
     console.debug(`Sending payment of ${amount} on token ${tokenAddress} to ${partner}`);
