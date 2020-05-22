@@ -5,9 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import rifActions from '../../../actions';
 import PropTypes from 'prop-types';
 import { tokenIcons, brandConnections, DEFAULT_ICON } from '../../../constants/icons';
+import { PATH_TO_RIF_IMAGES } from '../../../constants';
 import {Menu} from '../../../components';
-
-const PATH_TO_RIF_IMAGES = '/images/rif/';
 
 class LuminoTokenDetailPage extends Component {
   static propTypes = {
@@ -25,7 +24,7 @@ class LuminoTokenDetailPage extends Component {
         <Menu />
       </div>)
     } else {
-      return (<div>Loading tokens...</div>);
+      return (<div>Loading token detail...</div>);
     }
   }
 }

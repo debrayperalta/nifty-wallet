@@ -53,7 +53,7 @@ class LuminoTokensPage extends Component {
             <FontAwesomeIcon icon={DEFAULT_ICON.icon} color={DEFAULT_ICON.color} className={'token-logo-icon'}/>
           }
         </div>
-        <div id="TokenSymbol" className={'token-symbol align-left'} >
+        <div id="TokenSymbol" className={'token-symbol align-left'} onClick={() => this.props.showTokenDetail(token)}>
           {token.symbol}
         </div>
         <div id="TokenInfo" className={'token-info align-right'}>
@@ -96,7 +96,7 @@ const mapDispatchToProps = dispatch => {
     showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokensPage, params)),
     getTokens: () => dispatch(rifActions.getTokens()),
     getChannels: () => dispatch(rifActions.getChannels()),
-    showTokenDetail: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokensPage, params)),
+    showTokenDetail: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokenDetailPage, params)),
   }
 }
 
