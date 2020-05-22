@@ -76,38 +76,6 @@ class DomainsScreen extends Component {
           {this.props.domains.map((item, index) => {
             return this.chiplet(item, index)
           })}
-
-          <div className="chiplet">
-            <div className="chiplet-body">
-              <div id="chipletTitle" className="chiplet-title">Test1.rsk</div>
-            </div>
-            <div className="chiplet-status-wrapper chiplet-status-expiring">
-              <div id="chipletStatus" className="chiplet-status-text">
-                <div className="chiplet-status-circle"></div><span className="chiplet-status">Epiring</span>
-              </div>
-            </div>
-            <span className="chiplet-arrow">
-              <svg width="11" height="17" viewBox="0 0 11 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 1L9 8.5L1 16" stroke="#5B2A92" strokeWidth="2"/>
-              </svg>
-            </span>
-          </div>
-
-          <div className="chiplet">
-            <div className="chiplet-body">
-              <div id="chipletTitle" className="chiplet-title">Test2.rsk</div>
-            </div>
-            <div className="chiplet-status-wrapper chiplet-status-pending">
-              <div id="chipletStatus" className="chiplet-status-text">
-                <div className="chiplet-status-circle"></div><span className="chiplet-status">Pending</span>
-              </div>
-            </div>
-            <span className="chiplet-arrow">
-              <svg width="11" height="17" viewBox="0 0 11 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 1L9 8.5L1 16" stroke="#5B2A92" strokeWidth="2"/>
-              </svg>
-            </span>
-          </div>
         </div>
       )
     } else {
