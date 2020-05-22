@@ -47,10 +47,7 @@ function buildScreen (screenComponent, context, dispatch) {
       backButton = (
         <i onClick={(event) => {
           context.params.navBar.backAction();
-        }} className="fa fa-arrow-left fa-lg cursor-pointer" style={{
-          position: 'absolute',
-          left: '30px',
-        }}/>
+        }} className="arrow-left cursor-pointer"/>
       );
     }
     let title = null;

@@ -1,17 +1,23 @@
+.domains-list {
+  height: 26.5em;
+  overflow: scroll;
+  padding: 0 20px;
+  font-family: var(--primary-font);
+}
+
 .chiplet {
-    width: 90%;
-    height: 100px;
-    font-size: 1rem;
-    color: #242A30;
-    margin: 5px;
-    padding:0.5rem;
+  display: flex;
+  border-bottom: 1px solid var(--gray-soft);
+  padding: 10px 30px;
 }
+
 .chiplet-title {
-    color: black;
-    font-size: 1.25rem;
-    font-weight: bold;
-    cursor: pointer;
+  color: var(--primary-color);
+  font-size: 18px;
+  font-weight: 400;
+  cursor: pointer;
 }
+
 .chiplet-description {
     padding-left: 1.5rem;
 }
@@ -20,44 +26,97 @@
     font-weight: normal;
     cursor: pointer;
 }
+
 .chiplet-description a:hover {
     color: #84C1FF;
 }
-.chiplet-body {
-    width: 85%;
-    height: 100%;
-    float: left;
-    border-bottom: 2.5px solid #EEEEEE;
-}
+
 .chiplet-status-wrapper {
-    width: 15%;
-    height: 100%;
-    float: right;
-    position: relative;
+  position: relative;
+  margin-left: 10px;
 }
+
 .chiplet-status-text {
-    position: absolute;
-    color: white;
-    top: 50%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 400;
+  color: #fff;
 }
-.chiplet-status-active {
+
+.chiplet-status-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  margin-right: 3px;
+}
+
+.chiplet-status-text .chiplet-status {
+  width: 50px;
+  display: inline-block;
+  border-radius: 5px;
+  padding: 1px 0;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.chiplet-status-active .chiplet-status,
+.chiplet-status-active .chiplet-status-circle {
     background-color: #008744;
-    border-left: 4px solid #7FC3A1;
 }
-.chiplet-status-pending {
-    background-color: #0057e7;
-    border-left: 4px solid #7FABF3;
+
+.chiplet-status-active .chiplet-status-circle {
+  background-image: url("data:image/svg+xml,%3Csvg aria-hidden='true' focusable='false' data-prefix='fal' data-icon='check' role='img' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' class='svg-inline--fa fa-check fa-w-14' style=' color: white;%0A'%3E%3Cpath fill='currentColor' d='M413.505 91.951L133.49 371.966l-98.995-98.995c-4.686-4.686-12.284-4.686-16.971 0L6.211 284.284c-4.686 4.686-4.686 12.284 0 16.971l118.794 118.794c4.686 4.686 12.284 4.686 16.971 0l299.813-299.813c4.686-4.686 4.686-12.284 0-16.971l-11.314-11.314c-4.686-4.686-12.284-4.686-16.97 0z' class=''%3E%3C/path%3E%3C/svg%3E");
+  background-size: 12px auto;
 }
-.chiplet-status-expired {
+
+.chiplet-status-pending .chiplet-status,
+.chiplet-status-pending  .chiplet-status-circle {
+    background-color: #F723A4;
+}
+
+.chiplet-status-pending .chiplet-status-circle:after {
+  content: " ";
+  position: absolute;
+  width: 10px;
+  height: 20px;
+  background: white;
+  top: 2px;
+  right: 2px;
+  border-radius: 0 20px 20px 0;
+}
+
+.chiplet-status-pending  .chiplet-status-circle {
+}
+
+.chiplet-status-expired .chiplet-status,
+.chiplet-status-expired  .chiplet-status-circle {
     background-color: #D62D20;
-    border-left: 4px solid #EA968F;
 }
-.chiplet-status-expiring {
-    background-color: #FFA700;
-    border-left: 4px solid #FFD37F;
+
+.chiplet-status-expiring .chiplet-status,
+.chiplet-status-expiring .chiplet-status-circle {
+    background-color: #FFAA05;
 }
+
+.chiplet-status-expiring .chiplet-status-circle {
+  background-image: url("data:image/svg+xml,%3Csvg width='7' height='16' viewBox='0 0 7 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.5 14.5L1.5 10.5V1' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
+  background-size: 6px auto;
+  background-position: 10px 4px;
+}
+
+.chiplet-arrow {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.chiplet-arrow svg {
+  display: block;
+}
+
 .rif-back-button {
     font-size: 1rem;
     cursor: pointer;
@@ -65,12 +124,4 @@
 .rif-back-button:hover {
     transform: scale(1.2);
     transition: all 0.2s;
-}
-.search-bar {
-    width: 90%;
-    margin: 5%;
-    font-size: 1rem;
-    border-top: 0px;
-    border-left: 0px;
-    border-right: 0px;
 }

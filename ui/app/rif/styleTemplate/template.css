@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+
+:root {
+  --primary-color: #572990;
+
+  --gray-soft: #DFDFDF;
+
+  --primary-font: 'Lato', sans-serif;
+}
+
+
+/* HEADER */
+
+.arrow-left {
+  width: 17px;
+  height: 17px;
+  background-image: url("data:image/svg+xml,%3Csvg width='11' height='17' viewBox='0 0 11 17' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 16L2 8.5L10 1' stroke='white' stroke-width='2'/%3E%3C/svg%3E%0A");
+  background-repeat: no-repeat;
+  background-position: center;
+
+  position: absolute;
+  left: 25px;
+}
+
+.search-bar {
+  width: 100%;
+  max-width: 290px;
+  margin: 34px auto;
+  border-width: 0 0 1px 0;
+  border-color: var(--primary-color);
+  padding: 6px 0;
+  font-family: var(--primary-font);
+  font-size: 16px;
+  text-align: center;
+  font-weight: 400;
+
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='15' viewBox='0 0 12 15' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='7' cy='5' r='4.5' stroke='%235A2992'/%3E%3Cpath d='M5 9L1 14' stroke='%235A2992'/%3E%3C/svg%3E%0A");
+  background-repeat: no-repeat;
+  background-position: center right 15px;
+}
+
+.search-bar::-webkit-input-placeholder {color: var(--primary-color);}
+.search-bar:-ms-input-placeholder {color: var(--primary-color);}
+.search-bar::placeholder {color: var(--primary-color);}
+
+.mr-auto {
+  margin-right: auto;
+}
