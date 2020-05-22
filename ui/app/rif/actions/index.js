@@ -112,8 +112,6 @@ function checkDomainAvailable (domainName) {
     dispatch(niftyActions.showLoadingIndication());
     return new Promise((resolve, reject) => {
       background.rif.rns.resolver.isDomainAvailable(domainName, (error, available) => {
-        console.debug('IM HERE', error);
-        console.debug('IM HERE TRUE', available);
         dispatch(niftyActions.hideLoadingIndication());
         if (error) {
           dispatch(niftyActions.displayWarning(error));
