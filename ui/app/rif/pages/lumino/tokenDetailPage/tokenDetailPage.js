@@ -1,17 +1,14 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {pageNames} from '../../index';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import rifActions from '../../../actions';
 import PropTypes from 'prop-types';
-import { tokenIcons, brandConnections, DEFAULT_ICON } from '../../../constants/icons';
-import { PATH_TO_RIF_IMAGES } from '../../../constants';
+import { tokenIcons } from '../../../constants/icons';
 import {Menu} from '../../../components';
 
 class LuminoTokenDetailPage extends Component {
   static propTypes = {
     token: PropTypes.object,
-    channels: PropTypes.array,
     showThis: PropTypes.func,
     getChannels: PropTypes.func,
   }
@@ -21,7 +18,6 @@ class LuminoTokenDetailPage extends Component {
     if (token) {
       return (<div className={'body'}>
         Token
-        <Menu />
       </div>)
     } else {
       return (<div>Loading token detail...</div>);
@@ -33,6 +29,7 @@ function mapStateToProps (state) {
   const params = state.appState.currentView.params;
   return {
     dispatch: state.dispatch,
+    token: params,
     ...params,
   }
 }

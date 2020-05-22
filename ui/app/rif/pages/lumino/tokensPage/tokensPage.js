@@ -86,7 +86,7 @@ const mapDispatchToProps = dispatch => {
   return {
     showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokensPage, params)),
     getTokensAndJoined: () => dispatch(rifActions.getTokensAndJoined()),
-    showTokenDetail: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokensPage, params)),
+    showTokenDetail: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokenDetailPage, params)),
   }
 }
 
