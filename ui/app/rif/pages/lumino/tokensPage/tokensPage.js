@@ -5,9 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import rifActions from '../../../actions';
 import PropTypes from 'prop-types';
 import { tokenIcons, brandConnections, DEFAULT_ICON } from '../../../constants/icons';
+import { PATH_TO_RIF_IMAGES } from '../../../constants';
 import {Menu} from '../../../components';
-
-const PATH_TO_RIF_IMAGES = '/images/rif/';
 
 class LuminoTokensPage extends Component {
   static propTypes = {
@@ -16,6 +15,7 @@ class LuminoTokensPage extends Component {
     showThis: PropTypes.func,
     getTokens: PropTypes.func,
     getChannels: PropTypes.func,
+    showTokenDetail: PropTypes.func,
   }
   async componentDidMount () {
     if (!this.props.tokens) {
@@ -53,7 +53,7 @@ class LuminoTokensPage extends Component {
             <FontAwesomeIcon icon={DEFAULT_ICON.icon} color={DEFAULT_ICON.color} className={'token-logo-icon'}/>
           }
         </div>
-        <div id="TokenSymbol" className={'token-symbol align-left'}>
+        <div id="TokenSymbol" className={'token-symbol align-left'} >
           {token.symbol}
         </div>
         <div id="TokenInfo" className={'token-info align-right'}>
@@ -96,6 +96,7 @@ const mapDispatchToProps = dispatch => {
     showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokensPage, params)),
     getTokens: () => dispatch(rifActions.getTokens()),
     getChannels: () => dispatch(rifActions.getChannels()),
+    showTokenDetail: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokensPage, params)),
   }
 }
 
