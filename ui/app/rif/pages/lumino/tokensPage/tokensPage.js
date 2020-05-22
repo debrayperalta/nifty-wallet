@@ -44,7 +44,7 @@ class LuminoTokensPage extends Component {
   render () {
     const { tokens } = this.props;
     const chiplet = (token, joined, index) => {
-      const icon = tokenIcons[token.name.toLowerCase()];
+      const icon = tokenIcons[token.symbol.toLowerCase()];
       return <div key={index} className={'token-chiplet align-left'}>
         <div id="Logo" className={'token-logo align-left'}>
           {icon ?
@@ -53,8 +53,8 @@ class LuminoTokensPage extends Component {
             <FontAwesomeIcon icon={DEFAULT_ICON.icon} color={DEFAULT_ICON.color} className={'token-logo-icon'}/>
           }
         </div>
-        <div id="TokenName" className={'token-name align-left'}>
-          {token.name}
+        <div id="TokenSymbol" className={'token-symbol align-left'}>
+          {token.symbol}
         </div>
         <div id="TokenInfo" className={'token-info align-right'}>
           <div id="TokenChannels" className={'token-info-channels align-right'}>
