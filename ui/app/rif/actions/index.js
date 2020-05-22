@@ -45,6 +45,7 @@ const rifActions = {
   listenCallback,
   createPayment,
   createDeposit,
+  getTokens,
 }
 
 let background = null;
@@ -675,6 +676,20 @@ function getChannels () {
           return reject(error);
         }
         return resolve(channels);
+      });
+    });
+  };
+}
+
+function getTokens () {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.lumino.getTokens((error, tokens) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(tokens);
       });
     });
   };

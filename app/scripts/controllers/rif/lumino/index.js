@@ -6,6 +6,7 @@ import {bindOperation, isRskNetwork} from '../utils/general';
 import {LuminoOperations} from './operations';
 import {LuminoCallbacks} from './callbacks';
 import ethUtils from 'ethereumjs-util';
+import { LuminoExplorer } from './explorer';
 
 /**
  * Manager to control the access to lumino api
@@ -24,6 +25,7 @@ export class LuminoManager extends AbstractManager {
       address: this.address,
       keyringController: this.keyringController,
     });
+    this.luminoExplorer = new LuminoExplorer();
   }
 
   async initializeLumino (cleanApiKey = false) {
@@ -77,6 +79,7 @@ export class LuminoManager extends AbstractManager {
       getApiKey: bindOperation(this.operations.getApiKey, this.operations),
       getAvailableCallbacks: bindOperation(this.callbacks.getAvailableCallbacks, this.callbacks),
       listenCallback: bindOperation(this.callbacks.listenForCallback, this.callbacks),
+      getTokens: bindOperation(this.luminoExplorer.getTokens, this.luminoExplorer),
     };
   }
 
