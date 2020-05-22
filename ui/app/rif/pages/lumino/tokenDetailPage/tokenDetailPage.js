@@ -1,5 +1,5 @@
-import React, {Component} from 'react'
-import {connect} from 'react-redux'
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import {pageNames} from '../../index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import rifActions from '../../../actions';
