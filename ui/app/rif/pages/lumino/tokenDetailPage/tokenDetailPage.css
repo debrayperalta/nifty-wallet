@@ -55,3 +55,8 @@
   border-radius: 4em;
   font-size: 0.85em;
 }
+.channels-info{
+  width: 100%;
+  float: left;
+  margin-top: 1em;
+}

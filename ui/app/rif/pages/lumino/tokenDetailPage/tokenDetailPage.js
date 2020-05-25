@@ -73,6 +73,9 @@ class LuminoTokenDetailPage extends Component {
             </div>
           </div>
         </div>
+        <div id="ChannelsInfo" className={'channels-info'}>
+          CHANNELS
+        </div>
       </div>)
     } else {
       return (<div>Loading token detail...</div>);
