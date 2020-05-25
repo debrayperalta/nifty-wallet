@@ -48,6 +48,7 @@ const rifActions = {
   createPayment,
   createDeposit,
   getTokens,
+  cleanStore,
 }
 
 let background = null;
@@ -707,6 +708,8 @@ function getTokensWithJoinedCheck () {
           tokens.map(token => {
             const tokenJoined = token;
             tokenJoined.joined = !!channels.find(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
+            const openedChannels = channels.find(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
+            tokenJoined.openedChannels = openedChannels || [];
             tokensJoined.push(tokenJoined);
           });
           resolve(tokensJoined);
@@ -718,6 +721,20 @@ function getTokensWithJoinedCheck () {
       }).catch(err => {
         reject(err);
       })
+    });
+  };
+}
+
+function cleanStore () {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.cleanStore((error) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve();
+      });
     });
   };
 }

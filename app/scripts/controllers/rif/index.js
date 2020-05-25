@@ -2,6 +2,7 @@ import RnsManager from './rns'
 import Web3 from 'web3'
 import ComposableObservableStore from './../../lib/ComposableObservableStore'
 import {LuminoManager} from './lumino';
+import {bindOperation} from './utils/general';
 
 /**
  * RIF Controller
@@ -127,6 +128,14 @@ export default class RifController {
   }
 
   /**
+   * Cleans the store completely, this can be used by the developer to reset rif state.
+   */
+  cleanStore () {
+    this.rnsManager.store.putState({});
+    this.luminoManager.store.putState({});
+  }
+
+  /**
    * This method publishes all the operations available to call from the ui for RifController
    * and all it's members.
    * @returns an object like { operationName: functionBind, }
@@ -135,6 +144,7 @@ export default class RifController {
     return {
       rns: this.rnsManager.bindApi(),
       lumino: this.luminoManager.bindApi(),
+      cleanStore: bindOperation(this.cleanStore, this),
     }
   }
 }

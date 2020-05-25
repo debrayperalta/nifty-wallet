@@ -16,7 +16,7 @@ export class LuminoSigningHandler {
     // sign tx
     const ethTx = new Transaction(txParams);
     await this.transactionController.signEthTx(ethTx, this.address);
-    const signedTransaction = ethUtil.bufferToHex(ethTx.serialize());
+    const signedTransaction = ethUtils.bufferToHex(ethTx.serialize());
     console.debug('Signed raw transaction', signedTransaction)
     return signedTransaction
   }
