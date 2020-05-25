@@ -1,0 +1,57 @@
+.token-description {
+  width: 90%;
+  float: left;
+  border-bottom: 0.05em solid #cdcdcd;
+  margin-left: 5%;
+  margin-top: 0.25em;
+  padding: 0.5em;
+}
+.token-name-desc{
+  width: 40%;
+}
+.token-name-desc-symbol {
+  width: 100%;
+  text-transform: uppercase;
+  font: 1.5em bold;
+}
+.token-name-desc-name {
+  width: 100%;
+  font-size: 1.2em;
+}
+.token-deposit {
+  width: 40%;
+}
+.token-deposit-text {
+  width: 100%;
+  text-align: right;
+}
+.token-general-info {
+  width: 100%;
+  margin-top: 1em;
+}
+.token-general-info-chiplet {
+  width: 30%;
+  float: left;
+  margin-left: 2.5%;
+}
+.token-general-info-channels {
+  width: 100%;
+  color: white;
+  text-align: center;
+  white-space: nowrap;
+  padding: 0.15em;
+  border-radius: 4em;
+  font-size: 0.85em;
+  background-color: #009edf;
+  position: relative;
+}
+.token-general-info-status {
+  width: 100%;
+  color: white;
+  text-align: center;
+  white-space: nowrap;
+  padding: 0.15em;
+  margin-top: 0.1em;
+  border-radius: 4em;
+  font-size: 0.85em;
+}
