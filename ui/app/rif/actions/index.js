@@ -514,16 +514,16 @@ function updateDomains (domain) {
 function onboarding (callbackHandlers = new CallbackHandlers()) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
+      if (callbackHandlers && callbackHandlers.requestHandler) {
+        handleSdkCallback(lumino.callbacks.REQUEST_CLIENT_ONBOARDING, dispatch, callbackHandlers.requestHandler);
+      }
+      if (callbackHandlers && callbackHandlers.successHandler) {
+        handleSdkCallback(lumino.callbacks.CLIENT_ONBOARDING_SUCCESS, dispatch, callbackHandlers.successHandler);
+      }
       background.rif.lumino.onboarding((error) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
-        }
-        if (callbackHandlers && callbackHandlers.requestHandler) {
-          handleSdkCallback(lumino.callbacks.REQUEST_CLIENT_ONBOARDING, dispatch, callbackHandlers.requestHandler);
-        }
-        if (callbackHandlers && callbackHandlers.successHandler) {
-          handleSdkCallback(lumino.callbacks.CLIENT_ONBOARDING_SUCCESS, dispatch, callbackHandlers.successHandler);
         }
         return resolve();
       });
@@ -580,19 +580,19 @@ function getAvailableCallbacks () {
 function openChannel (partner, tokenAddress, callbackHandlers = new CallbackHandlers()) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
+      if (callbackHandlers && callbackHandlers.requestHandler) {
+        handleSdkCallback(lumino.callbacks.REQUEST_OPEN_CHANNEL, dispatch, callbackHandlers.requestHandler);
+      }
+      if (callbackHandlers && callbackHandlers.successHandler) {
+        handleSdkCallback(lumino.callbacks.OPEN_CHANNEL, dispatch, callbackHandlers.successHandler);
+      }
+      if (callbackHandlers && callbackHandlers.errorHandler) {
+        handleSdkCallback(lumino.callbacks.FAILED_OPEN_CHANNEL, dispatch, callbackHandlers.errorHandler);
+      }
       background.rif.lumino.openChannel(partner, tokenAddress, (error) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
-        }
-        if (callbackHandlers && callbackHandlers.requestHandler) {
-          handleSdkCallback(lumino.callbacks.REQUEST_OPEN_CHANNEL, dispatch, callbackHandlers.requestHandler);
-        }
-        if (callbackHandlers && callbackHandlers.successHandler) {
-          handleSdkCallback(lumino.callbacks.OPEN_CHANNEL, dispatch, callbackHandlers.successHandler);
-        }
-        if (callbackHandlers && callbackHandlers.errorHandler) {
-          handleSdkCallback(lumino.callbacks.FAILED_OPEN_CHANNEL, dispatch, callbackHandlers.errorHandler);
         }
         return resolve();
       });
@@ -603,19 +603,19 @@ function openChannel (partner, tokenAddress, callbackHandlers = new CallbackHand
 function closeChannel (partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, callbackHandlers = new CallbackHandlers()) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
+      if (callbackHandlers && callbackHandlers.requestHandler) {
+        handleSdkCallback(lumino.callbacks.REQUEST_CLOSE_CHANNEL, dispatch, callbackHandlers.requestHandler);
+      }
+      if (callbackHandlers && callbackHandlers.successHandler) {
+        handleSdkCallback(lumino.callbacks.CLOSE_CHANNEL, dispatch, callbackHandlers.successHandler);
+      }
+      if (callbackHandlers && callbackHandlers.errorHandler) {
+        handleSdkCallback(lumino.callbacks.FAILED_CLOSE_CHANNEL, dispatch, callbackHandlers.errorHandler);
+      }
       background.rif.lumino.closeChannel(partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, (error) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
-        }
-        if (callbackHandlers && callbackHandlers.requestHandler) {
-          handleSdkCallback(lumino.callbacks.REQUEST_CLOSE_CHANNEL, dispatch, callbackHandlers.requestHandler);
-        }
-        if (callbackHandlers && callbackHandlers.successHandler) {
-          handleSdkCallback(lumino.callbacks.CLOSE_CHANNEL, dispatch, callbackHandlers.successHandler);
-        }
-        if (callbackHandlers && callbackHandlers.errorHandler) {
-          handleSdkCallback(lumino.callbacks.FAILED_CLOSE_CHANNEL, dispatch, callbackHandlers.errorHandler);
         }
         return resolve();
       });
@@ -626,19 +626,19 @@ function closeChannel (partner, tokenAddress, address, tokenNetworkAddress, chan
 function createDeposit (partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, netAmount, callbackHandlers = new CallbackHandlers()) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
+      if (callbackHandlers && callbackHandlers.requestHandler) {
+        handleSdkCallback(lumino.callbacks.REQUEST_DEPOSIT_CHANNEL, dispatch, callbackHandlers.requestHandler);
+      }
+      if (callbackHandlers && callbackHandlers.successHandler) {
+        handleSdkCallback(lumino.callbacks.DEPOSIT_CHANNEL, dispatch, callbackHandlers.successHandler);
+      }
+      if (callbackHandlers && callbackHandlers.errorHandler) {
+        handleSdkCallback(lumino.callbacks.FAILED_DEPOSIT_CHANNEL, dispatch, callbackHandlers.errorHandler);
+      }
       background.rif.lumino.createDeposit(partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, netAmount, (error) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
-        }
-        if (callbackHandlers && callbackHandlers.requestHandler) {
-          handleSdkCallback(lumino.callbacks.REQUEST_DEPOSIT_CHANNEL, dispatch, callbackHandlers.requestHandler);
-        }
-        if (callbackHandlers && callbackHandlers.successHandler) {
-          handleSdkCallback(lumino.callbacks.DEPOSIT_CHANNEL, dispatch, callbackHandlers.successHandler);
-        }
-        if (callbackHandlers && callbackHandlers.errorHandler) {
-          handleSdkCallback(lumino.callbacks.FAILED_DEPOSIT_CHANNEL, dispatch, callbackHandlers.errorHandler);
         }
         return resolve();
       });
@@ -649,20 +649,20 @@ function createDeposit (partner, tokenAddress, address, tokenNetworkAddress, cha
 function createPayment (partner, tokenAddress, netAmount, callbackHandlers = new CallbackHandlers()) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
+      if (callbackHandlers && callbackHandlers.requestHandler) {
+        handleSdkCallback(lumino.callbacks.SENT_PAYMENT, dispatch, callbackHandlers.requestHandler);
+      }
+      if (callbackHandlers && callbackHandlers.successHandler) {
+        handleSdkCallback(lumino.callbacks.COMPLETED_PAYMENT, dispatch, callbackHandlers.successHandler);
+      }
+      if (callbackHandlers && callbackHandlers.errorHandler) {
+        handleSdkCallback(lumino.callbacks.FAILED_CREATE_PAYMENT, dispatch, callbackHandlers.errorHandler);
+        handleSdkCallback(lumino.callbacks.FAILED_PAYMENT, dispatch, callbackHandlers.errorHandler);
+      }
       background.rif.lumino.createPayment(partner, tokenAddress, netAmount, (error) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
-        }
-        if (callbackHandlers && callbackHandlers.requestHandler) {
-          handleSdkCallback(lumino.callbacks.SENT_PAYMENT, dispatch, callbackHandlers.requestHandler);
-        }
-        if (callbackHandlers && callbackHandlers.successHandler) {
-          handleSdkCallback(lumino.callbacks.COMPLETED_PAYMENT, dispatch, callbackHandlers.successHandler);
-        }
-        if (callbackHandlers && callbackHandlers.errorHandler) {
-          handleSdkCallback(lumino.callbacks.FAILED_CREATE_PAYMENT, dispatch, callbackHandlers.errorHandler);
-          handleSdkCallback(lumino.callbacks.FAILED_PAYMENT, dispatch, callbackHandlers.errorHandler);
         }
         return resolve();
       });
@@ -708,8 +708,7 @@ function getTokensWithJoinedCheck () {
           tokens.map(token => {
             const tokenJoined = token;
             tokenJoined.joined = !!channels.find(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
-            const openedChannels = channels.find(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
-            tokenJoined.openedChannels = openedChannels || [];
+            tokenJoined.openedChannels = channels.filter(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
             tokensJoined.push(tokenJoined);
           });
           resolve(tokensJoined);

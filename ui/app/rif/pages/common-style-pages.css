@@ -32,6 +32,10 @@
   margin: 1em;
 }
 
+.form-segment>button {
+  margin: 0.2em;
+}
+
 .form-segment>span {
   width: 7em;
   overflow-wrap: break-word;

@@ -6,6 +6,7 @@ import NetworkDropdown from '../../../components/networks-dropdown';
 import TokenDropdown from '../../../components/tokens-dropdown';
 import {SLIP_ADDRESSES} from '../../../constants/slipAddresses';
 import rifActions from '../../../actions';
+import niftyActions from '../../../../actions';
 import {Tab, TabList, TabPanel, Tabs} from 'react-tabs';
 import {CallbackHandlers} from '../../../actions/callback-handlers';
 
@@ -23,7 +24,8 @@ class Pay extends Component {
     getTokens: PropTypes.func,
     showPopup: PropTypes.func,
     createDeposit: PropTypes.func,
-    showWarning: PropTypes.func,
+    showToast: PropTypes.func,
+    getSelectedAddress: PropTypes.func,
   }
 
   constructor (props) {
@@ -35,7 +37,6 @@ class Pay extends Component {
       selectedNetwork: null,
       loading: true,
       selectedToken: null,
-      deposit: '',
     };
   }
 
@@ -70,16 +71,6 @@ class Pay extends Component {
                       showOwnerIcon={domainInfo.isOwner}
                       showLuminoNodeIcon={domainInfo.isLuminoNode}
                       showRifStorageIcon={domainInfo.isRifStorage}/>
-      );
-    }
-  }
-
-  getDestinationFragment () {
-    if (!this.props.domainInfo) {
-      return (
-        <div className="form-segment">
-          <span>Destination:</span><input type="text" placeholder="Address or RNS Domain" onChange={event => this.changeDestination(event)} />
-        </div>
       );
     }
   }
@@ -136,15 +127,32 @@ class Pay extends Component {
   }
 
   sendNetworkPayment () {
-    this.props.sendNetworkPayment(this.state.selectedNetwork, this.state.destination, this.state.amount);
+    if (this.state.selectedNetwork && this.state.destination && this.state.amount) {
+      this.props.sendNetworkPayment(this.state.selectedNetwork, this.state.destination, this.state.amount);
+    } else {
+      this.props.showToast('You need to select a network and put the partner and amount first.', false);
+    }
   }
 
   sendLuminoPayment () {
     const callbackHandlers = new CallbackHandlers();
     callbackHandlers.successHandler = (result) => {
-      console.log('PAYMENT DONE!!!', result);
+      console.debug('PAYMENT REQUESTED', result);
+      this.props.showToast('Payment Sent');
     };
-    this.props.sendLuminoPayment(this.state.selectedToken, this.state.destination, this.state.amount, callbackHandlers);
+    callbackHandlers.successHandler = (result) => {
+      console.debug('PAYMENT DONE', result);
+      this.props.showToast('Payment Delivered');
+    };
+    callbackHandlers.successHandler = (error) => {
+      console.debug('PAYMENT ERROR', error);
+      this.props.showToast('Error trying to pay!', false);
+    };
+    if (this.state.selectedToken && this.state.destination && this.state.amount) {
+      this.props.sendLuminoPayment(this.state.selectedToken, this.state.destination, this.state.amount, callbackHandlers);
+    } else {
+      this.props.showToast('You need to select a token and put the partner and amount first.', false);
+    }
   }
 
   checkNetworkPaymentReady () {
@@ -152,7 +160,7 @@ class Pay extends Component {
   }
 
   checkLuminoPaymentReady () {
-    return this.state.amount && this.state.destination && this.state.selectedToken
+    return this.state.amount && this.state.destination && this.state.selectedToken;
   }
 
   readyToPay () {
@@ -176,105 +184,55 @@ class Pay extends Component {
     });
   }
 
-  tokenHasChannelOpened () {
-    if (this.state.selectedToken) {
-      return this.state.selectedToken.joined ? this.state.selectedToken.joined : false;
-    }
-    return false;
-  }
-
-  getTokenFragment (destination) {
-    let tokenDropdown = null;
-
-    if (!this.state.loading) {
-      tokenDropdown = (
-        <TokenDropdown onSelectedToken={(selectedToken) => this.onTokenChange(selectedToken)}
-                       defaultSelectedToken={this.getAllowedTokens()[0]}
-                       tokens={this.getAllowedTokens()}/>
-      );
-    }
-
-    if (this.tokenHasChannelOpened()) {
-      return (
-        <div>
-          {tokenDropdown}
-          <div>
-            <div className="form-segment">
-              <span>Amount:</span><input type="text" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
-            </div>
-            {destination}
-            <div className="form-segment">
-              <button onClick={() => this.depositOnChannel()}>Deposit</button>
-              <button disabled={!this.readyToPay()} onClick={() => this.sendLuminoPayment()}>Pay</button>
-            </div>
-          </div>
-        </div>
-      );
-    } else {
-      // we show a message that the user need to open channels on this particular token
-      return (
-        <div>
-          {tokenDropdown}
-          <div className="open-channel-message">
-            <div>
-              You need to open a channel with this token before you can pay with it
-            </div>
-          </div>
-          <div className="open-channel-button">
-            <button onClick={() => this.openChannel()}>Open Channel</button>
-          </div>
-        </div>
-      );
-    }
-  }
-
   depositOnChannel () {
     const callbackHandlers = new CallbackHandlers();
     callbackHandlers.requestHandler = (result) => {
+      this.props.showToast('Deposit Requested');
+    };
+    callbackHandlers.successHandler = (result) => {
+      console.debug('DEPOSIT CREATED', result);
+      this.props.showToast('Deposit Done');
       this.props.getTokens().then(tokens => {
         this.setState({
           tokens,
         });
       });
     };
-    callbackHandlers.successHandler = (result) => {
-      console.log('DEPOSIT CREATED!!!', result);
-    };
     callbackHandlers.errorHandler = (error) => {
-      this.props.showWarning(error);
+      console.debug('ERROR DEPOSIT', error);
+      this.props.showToast('Error trying to deposit!', false);
     };
-    const elements = [
-      (<input key="partner-input" type="text" placeholder="Partner Address" onChange={(event) => {
-        const destination = event.target.value;
-        if (destination) {
-          this.setState({
-            destination,
-          });
-        }
-      }} />),
-      (<input key="deposit-input" type="text" placeholder="Deposit Amount" onKeyDown={event => this.validateAmount(event)} onChange={(event) => {
-        const deposit = event.target.value;
-        if (deposit) {
-          this.setState({
-            deposit,
-          });
-        }
-      }} />),
-    ];
     this.props.showPopup('Deposit on Channel', {
-      elements,
+      text: 'Are you sure you want to deposit ' + this.state.amount + ' tokens?',
       confirmLabel: 'Deposit',
-      confirmCallback: () => {
-        console.log('Token', this.state.selectedToken);
-        console.log('Deposit', this.state.deposit);
-        console.log('Destination', this.state.destination);
+      confirmCallback: async () => {
+        if (this.state.destination && this.state.selectedToken && this.state.amount) {
+          const selectedAddress = await this.props.getSelectedAddress();
+          this.props.createDeposit(
+            this.state.destination,
+            this.state.selectedToken,
+            selectedAddress,
+            this.getOpenedChannelForPartner(this.state.destination).channel_identifier,
+            this.state.amount, callbackHandlers);
+        } else {
+          this.props.showToast('You need to fill with a partner address and an amount to deposit first.', false);
+        }
       },
     });
+  }
+
+  getOpenedChannelForPartner (partner) {
+    if (partner) {
+      return this.state.selectedToken.openedChannels
+        .find(openedChannel => openedChannel.partner_address === partner && openedChannel.sdk_status === 'CHANNEL_OPENED');
+    }
+    return null;
   }
 
   openChannel () {
     const callbackHandlers = new CallbackHandlers();
     callbackHandlers.requestHandler = (result) => {
+      this.props.showToast('Requesting open channel');
       this.props.getTokens().then(tokens => {
         this.setState({
           tokens,
@@ -284,35 +242,86 @@ class Pay extends Component {
     callbackHandlers.successHandler = (result) => {
       console.log('OPEN CHANNEL!!!', result);
       // TODO: this only will work with notifiers, we should move any logic after open channel to here instead of asuming that open channel was success
+      // this.props.getTokens().then(tokens => {
+      //   this.setState({
+      //     tokens,
+      //   });
+      // });
     };
     callbackHandlers.errorHandler = (error) => {
-      this.props.showWarning(error);
+      this.props.showToast(error, false);
     };
-    const elements = [
-      (<input key="partner-input" type="text" placeholder="Partner Address" onChange={(event) => {
-        const destination = event.target.value;
-        if (destination) {
-          this.setState({
-            destination,
-          });
-        }
-      }} />),
-    ];
     this.props.showPopup('Open Channel', {
-      elements,
+      text: 'Are you sure you want to open channel with this partner ' + this.state.destination + '?',
       confirmLabel: 'Open',
       confirmCallback: () => {
-        if (this.state.destination) {
+        if (this.state.destination && this.state.selectedToken) {
           this.props.openChannel(this.state.destination, this.state.selectedToken, callbackHandlers);
+        } else {
+          this.props.showToast('You need to fill with a partner address first.', false);
         }
       },
     });
   }
 
+  getDestinationFragment () {
+    return (
+      <div className="form-segment">
+        <span>Destination:</span><input type="text" placeholder="Address or RNS Domain" onChange={(event) => this.changeDestination(event)}/>
+      </div>
+    );
+  }
+
+  getNetworkPanel () {
+    return (
+      <div>
+        <NetworkDropdown onSelectedNetwork={(selectedNetwork => this.onNetworkChange(selectedNetwork))}
+                         defaultSelectedNetwork={this.getAllowedNetworks()[0]}
+                         networks={this.getAllowedNetworks()}/>
+        <div className="form-segment">
+          <span>Amount:</span><input type="text" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
+        </div>
+        {this.getDestinationFragment()}
+        <div className="form-segment">
+          <button disabled={!this.readyToPay()} onClick={() => this.sendNetworkPayment()}>Pay</button>
+        </div>
+      </div>
+    );
+  }
+
+  getTokenPanel () {
+    if (!this.state.loading) {
+      return (
+        <div>
+          <TokenDropdown onSelectedToken={(selectedToken) => this.onTokenChange(selectedToken)}
+                         defaultSelectedToken={this.getAllowedTokens()[0]}
+                         tokens={this.getAllowedTokens()}/>
+          <div>
+            <div className="form-segment">
+              <span>Amount:</span><input type="text" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
+            </div>
+            {this.getDestinationFragment()}
+            <div className="form-segment">
+              <button onClick={() => this.openChannel()}>Open Channel</button>
+              <button disabled={!this.readyToPay()} onClick={() => this.depositOnChannel()}>Deposit</button>
+              <button disabled={!this.readyToPay()} onClick={() => this.sendLuminoPayment()}>Pay</button>
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <span>Loading...</span>
+        </div>
+      );
+    }
+  }
+
   render () {
     const header = this.getHeaderFragment();
-    const destination = this.getDestinationFragment();
-    const tokenFragment = this.getTokenFragment(destination);
+    const tokenPanel = this.getTokenPanel();
+    const networkPanel = this.getNetworkPanel();
     return (
       <div className="body">
         {header}
@@ -321,21 +330,11 @@ class Pay extends Component {
             <Tab tabIndex="1">Pay</Tab>
             <Tab tabIndex="2">Pay with Lumino</Tab>
           </TabList>
-
           <TabPanel>
-            <NetworkDropdown onSelectedNetwork={(selectedNetwork => this.onNetworkChange(selectedNetwork))}
-                             defaultSelectedNetwork={this.getAllowedNetworks()[0]}
-                             networks={this.getAllowedNetworks()}/>
-            <div className="form-segment">
-              <span>Amount:</span><input type="text" onKeyDown={event => this.filterInput(event)} onChange={event => this.changeAmount(event)} />
-            </div>
-            {destination}
-            <div className="form-segment">
-              <button disabled={!this.readyToPay()} onClick={() => this.sendNetworkPayment()}>Send</button>
-            </div>
+            {networkPanel}
           </TabPanel>
           <TabPanel>
-            {tokenFragment}
+            {tokenPanel}
           </TabPanel>
         </Tabs>
       </div>
@@ -360,8 +359,8 @@ function mapDispatchToProps (dispatch) {
     openChannel: (partner, token, callbackHandlers) => {
       return dispatch(rifActions.openChannel(partner, token.address, callbackHandlers))
     },
-    createDeposit: (partner, token, channelId, amount, callbackHandlers) => {
-      return dispatch(rifActions.createDeposit(partner, token.address, null, token.token_network_address, channelId, amount, callbackHandlers))
+    createDeposit: (partner, token, address, channelId, amount, callbackHandlers) => {
+      return dispatch(rifActions.createDeposit(partner, token.address, address, token.network_address, channelId, amount, callbackHandlers))
     },
     getTokens: () => dispatch(rifActions.getTokensWithJoinedCheck()),
     showPopup: (title, opts) => {
@@ -370,6 +369,8 @@ function mapDispatchToProps (dispatch) {
         ...opts,
       }));
     },
+    showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
+    getSelectedAddress: () => dispatch(rifActions.getSelectedAddress()),
   }
 }
 module.exports = connect(mapStateToProps, mapDispatchToProps)(Pay)
