@@ -22,6 +22,7 @@ export class LuminoManager extends AbstractManager {
     this.callbacks = new LuminoCallbacks(this.lumino);
     this.keyringController = props.keyringController;
     this.signingHandler = new LuminoSigningHandler({
+      transactionController: this.transactionController,
       address: this.address,
       keyringController: this.keyringController,
     });
@@ -44,6 +45,7 @@ export class LuminoManager extends AbstractManager {
       const state = this.store.getState();
       if (state.apiKey && !cleanApiKey) {
         await this.operations.setApiKey(state.apiKey);
+        await this.operations.onboarding();
       } else {
         await this.operations.onboarding();
         state.apiKey = await this.operations.getApiKey();
@@ -64,7 +66,9 @@ export class LuminoManager extends AbstractManager {
 
   onAddressChanged (address) {
     super.onAddressChanged(address);
-    this.signingHandler.address = address;
+    if (this.signingHandler) {
+      this.signingHandler.address = address;
+    }
     this.initializeLumino(true);
   }
 

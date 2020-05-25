@@ -4,14 +4,14 @@ import {connect} from 'react-redux';
 import Select from 'react-select';
 import {DEFAULT_ICON} from '../../constants';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faTimes} from '@fortawesome/free-solid-svg-icons';
+import {faCheck, faTimes} from '@fortawesome/free-solid-svg-icons';
 
 class TokensDropdownOption extends Select.Option {
   render () {
     const { option } = this.props;
     let channelIcon = (<FontAwesomeIcon icon={faTimes} color={'#8b1a1a'}/>);
-    if (option.channels && option.channels.length > 0) {
-      channelIcon = (<FontAwesomeIcon icon={faTimes} color={'#3a9022'}/>);
+    if (option.joined) {
+      channelIcon = (<FontAwesomeIcon icon={faCheck} color={'#3a9022'}/>);
     }
     const icon = option.icon ? option.icon : DEFAULT_ICON;
     return (

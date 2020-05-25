@@ -14,6 +14,8 @@ export class LuminoExplorer {
         }).catch(err => reject(err));
     });
   }
+  // TODO: this method should return the channels per token no the token by address, or if the intention was to get
+  // TODO: the token by address then we should change the method name
   getChannelsForToken (tokenAddress) {
     return new Promise((resolve, reject) => {
       this.getTokens()

@@ -1,4 +1,4 @@
-import {toWei, toChecksumAddress} from 'web3-utils';
+import {toWei} from 'web3-utils';
 import {checkRequiredParameters, checksumAddresses} from '../utils/general';
 
 export class LuminoOperations {
@@ -9,8 +9,12 @@ export class LuminoOperations {
 
   onboarding () {
     console.debug('Onboarding Client');
-    this.lumino.get().actions.onboardingClient();
-    return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      this.lumino.get().actions.onboardingClient()
+        .then(() => {
+          resolve();
+        }).catch(error => reject(error));
+    });
   }
 
   getApiKey () {
