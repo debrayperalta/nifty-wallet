@@ -1,4 +1,4 @@
-import {LocalStorageHandler, Lumino} from '@rsksmart/lumino-light-client-sdk';
+import {Lumino} from '@rsksmart/lumino-light-client-sdk';
 import {lumino} from '../../../../../rif.config';
 import {LuminoSigningHandler} from './signing-handler';
 import {AbstractManager} from '../abstract-manager';
@@ -7,6 +7,7 @@ import {LuminoOperations} from './operations';
 import {LuminoCallbacks} from './callbacks';
 import ethUtils from 'ethereumjs-util';
 import { LuminoExplorer } from './explorer';
+import {LuminoStorageHandler} from './storage';
 
 /**
  * Manager to control the access to lumino api
@@ -41,7 +42,18 @@ export class LuminoManager extends AbstractManager {
         sign: (tx) => this.signingHandler.sign(tx),
         offChainSign: (byteMessage) => this.signingHandler.offChainSign(byteMessage),
       }
-      await this.lumino.init(signingHandler, LocalStorageHandler, configParams);
+      const luminoStorageHandler = new LuminoStorageHandler({
+        store: this.store,
+      });
+      const storageHandler = {
+        getLuminoData: () => {
+          return luminoStorageHandler.getLuminoData();
+        },
+        saveLuminoData: (data) => {
+          luminoStorageHandler.saveLuminoData(data);
+        },
+      }
+      await this.lumino.init(signingHandler, storageHandler, configParams);
       const state = this.store.getState();
       if (state.apiKey && !cleanApiKey) {
         await this.operations.setApiKey(state.apiKey);

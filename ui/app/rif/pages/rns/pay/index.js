@@ -21,6 +21,9 @@ class Pay extends Component {
     sendNetworkPayment: PropTypes.func,
     openChannel: PropTypes.func,
     getTokens: PropTypes.func,
+    showPopup: PropTypes.func,
+    createDeposit: PropTypes.func,
+    showWarning: PropTypes.func,
   }
 
   constructor (props) {
@@ -32,6 +35,7 @@ class Pay extends Component {
       selectedNetwork: null,
       loading: true,
       selectedToken: null,
+      deposit: '',
     };
   }
 
@@ -92,7 +96,7 @@ class Pay extends Component {
     });
   }
 
-  filterInput (event) {
+  validateAmount (event) {
     const keyCode = event.keyCode;
     const key = event.key;
     const decimalSeparator = this.props.decimalSeparator ? this.props.decimalSeparator : this.defaultDecimalSeparator;
@@ -196,11 +200,12 @@ class Pay extends Component {
           {tokenDropdown}
           <div>
             <div className="form-segment">
-              <span>Amount:</span><input type="text" onKeyDown={event => this.filterInput(event)} onChange={event => this.changeAmount(event)} />
+              <span>Amount:</span><input type="text" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
             </div>
             {destination}
             <div className="form-segment">
-              <button disabled={!this.readyToPay()} onClick={() => this.sendLuminoPayment()}>Send</button>
+              <button onClick={() => this.depositOnChannel()}>Deposit</button>
+              <button disabled={!this.readyToPay()} onClick={() => this.sendLuminoPayment()}>Pay</button>
             </div>
           </div>
         </div>
@@ -223,21 +228,85 @@ class Pay extends Component {
     }
   }
 
+  depositOnChannel () {
+    const callbackHandlers = new CallbackHandlers();
+    callbackHandlers.requestHandler = (result) => {
+      this.props.getTokens().then(tokens => {
+        this.setState({
+          tokens,
+        });
+      });
+    };
+    callbackHandlers.successHandler = (result) => {
+      console.log('DEPOSIT CREATED!!!', result);
+    };
+    callbackHandlers.errorHandler = (error) => {
+      this.props.showWarning(error);
+    };
+    const elements = [
+      (<input key="partner-input" type="text" placeholder="Partner Address" onChange={(event) => {
+        const destination = event.target.value;
+        if (destination) {
+          this.setState({
+            destination,
+          });
+        }
+      }} />),
+      (<input key="deposit-input" type="text" placeholder="Deposit Amount" onKeyDown={event => this.validateAmount(event)} onChange={(event) => {
+        const deposit = event.target.value;
+        if (deposit) {
+          this.setState({
+            deposit,
+          });
+        }
+      }} />),
+    ];
+    this.props.showPopup('Deposit on Channel', {
+      elements,
+      confirmLabel: 'Deposit',
+      confirmCallback: () => {
+        console.log('Token', this.state.selectedToken);
+        console.log('Deposit', this.state.deposit);
+        console.log('Destination', this.state.destination);
+      },
+    });
+  }
+
   openChannel () {
     const callbackHandlers = new CallbackHandlers();
     callbackHandlers.requestHandler = (result) => {
-      console.log('REQUEST OPEN CHANNEL!!!', result);
+      this.props.getTokens().then(tokens => {
+        this.setState({
+          tokens,
+        });
+      });
     };
     callbackHandlers.successHandler = (result) => {
       console.log('OPEN CHANNEL!!!', result);
+      // TODO: this only will work with notifiers, we should move any logic after open channel to here instead of asuming that open channel was success
     };
-    callbackHandlers.errorHandler = (result) => {
-      console.log('ERROR OPEN CHANNEL!!!', result);
+    callbackHandlers.errorHandler = (error) => {
+      this.props.showWarning(error);
     };
-    const destination = window.prompt('Please input the partner address');
-    if (destination) {
-      this.props.openChannel(destination, this.state.selectedToken, callbackHandlers);
-    }
+    const elements = [
+      (<input key="partner-input" type="text" placeholder="Partner Address" onChange={(event) => {
+        const destination = event.target.value;
+        if (destination) {
+          this.setState({
+            destination,
+          });
+        }
+      }} />),
+    ];
+    this.props.showPopup('Open Channel', {
+      elements,
+      confirmLabel: 'Open',
+      confirmCallback: () => {
+        if (this.state.destination) {
+          this.props.openChannel(this.state.destination, this.state.selectedToken, callbackHandlers);
+        }
+      },
+    });
   }
 
   render () {
@@ -291,7 +360,16 @@ function mapDispatchToProps (dispatch) {
     openChannel: (partner, token, callbackHandlers) => {
       return dispatch(rifActions.openChannel(partner, token.address, callbackHandlers))
     },
+    createDeposit: (partner, token, channelId, amount, callbackHandlers) => {
+      return dispatch(rifActions.createDeposit(partner, token.address, null, token.token_network_address, channelId, amount, callbackHandlers))
+    },
     getTokens: () => dispatch(rifActions.getTokensWithJoinedCheck()),
+    showPopup: (title, opts) => {
+      dispatch(rifActions.showModal({
+        title,
+        ...opts,
+      }));
+    },
   }
 }
 module.exports = connect(mapStateToProps, mapDispatchToProps)(Pay)
