@@ -127,11 +127,17 @@ class Pay extends Component {
   }
 
   sendNetworkPayment () {
-    if (this.state.selectedNetwork && this.state.destination && this.state.amount) {
-      this.props.sendNetworkPayment(this.state.selectedNetwork, this.state.destination, this.state.amount);
-    } else {
-      this.props.showToast('You need to select a network and put the partner and amount first.', false);
-    }
+    this.props.showPopup('Pay', {
+      text: 'Are you sure you want to pay ' + this.state.amount + ' to partner ' + this.state.destination + '?',
+      confirmLabel: 'Pay',
+      confirmCallback: async () => {
+        if (this.state.selectedNetwork && this.state.destination && this.state.amount) {
+          this.props.sendNetworkPayment(this.state.selectedNetwork, this.state.destination, this.state.amount);
+        } else {
+          this.props.showToast('You need to select a network and put the partner and amount first.', false);
+        }
+      },
+    });
   }
 
   sendLuminoPayment () {
@@ -148,11 +154,17 @@ class Pay extends Component {
       console.debug('PAYMENT ERROR', error);
       this.props.showToast('Error trying to pay!', false);
     };
-    if (this.state.selectedToken && this.state.destination && this.state.amount) {
-      this.props.sendLuminoPayment(this.state.selectedToken, this.state.destination, this.state.amount, callbackHandlers);
-    } else {
-      this.props.showToast('You need to select a token and put the partner and amount first.', false);
-    }
+    this.props.showPopup('Pay', {
+      text: 'Are you sure you want to pay ' + this.state.amount + ' tokens to partner ' + this.state.destination + '?',
+      confirmLabel: 'Pay',
+      confirmCallback: async () => {
+        if (this.state.selectedToken && this.state.destination && this.state.amount) {
+          this.props.sendLuminoPayment(this.state.selectedToken, this.state.destination, this.state.amount, callbackHandlers);
+        } else {
+          this.props.showToast('You need to select a token and put the partner and amount first.', false);
+        }
+      },
+    });
   }
 
   checkNetworkPaymentReady () {
@@ -163,7 +175,11 @@ class Pay extends Component {
     return this.state.amount && this.state.destination && this.state.selectedToken;
   }
 
-  readyToPay () {
+  readyToOpenChannel () {
+    return !!this.state.destination;
+  }
+
+  readyToPayOrDeposit () {
     switch (this.state.tabIndex) {
       case '1':
         return this.checkNetworkPaymentReady();
@@ -302,9 +318,9 @@ class Pay extends Component {
             </div>
             {this.getDestinationFragment()}
             <div className="form-segment">
-              <button onClick={() => this.openChannel()}>Open Channel</button>
-              <button disabled={!this.readyToPay()} onClick={() => this.depositOnChannel()}>Deposit</button>
-              <button disabled={!this.readyToPay()} onClick={() => this.sendLuminoPayment()}>Pay</button>
+              <button disabled={!this.readyToOpenChannel()} onClick={() => this.openChannel()}>Open Channel</button>
+              <button disabled={!this.readyToPayOrDeposit()} onClick={() => this.depositOnChannel()}>Deposit</button>
+              <button disabled={!this.readyToPayOrDeposit()} onClick={() => this.sendLuminoPayment()}>Pay</button>
             </div>
           </div>
         </div>
