@@ -4,7 +4,7 @@ import {DomainIcon, LuminoNodeIcon, RifStorageIcon} from './commons'
 import Menu from './menu/index'
 import h from 'react-hyperscript'
 import CustomModal from './modal/modal';
-import { Logo, Channels, JoinedChip } from './tokens';
+import { Logo, Channels, JoinedChip, ChannelStatusChip } from './tokens';
 
 function buildModal (modalComponent, currentModal) {
   return h(modalComponent, {key: currentModal.name, message: currentModal.message})
@@ -31,4 +31,5 @@ export {
   Logo,
   Channels,
   JoinedChip,
+  ChannelStatusChip,
 }

@@ -29,14 +29,28 @@ const Channels = (className, channelsLength) => {
 const JoinedChip = (className, joined) => {
   return (<div className={
     ((className && className.tokenInfoStatus) ? className.tokenInfoStatus : '') +
-      (joined ? ((className && className.tokenInfoStatusJoined) ? className.tokenInfoStatusJoined : '') :
-        ((className && className.tokenInfoStatusUnJoined) ? className.tokenInfoStatusUnJoined : ''))}>
+    (joined ? ((className && className.tokenInfoStatusJoined) ? className.tokenInfoStatusJoined : '') :
+      ((className && className.tokenInfoStatusUnJoined) ? className.tokenInfoStatusUnJoined : ''))}>
     {joined ? JOINED_TEXT : UNJOINED_TEXT}
   </div>);
+}
+
+const ChannelStatusChip = (status) => {
+  let retChannelStatus = <div className={'channel-chiplet channel-chiplet-close'}>
+      {status.toUpperCase()}
+    </div>;
+  if (status.toLowerCase() === 'open') {
+    retChannelStatus =
+      <div className={'channel-chiplet channel-chiplet-open'}>
+        {status.toUpperCase()}
+      </div>
+  }
+  return retChannelStatus;
 }
 
 export {
   Logo,
   Channels,
   JoinedChip,
+  ChannelStatusChip,
 }
