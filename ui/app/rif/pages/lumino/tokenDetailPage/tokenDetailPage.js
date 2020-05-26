@@ -4,9 +4,8 @@ import {pageNames} from '../../index';
 import rifActions from '../../../actions';
 import PropTypes from 'prop-types';
 import Token from '../../../classes/token';
-import { Logo, Channels, JoinedChip, ChannelStatusChip } from '../../../components';
-import { tokenIcons } from '../../../constants';
-import { getStatusForChannel } from '../../../utils/utils'
+import {Channels, JoinedChip, Logo, ChannelChiplet} from '../../../components';
+import {tokenIcons} from '../../../constants';
 
 const mockChannels = {
   '2-0xa00a2145d01EaCd500E6e196296839D0E4b8654D': {
@@ -15,7 +14,7 @@ const mockChannels = {
     'token_address': '0xa00a2145d01EaCd500E6e196296839D0E4b8654D',
     'balance': 0,
     'reveal_timeout': 50,
-    'partner_address': '0x64170130Af2E2e638C01a9492f8268D0E28e3233',
+    'partner_address': '0x29f0Ddd2A7721b5F1Dcd79fBCaa97D15d0c9C0F3',
     'token_network_identifier': '0x4202D38Cde22C666C1A021B2bA1e6b5F65cbe0bA',
     'state': 'opened',
     'channel_identifier': 2,
@@ -40,7 +39,7 @@ const mockChannels = {
     'token_address': '0xA850E59b0b9Da8c76D37029bC6A6373edebD3C4b',
     'balance': 0,
     'reveal_timeout': 50,
-    'partner_address': '0x64170130Af2E2e638C01a9492f8268D0E28e3233',
+    'partner_address': '0x29f0Ddd2A7721b5F1Dcd79fBCaa97D15d0c9C0F3',
     'token_network_identifier': '0x1aE0bdec5d5cC81cD18b1567a63460769F188836',
     'state': 'opened',
     'channel_identifier': 2,
@@ -65,7 +64,7 @@ const mockChannels = {
     'token_address': '0x0319b08220f83EAD273cC09531f6d0F96269b5bF',
     'balance': 0,
     'reveal_timeout': 50,
-    'partner_address': '0x64170130Af2E2e638C01a9492f8268D0E28e3233',
+    'partner_address': '0x29f0Ddd2A7721b5F1Dcd79fBCaa97D15d0c9C0F3',
     'token_network_identifier': '0x07adc7b6A303575b78617c0AF351B19759A5404e',
     'state': 'opened',
     'channel_identifier': 1,
@@ -109,23 +108,11 @@ class LuminoTokenDetailPage extends Component {
     token: PropTypes.object,
     showThis: PropTypes.func,
     getChannels: PropTypes.func,
+    getDomainByAddress: PropTypes.func,
   }
-
   render () {
     const { token } = this.props;
     const icon = tokenIcons[token.symbol.toLowerCase()];
-    // TODO: Rodrigo
-    // Resolve address with RNS
-    const channelChiplet = (index, balance, status, tokenSymbol) =>
-      <div key={index} className={'channels-info-chiplet'}>
-        <div className={'channels-info-chiplet-text'}>
-          <div className={'channels-info-chiplet-text-domain'}>Pixel.rsk</div>
-          <div className={'channels-info-chiplet-text-balance'}>Your balance: <span>{balance} {tokenSymbol}</span></div>
-        </div>
-        <div className={'channels-info-chiplet-status'}>
-          <div>{ChannelStatusChip(getStatusForChannel(status))}</div>
-        </div>
-      </div>
     if (token) {
       return (<div className={'body'}>
         <div id="TokenDescription" className={'token-description align-left'} >
@@ -175,7 +162,7 @@ class LuminoTokenDetailPage extends Component {
             token.userChannels &&
             token.userChannels.map((channel, index) => {
               return (
-                channelChiplet(index, channel.balance, channel.sdk_status, token.symbol)
+                <ChannelChiplet key={index} address={channel.partner_address} balance={channel.balance} status={channel.sdk_status} symbol={token.symbol} />
               )
             })
           }
@@ -205,6 +192,7 @@ const mapDispatchToProps = dispatch => {
   return {
     showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokensPage, params)),
     getChannels: () => dispatch(rifActions.getChannels()),
+    getDomainByAddress: (address) => dispatch(rifActions.getDomainByAddress(address)),
   }
 }
 

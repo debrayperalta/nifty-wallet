@@ -2,6 +2,7 @@ import React from 'react';
 import {DEFAULT_ICON, PATH_TO_RIF_IMAGES, JOINED_TEXT, UNJOINED_TEXT} from '../../constants';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {brandConnections} from '../../constants/icons';
+import ChannelChiplet from './ChannelChiplet';
 
 const Logo = (className, icon) => {
   return (<div className={(className && className.tokenLogo) ? className.tokenLogo : ''}>
@@ -53,4 +54,5 @@ export {
   Channels,
   JoinedChip,
   ChannelStatusChip,
+  ChannelChiplet,
 }

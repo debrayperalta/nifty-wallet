@@ -2,7 +2,6 @@
   width: 90%;
   float: left;
   border-bottom: 0.05em solid #cdcdcd;
-  margin-left: 5%;
   margin-top: 0.25em;
   padding: 0.5em;
 }
@@ -64,15 +63,9 @@
   color: #50644c;
   cursor: pointer;
 }
-.channels-info{
-  width: 100%;
-  float: left;
-  margin-top: 1em;
-}
 .channels-info {
   width: 90%;
   float: left;
-  margin-left: 5%;
   margin-top: 0.25em;
   padding: 0.5em;
 }
@@ -93,6 +86,9 @@
 }
 .channels-info-chiplet-text-domain {
   font: 1.25em bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .channels-info-chiplet-text-balance {
   padding: 0.25em;

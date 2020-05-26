@@ -146,11 +146,9 @@ function getDomainDetails (domainName) {
 
 function getDomainByAddress(address) {
   return (dispatch) => {
-    dispatch(niftyActions.showLoadingIndication());
     return new Promise((resolve, reject) => {
       background.rif.rns.resolver.getAddressDomain(address, (error, domain) => {
         console.debug('this is the domain bringed', domain);
-        dispatch(niftyActions.hideLoadingIndication());
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
