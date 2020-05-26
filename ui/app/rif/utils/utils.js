@@ -13,8 +13,13 @@ const getStatusForChannel = (SDK_STATUS) => {
       return 'CLOSE';
   }
 }
-
+const sumValuesOfArray = (items, prop) => {
+  return items.reduce( function(a, b){
+    return a + b[prop];
+  }, 0);
+};
 export {
   getChainAddressByChainAddress,
   getStatusForChannel,
+  sumValuesOfArray,
 }

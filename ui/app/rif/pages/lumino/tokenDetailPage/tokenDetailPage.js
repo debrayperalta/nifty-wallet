@@ -98,7 +98,7 @@ class LuminoTokenDetailPage extends Component {
 
 function mapStateToProps (state) {
   const params = state.appState.currentView.params;
-  const token = new Token(params.name, params.symbol, params.address, params.channels, params.openedChannels, params.network_address, params.joined);
+  const token = new Token(params.name, params.symbol, params.address, params.channels, params.openedChannels, params.network_address, params.joined, params.userBalance);
   return {
     dispatch: state.dispatch,
     token: token,

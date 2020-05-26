@@ -1,5 +1,5 @@
 export default class Token {
-  constructor (name, symbol, address, networkChannels, userChannels, networkAddress, joined) {
+  constructor (name, symbol, address, networkChannels, userChannels, networkAddress, joined, userBalance) {
     this.name = name;
     this.symbol = symbol;
     this.address = address;
@@ -7,5 +7,6 @@ export default class Token {
     this.userChannels = userChannels;
     this.network_address = networkAddress;
     this.joined = joined;
+    this.userBalance = userBalance;
   }
 }

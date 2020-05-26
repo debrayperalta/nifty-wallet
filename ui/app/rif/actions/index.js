@@ -3,6 +3,7 @@ import extend from 'xtend';
 import {lumino} from '../../../../app/scripts/controllers/rif/constants';
 import {CallbackHandlers} from './callback-handlers';
 import ethUtils from 'ethereumjs-util';
+import { sumValuesOfArray } from '../utils/utils';
 
 const rifActions = {
   SHOW_MODAL: 'SHOW_MODAL',
@@ -725,7 +726,9 @@ function getTokensWithJoinedCheck () {
             const tokenJoined = token;
             tokenJoined.joined = !!channels.find(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
             const openedChannels = channels.find(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
+            const userBalance = sumValuesOfArray(openedChannels, 'balance');
             tokenJoined.openedChannels = openedChannels || [];
+            tokenJoined.userBalance = userBalance;
             tokensJoined.push(tokenJoined);
           });
           resolve(tokensJoined);
