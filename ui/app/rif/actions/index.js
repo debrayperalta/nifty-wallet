@@ -145,6 +145,10 @@ function getDomainDetails (domainName) {
   }
 }
 
+/*
+  TODO: rorolopetegui
+   This action isn't used for now, but it resolves an address using reverse lookup
+ */
 function getDomainByAddress(address) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
