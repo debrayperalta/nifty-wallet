@@ -31,6 +31,8 @@ class LuminoTokenDetailPage extends Component {
     showThis: PropTypes.func,
     getChannels: PropTypes.func,
     getDomainByAddress: PropTypes.func,
+    joinNetwork: PropTypes.func,
+    leaveNetwork: PropTypes.func,
   }
   render () {
     const { token } = this.props;
@@ -49,7 +51,7 @@ class LuminoTokenDetailPage extends Component {
           </div>
           <div id="TokenDeposit" className={'token-deposit align-left'}>
             <div id="TokenSymbol" className={'token-deposit-text align-right'}>
-              0.000005 BTC
+              {token.userBalance || 0} {token.symbol}
             </div>
             <div id="TokenName" className={'token-deposit-text align-right'}>
               1 USD
@@ -76,17 +78,23 @@ class LuminoTokenDetailPage extends Component {
         <div id="ChannelsInfo" className={'channels-info'}>
           {
             !token.userChannels &&
+            <div>
               <span>
                 You don't have any channel on this network
               </span>
+              <div className={'join-network-button'} onClick={() => this.props.joinNetwork()}>JOIN NETWORK</div>
+            </div>
           }
           {
             token.userChannels &&
-            token.userChannels.map((channel, index) => {
-              return (
-                <ChannelChiplet key={index} address={channel.partner_address} balance={channel.balance} status={channel.sdk_status} symbol={token.symbol} />
-              )
-            })
+              <div>
+                {token.userChannels.map((channel, index) => {
+                  return (
+                    <ChannelChiplet key={index} address={channel.partner_address} balance={channel.balance} status={channel.sdk_status} symbol={token.symbol} />
+                  )
+                })}
+                <div className={'leave-network-button'} onClick={() => this.props.leaveNetwork()}>LEAVE NETWORK</div>
+              </div>
           }
         </div>
       </div>)
@@ -111,6 +119,8 @@ const mapDispatchToProps = dispatch => {
     showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokensPage, params)),
     getChannels: () => dispatch(rifActions.getChannels()),
     getDomainByAddress: (address) => dispatch(rifActions.getDomainByAddress(address)),
+    joinNetwork: () => {},
+    leaveNetwork: () => {},
   }
 }
 

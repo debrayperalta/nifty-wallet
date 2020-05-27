@@ -3,6 +3,7 @@
   float: left;
   border-bottom: 0.05em solid #cdcdcd;
   margin-top: 0.25em;
+  margin-left: 5%;
   padding: 0.5em;
 }
 .token-name-desc{
@@ -95,4 +96,28 @@
 }
 .channels-info-chiplet-text-balance span {
   font-weight: bold;
+}
+.join-network-button {
+  width: 100%;
+  margin-left: 5%;
+  background-color: #00a538;
+  color: white;
+  text-align: center;
+  border-radius: 0.5em;
+  cursor: pointer;
+  font: 1.5em bold;
+  padding: 0.25em;
+  margin-top: 25%;
+}
+.leave-network-button {
+  width: 100%;
+  margin-left: 5%;
+  background-color: #ff0119;
+  color: white;
+  text-align: center;
+  border-radius: 0.5em;
+  cursor: pointer;
+  font: 1.5em bold;
+  padding: 0.25em;
+  margin-top: 10%;
 }
