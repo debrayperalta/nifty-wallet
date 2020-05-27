@@ -7,8 +7,8 @@ import TokenDropdown from '../../../components/tokens-dropdown';
 import {SLIP_ADDRESSES} from '../../../constants/slipAddresses';
 import rifActions from '../../../actions';
 import niftyActions from '../../../../actions';
-import {Tab, TabList, TabPanel, Tabs} from 'react-tabs';
 import {CallbackHandlers} from '../../../actions/callback-handlers';
+import Tabs from '../../../components/tabs';
 
 class Pay extends Component {
 
@@ -334,25 +334,30 @@ class Pay extends Component {
     }
   }
 
+  getTabs (networkPanel, tokenPanel) {
+    return [
+      {
+        title: 'Pay',
+        index: 0,
+        component: networkPanel,
+      },
+      {
+        title: 'Pay with Lumino',
+        index: 1,
+        component: tokenPanel,
+      },
+    ];
+  }
+
   render () {
     const header = this.getHeaderFragment();
     const tokenPanel = this.getTokenPanel();
     const networkPanel = this.getNetworkPanel();
+    const tabs = this.getTabs(networkPanel, tokenPanel);
     return (
       <div className="body">
         {header}
-        <Tabs onSelect={(index) => this.onTabChange(index)}>
-          <TabList>
-            <Tab tabIndex="1">Pay</Tab>
-            <Tab tabIndex="2">Pay with Lumino</Tab>
-          </TabList>
-          <TabPanel>
-            {networkPanel}
-          </TabPanel>
-          <TabPanel>
-            {tokenPanel}
-          </TabPanel>
-        </Tabs>
+        <Tabs tabs={tabs} onChange={(tab) => this.onTabChange(tab.index)} />
       </div>
     );
   }

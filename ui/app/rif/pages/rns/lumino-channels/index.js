@@ -6,7 +6,7 @@ class LuminoChannels extends Component {
   static propTypes = {}
 
   render () {
-    return (<div>LuminoChannels</div>);
+    return (<div className="body">LuminoChannels</div>);
   }
 }
 function mapStateToProps (state) {

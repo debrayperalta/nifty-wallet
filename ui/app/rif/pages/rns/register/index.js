@@ -325,7 +325,7 @@ class DomainRegisterScreen extends Component {
     const registerBody = this.getBody(this.props.currentStep ? this.props.currentStep : 'available');
     const registerButtons = this.getButtons(this.props.currentStep ? this.props.currentStep : 'available');
     return (
-      <div className={'body'}>
+      <div className="body">
         <div id="headerName" className={'domain-name'}>
           <div>{this.props.domainName}</div>
         </div>

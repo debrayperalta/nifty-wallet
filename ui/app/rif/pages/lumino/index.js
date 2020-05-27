@@ -1,16 +1,16 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 
-class Transfer extends Component {
+class LuminoHome extends Component {
 
   static propTypes = {}
 
   render () {
-    return (<div className="body">Transfer</div>);
+    return (<div className="body">LuminoHome</div>);
   }
 }
 function mapStateToProps (state) {
-  // params is the params value or object passet to rifActions.navigateTo('pageName', params)
+  // params is the params value or object passed to rifActions.navigateTo('pageName', params)
   const params = state.appState.currentView.params;
   return {}
 }
@@ -18,4 +18,4 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {}
 }
-module.exports = connect(mapStateToProps, mapDispatchToProps)(Transfer)
+module.exports = connect(mapStateToProps, mapDispatchToProps)(LuminoHome)

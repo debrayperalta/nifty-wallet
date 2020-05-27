@@ -8,6 +8,7 @@ const rifActions = {
   SHOW_MODAL: 'SHOW_MODAL',
   SHOW_MENU: 'SHOW_MENU',
   NAVIGATE_TO: 'NAVIGATE_TO',
+  RIF_LANDING_PAGE: 'RIF_LANDING_PAGE',
   setBackgroundConnection,
   // RNS
   checkDomainAvailable,
@@ -49,6 +50,7 @@ const rifActions = {
   createDeposit,
   getTokens,
   cleanStore,
+  showRifLandingPage,
 }
 
 let background = null;
@@ -326,7 +328,7 @@ function navigateBack () {
     }
     if (navigationStack.length > 0) {
       const navigation = navigationStack.pop();
-      return navigateTo(navigation.data.screenName, navigation.data.params);
+      return navigateTo(navigation.params.name, navigation.params);
     }
   }
   // go to home since we don't have any other page to go to.
@@ -335,18 +337,12 @@ function navigateBack () {
 
 function navigateTo (screenName, params) {
   const defaultParams = {
-    showDomainsSearch: true,
-  };
-
-  const defaultNavBarParams = {
-    showTitle: true,
+    title: screenName,
     showBack: true,
+    name: screenName,
   };
-
   params = extend(defaultParams, params);
-  params.navBar = extend(defaultNavBarParams, params.navBar);
-
-  if (params.navBar.showBack === false) {
+  if (params.showBack === false) {
     // we reset the navigation since we can't go back in the next page or any other after that
     for (let index = 0; index < navigationStack.length; index++) {
       navigationStack.pop();
@@ -355,12 +351,9 @@ function navigateTo (screenName, params) {
 
   const currentNavigation = {
     type: rifActions.NAVIGATE_TO,
-    data: {
-      screenName,
-      params,
-    },
+    params,
   }
-  const alreadyNavigatedTo = navigationStack.find(navigation => navigation.data.screenName === screenName);
+  const alreadyNavigatedTo = navigationStack.find(navigation => navigation.params.name === screenName);
   if (!alreadyNavigatedTo) {
     navigationStack.push(currentNavigation);
   }
@@ -736,6 +729,15 @@ function cleanStore () {
       });
     });
   };
+}
+
+function showRifLandingPage () {
+  return {
+    type: rifActions.RIF_LANDING_PAGE,
+    params: {
+      showBack: true,
+    },
+  }
 }
 
 module.exports = rifActions

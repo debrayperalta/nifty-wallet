@@ -6,7 +6,7 @@ class Renew extends Component {
   static propTypes = {}
 
   render () {
-    return (<div>Renew</div>);
+    return (<div className="body">Renew</div>);
   }
 }
 function mapStateToProps (state) {
