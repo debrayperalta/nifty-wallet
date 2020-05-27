@@ -30,7 +30,6 @@ class LuminoTokenDetailPage extends Component {
     token: PropTypes.object,
     showThis: PropTypes.func,
     getChannels: PropTypes.func,
-    getDomainByAddress: PropTypes.func,
     joinNetwork: PropTypes.func,
     leaveNetwork: PropTypes.func,
   }
@@ -77,7 +76,7 @@ class LuminoTokenDetailPage extends Component {
         </div>
         <div id="ChannelsInfo" className={'channels-info'}>
           {
-            !token.userChannels &&
+            token.userChannels.length === 0 &&
             <div>
               <span>
                 You don't have any channel on this network
@@ -86,7 +85,7 @@ class LuminoTokenDetailPage extends Component {
             </div>
           }
           {
-            token.userChannels &&
+            token.userChannels.length > 0 &&
               <div>
                 {token.userChannels.map((channel, index) => {
                 return (
@@ -118,7 +117,6 @@ const mapDispatchToProps = dispatch => {
   return {
     showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokensPage, params)),
     getChannels: () => dispatch(rifActions.getChannels()),
-    getDomainByAddress: (address) => dispatch(rifActions.getDomainByAddress(address)),
     joinNetwork: () => {},
     leaveNetwork: () => {},
   }

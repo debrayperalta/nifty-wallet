@@ -4,15 +4,10 @@ import {connect} from 'react-redux';
 import Select from 'react-select';
 import {DEFAULT_ICON} from '../../constants';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faCheck, faTimes} from '@fortawesome/free-solid-svg-icons';
 
 class TokensDropdownOption extends Select.Option {
   render () {
     const { option } = this.props;
-    let channelIcon = (<FontAwesomeIcon icon={faTimes} color={'#8b1a1a'}/>);
-    if (option.joined) {
-      channelIcon = (<FontAwesomeIcon icon={faCheck} color={'#3a9022'}/>);
-    }
     const icon = option.icon ? option.icon : DEFAULT_ICON;
     return (
       <div
@@ -32,7 +27,6 @@ class TokensDropdownOption extends Select.Option {
           <FontAwesomeIcon className="add-new-multicrypto-select-value-icon" icon={icon.icon} color={icon.color}/>
           <span className="label-spacing-left">{option.name}</span>
         </div>
-        {channelIcon}
       </div>
     )
   }

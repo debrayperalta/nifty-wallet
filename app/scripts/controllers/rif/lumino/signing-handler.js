@@ -21,18 +21,20 @@ export class LuminoSigningHandler {
     return signedTransaction
   }
 
-  async offChainSign (plainMessage) {
+  async offChainSign (plainOrByteMessage) {
+    let message;
     try {
-      const message = ethUtils.toBuffer(plainMessage);
-      const messageHash = ethUtils.hashPersonalMessage(message);
-      const offChainSign = await this.keyringController.signMessage({
-        from: this.address,
-        data: messageHash,
-      });
-      console.debug('Lumino Signed Message', offChainSign);
-      return offChainSign;
+      message = ethUtils.toBuffer(plainOrByteMessage);
     } catch (error) {
-      console.error(error);
+      console.debug(error);
+      message = plainOrByteMessage;
     }
+    const messageHash = ethUtils.hashPersonalMessage(message);
+    const offChainSign = await this.keyringController.signMessage({
+      from: this.address,
+      data: messageHash,
+    });
+    console.debug('Lumino Signed Message', offChainSign);
+    return offChainSign;
   }
 }
