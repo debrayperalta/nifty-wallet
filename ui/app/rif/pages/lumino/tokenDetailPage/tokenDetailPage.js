@@ -89,10 +89,10 @@ class LuminoTokenDetailPage extends Component {
             token.userChannels &&
               <div>
                 {token.userChannels.map((channel, index) => {
-                  return (
-                    <ChannelChiplet key={index} address={channel.partner_address} balance={channel.balance} status={channel.sdk_status} symbol={token.symbol} />
-                  )
-                })}
+                return (
+                  <ChannelChiplet key={index} address={channel.partner_address} balance={channel.balance} status={channel.sdk_status} symbol={token.symbol} />
+                )
+              })}
                 <div className={'leave-network-button'} onClick={() => this.props.leaveNetwork()}>LEAVE NETWORK</div>
               </div>
           }
