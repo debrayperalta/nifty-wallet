@@ -299,7 +299,7 @@ class Pay extends Component {
         </div>
         {this.getDestinationFragment()}
         <div className="form-segment">
-          <button disabled={!this.readyToPay()} onClick={() => this.sendNetworkPayment()}>Pay</button>
+          <button disabled={!this.readyToPayOrDeposit()} onClick={() => this.sendNetworkPayment()}>Pay</button>
         </div>
       </div>
     );
