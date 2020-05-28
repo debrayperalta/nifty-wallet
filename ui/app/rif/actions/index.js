@@ -343,6 +343,11 @@ function navigateTo (screenName, params, resetNavigation = false) {
     screenName,
     tabIndex: 0,
   };
+  if (!params) {
+    params = {
+      tabOptions: defaultTabOptions,
+    };
+  }
   if (params.tabOptions) {
     params.tabOptions = extend(defaultTabOptions, params.tabOptions);
   }
