@@ -323,6 +323,7 @@ gulp.task('zip', gulp.parallel('zip:chrome', 'zip:firefox', 'zip:edge', 'zip:ope
 // high level tasks
 
 gulp.task('rifCss', watchRifCss)
+gulp.task('rifConfig', rifConfig)
 
 gulp.task('dev',
   gulp.series(
@@ -339,6 +340,7 @@ gulp.task('dev',
 gulp.task('dev:extension',
   gulp.series(
     'clean',
+    'rifConfig',
     'rifCss',
     gulp.parallel(
       'dev:extension:js',
@@ -362,6 +364,7 @@ gulp.task('dev:mascara',
 gulp.task('build',
   gulp.series(
     'clean',
+    'rifConfig',
     'rifCss',
     gulpParallel(
       'build:extension:js',
@@ -526,6 +529,12 @@ function bundleTask (opts) {
 
 function beep () {
   process.stdout.write('\x07')
+}
+
+function rifConfig () {
+  const environment = 'local';
+  return gulp.src(`rif/rif.config.${environment}.js`)
+    .pipe(gulp.dest('rif.config.js'))
 }
 
 function watchRifCss () {
