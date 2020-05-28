@@ -30,7 +30,7 @@ class DomainRegisterScreen extends Component {
     isDomainAvailable: PropTypes.func,
     showToast: PropTypes.func,
     showDomainList: PropTypes.func,
-    navBar: PropTypes.object,
+    tabOptions: PropTypes.object,
     showLoading: PropTypes.func,
   }
 
@@ -64,9 +64,9 @@ class DomainRegisterScreen extends Component {
     this.props.showThis({
       ...this.props,
       currentStep: 'waitingForRegister',
-      navBar: {
+      tabOptions: {
         showBack: false,
-        title: this.props.navBar.title,
+        screenTitle: this.props.tabOptions.screenTitle,
       },
     });
   }
@@ -128,8 +128,8 @@ class DomainRegisterScreen extends Component {
         this.props.viewDomainDetails({
           domain: domain,
           status: domain.details.status,
-          navBar: {
-            title: 'Domain Detail',
+          tabOptions: {
+            screenTitle: 'Domain Detail',
             showBack: false,
           },
         });
@@ -155,9 +155,9 @@ class DomainRegisterScreen extends Component {
     this.props.showThis({
       ...this.props,
       currentStep: 'waitingForConfirmation',
-      navBar: {
+      tabOptions: {
         showBack: false,
-        title: this.props.navBar.title,
+        screenTitle: this.props.tabOptions.screenTitle,
       },
     });
   }
@@ -288,9 +288,9 @@ class DomainRegisterScreen extends Component {
     this.props.showThis({
       ...this.props,
       currentStep: 'readyToRegister',
-      navBar: {
+      tabOptions: {
         showBack: false,
-        title: this.props.navBar.title,
+        screenTitle: this.props.tabOptions.screenTitle,
       },
     });
   }
