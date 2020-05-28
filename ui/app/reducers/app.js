@@ -862,6 +862,7 @@ function reduceApp (state, action) {
         },
       })
 
+    // RIF Section
     case rifActions.SHOW_MODAL:
       return rifReducers.showModal(appState, action)
 
@@ -870,6 +871,9 @@ function reduceApp (state, action) {
 
     case rifActions.NAVIGATE_TO:
       return rifReducers.navigateTo(appState, action)
+
+    case rifActions.RIF_LANDING_PAGE:
+      return rifReducers.landingPage(appState, action)
 
     default:
       return appState

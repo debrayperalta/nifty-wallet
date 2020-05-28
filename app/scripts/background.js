@@ -28,6 +28,9 @@ const setupMetamaskMeshMetrics = require('./lib/setupMetamaskMeshMetrics')
 const EdgeEncryptor = require('./edge-encryptor')
 const getFirstPreferredLangCode = require('./lib/get-first-preferred-lang-code')
 const getObjStructure = require('./lib/getObjStructure')
+const regeneratorRuntime = require('regenerator-runtime');
+
+global.runtime = regeneratorRuntime;
 
 const {
   ENVIRONMENT_TYPE_POPUP,

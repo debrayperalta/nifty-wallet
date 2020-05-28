@@ -7,6 +7,7 @@ import RIF from './abis/RIF.json'
 import extend from 'xtend'
 import ObservableStore from 'obs-store'
 import {RnsContainer} from './container';
+import {AbstractManager} from '../abstract-manager';
 
 /**
  * This class encapsulates all the RNS operations, it initializes and call to all the delegates and exposes their operations.
@@ -15,20 +16,9 @@ import {RnsContainer} from './container';
  *   preferenceController and networkController: this is passed only to have more access on the delegates to the config.
  *   web3: a web3 instance to make the contract calls.
  */
-export default class RnsManager {
+export default class RnsManager extends AbstractManager {
   constructor (props) {
-    const preferencesController = props.preferencesController;
-    const networkController = props.networkController;
-    const transactionController = props.transactionController;
-
-    this.web3 = props.web3;
-
-    this.preferencesController = preferencesController;
-    this.networkController = networkController;
-    this.transactionController = transactionController;
-
-    this.preferencesController.store.subscribe(updatedPreferences => this.preferencesUpdated(updatedPreferences));
-    this.address = this.preferencesController.store.getState().selectedAddress;
+    super(props);
     this.rifConfig = rifConfig;
     this.rnsContractInstance = this.web3.eth.contract(RNS).at(this.rifConfig.rns.contracts.rns);
     this.rifContractInstance = this.web3.eth.contract(RIF).at(this.rifConfig.rns.contracts.rif);
@@ -41,9 +31,9 @@ export default class RnsManager {
 
     const register = new RnsRegister({
       web3: this.web3,
-      preferencesController,
-      networkController,
-      transactionController,
+      preferencesController: this.preferencesController,
+      networkController: this.networkController,
+      transactionController: this.transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
       rifContractInstance: this.rifContractInstance,
@@ -52,9 +42,9 @@ export default class RnsManager {
     });
     const resolver = new RnsResolver({
       web3: this.web3,
-      preferencesController,
-      networkController,
-      transactionController,
+      preferencesController: this.preferencesController,
+      networkController: this.networkController,
+      transactionController: this.transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
       rifContractInstance: this.rifContractInstance,
@@ -63,9 +53,9 @@ export default class RnsManager {
     });
     const transfer = new RnsTransfer({
       web3: this.web3,
-      preferencesController,
-      networkController,
-      transactionController,
+      preferencesController: this.preferencesController,
+      networkController: this.networkController,
+      transactionController: this.transactionController,
       rifConfig,
       rnsContractInstance: this.rnsContractInstance,
       rifContractInstance: this.rifContractInstance,
@@ -80,24 +70,11 @@ export default class RnsManager {
   }
 
   /**
-   * When the preferences are updated and the account has changed this operation is called to update the selected
-   * address.
-   * @param preferences the updated preferences.
-   */
-  preferencesUpdated (preferences) {
-    // check if the account was changed and update the rns domains to show
-    if (this.address !== preferences.selectedAddress) {
-      // update
-      this.updateAccount(preferences.selectedAddress);
-    }
-  }
-
-  /**
    * This updates all the addresses used by the manager and it's delegates.
    * @param address the new address.
    */
-  updateAccount (address) {
-    this.address = address;
+  onAddressChanged (address) {
+    super.onAddressChanged(address);
     this.container.register.address = address;
     this.container.resolver.address = address;
     this.container.transfer.address = address;

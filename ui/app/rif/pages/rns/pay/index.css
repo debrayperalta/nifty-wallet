@@ -1,0 +1,14 @@
+.open-channel-message {
+  display: flex;
+  justify-content: center;
+  margin-top: 2em;
+}
+.open-channel-message>div {
+  text-align: center;
+  width: 15em;
+}
+.open-channel-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 2em;
+}

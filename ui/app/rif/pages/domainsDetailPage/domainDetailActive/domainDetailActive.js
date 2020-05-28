@@ -292,8 +292,8 @@ const mapDispatchToProps = dispatch => {
     waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
 		setAutoRenew: () => {},
     showDomainsDetailPage: (props) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, {
-      navBar: {
-        title: 'Domain Details',
+      tabOptions: {
+        screenTitle: 'Domain Details',
       },
       ...props,
     })),

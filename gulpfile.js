@@ -475,6 +475,7 @@ function bundleTask (opts) {
 
     // handle errors
     buildStream.on('error', (err) => {
+      console.log('Error', err);
       beep()
       if (opts.watch) {
         console.warn(err.stack)
