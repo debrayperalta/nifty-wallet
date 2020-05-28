@@ -11,7 +11,7 @@ Before you try to build this you need to deploy
  [rns-suite](https://github.com/rnsdomains/rns-suite) contracts into the 
 chain that you are working on. In the case you are testing using a real chain
 you should have the contracts addresses needed for this. After you have those 
-addresses you need to fill the file `rif.config.js` with those values, an example could be:
+addresses you need to fill the file `rif/rif.config.{environment}.js` with those values, an example could be:
 
 ```js
 module.exports = {
@@ -33,6 +33,19 @@ module.exports = {
   },
 }
 ```
+As you can see in the file name we have a {environment} placeholder, that's because by default is production so
+if you run ```yarn start``` the project will take the file ```rif/rif.config.production.js```. You can 
+use any environment that you want, you just need to create a new file and then run the project
+with ```yarn start --environment=environmentname```.
+An example, let's say you have your environment setup and you put testing as the environment name. So you 
+create a file in the folder rif inside the project root called ```rif.config.testing.js```, then you run
+the project using this command ```yarn start --environment=testing``` that will load your environment
+into the ```rif.config.js``` file in the root of the project. ```rif.config.js``` gets overwritten each time 
+by the selected environment so don't use that file for setup. 
+
+NOTE: This applies to builds too. So if you want to build a production bundle you don't need to do anything since
+production is the default environment, but if you want to build another environment you need to specify the
+argument on the build command.
 
 ## Building locally
 

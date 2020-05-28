@@ -24,6 +24,7 @@ const pify = require('pify')
 const gulpMultiProcess = require('gulp-multi-process')
 const endOfStream = pify(require('end-of-stream'))
 const concat = require('gulp-concat')
+const rename = require('gulp-rename')
 
 function gulpParallel (...args) {
   return function spawnGulpChildProcess (cb) {
@@ -531,10 +532,21 @@ function beep () {
   process.stdout.write('\x07')
 }
 
+function getEnvironmentFromArguments () {
+  const args = process.argv.slice(2);
+  const environment = args.find(arg => arg.indexOf('--environment=') !== -1);
+  if (environment) {
+    return environment.split('=')[1];
+  }
+  return 'production';
+}
+
 function rifConfig () {
-  const environment = 'local';
+  const environment = getEnvironmentFromArguments();
+  console.log('Using RIF environment', environment);
   return gulp.src(`rif/rif.config.${environment}.js`)
-    .pipe(gulp.dest('rif.config.js'))
+    .pipe(rename('rif.config.js'))
+    .pipe(gulp.dest('./'))
 }
 
 function watchRifCss () {
