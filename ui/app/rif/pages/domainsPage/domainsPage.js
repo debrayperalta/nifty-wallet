@@ -25,7 +25,7 @@ class DomainsScreen extends Component {
       this.props.showThis({
         ...this.props,
         domains,
-      })
+      });
     }
   }
 
@@ -92,13 +92,19 @@ const mapDispatchToProps = dispatch => {
   return {
     showDomainsDetailPage: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, {
       ...data,
-      navBar: {
-        title: 'Domain Detail',
+      tabOptions: {
+        screenTitle: 'Domain Detail',
         showBack: true,
       },
     })),
     setAutoRenew: (data) => {},
-    showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.domains, params)),
+    showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.domains, {
+      ...params,
+      tabOptions: {
+        screenTitle: 'My Domains',
+        showBack: true,
+      },
+    })),
     getDomains: () => dispatch(rifActions.getDomains()),
   }
 }

@@ -1,21 +1,18 @@
-// default view of panels
-import DomainsScreen from './domainsPage/domainsPage';
-import LuminoHome from './lumino';
-import React from 'react';
+import {pageNames} from './names';
 
 export const tabDefinitions = [
   {
     title: 'Domains',
-    index: 1,
-    defaultTitle: 'My Domains',
-    defaultComponent: (<DomainsScreen />),
+    index: 0,
+    defaultScreenTitle: 'My Domains',
+    defaultScreenName: pageNames.rns.domains,
     showSearchbar: true,
   },
   {
     title: 'Lumino',
-    index: 2,
-    defaultTitle: 'Lumino networks directory',
-    defaultComponent: (<LuminoHome />),
+    index: 1,
+    defaultScreenTitle: 'Lumino networks directory',
+    defaultScreenName: pageNames.lumino.home,
     showSearchbar: true,
   },
 ]

@@ -15,13 +15,13 @@ class Tabs extends Component {
   constructor (props) {
     super(props);
     this.state = {
-      activeTab: props.initialTabIndex ? props.tabs[props.initialTabIndex] : props.tabs[0],
+      activeTabIndex: props.initialTabIndex ? props.initialTabIndex : 0,
     }
   }
 
   selectTab (tab) {
     this.setState({
-      activeTab: tab,
+      activeTabIndex: tab.index,
     });
     if (this.props.onChange) {
       this.props.onChange(tab);
@@ -43,17 +43,17 @@ class Tabs extends Component {
     tabs = tabs.sort(this.sortTabs);
     const tabComponents = [];
     if (this.props.showBack) {
-      tabComponents.push(<li className="rif-tabs-back-button">
+      tabComponents.push(<li key="-1" className="rif-tabs-back-button">
                            <i onClick={(event) => {
                               this.props.backAction();
                             }} className="fa fa-arrow-left fa-lg cursor-pointer"/>
                          </li>);
     }
     tabComponents.push(...tabs.map(tab => {
-      const active = tab.index === this.state.activeTab.index;
+      const active = tab.index === this.state.activeTabIndex;
       const className = 'rif-tabs-bar-item ' + (active ? 'rif-tabs-bar-item-active' : '');
       return (
-        <li key={tab.index} id={tab.index}
+        <li key={tab.index}
             className={className}
             onClick={(event) => this.selectTab(tab)}>{tab.title}</li>
       );
@@ -62,7 +62,7 @@ class Tabs extends Component {
   }
 
   getActiveTabContent () {
-    return (this.state.activeTab.component);
+    return (this.props.tabs[this.state.activeTabIndex].component);
   }
 
   render () {

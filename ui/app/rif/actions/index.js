@@ -328,23 +328,27 @@ function navigateBack () {
     }
     if (navigationStack.length > 0) {
       const navigation = navigationStack.pop();
-      return navigateTo(navigation.params.name, navigation.params);
+      return navigateTo(navigation.params.tabOptions.screenName, navigation.params);
     }
   }
   // go to home since we don't have any other page to go to.
   return niftyActions.goHome();
 }
 
-function navigateTo (screenName, params) {
-  const defaultParams = {
-    title: screenName,
+function navigateTo (screenName, params, resetNavigation = false) {
+  const defaultTabOptions = {
+    screenTitle: screenName,
     showBack: true,
-    name: screenName,
+    showSearchbar: true,
+    screenName,
+    tabIndex: 0,
   };
-  params = extend(defaultParams, params);
-  if (params.showBack === false) {
+  if (params.tabOptions) {
+    params.tabOptions = extend(defaultTabOptions, params.tabOptions);
+  }
+  if (params.tabOptions.showBack === false || resetNavigation) {
     // we reset the navigation since we can't go back in the next page or any other after that
-    for (let index = 0; index < navigationStack.length; index++) {
+    for (let index = 0; index <= navigationStack.length; index++) {
       navigationStack.pop();
     }
   }
@@ -353,8 +357,8 @@ function navigateTo (screenName, params) {
     type: rifActions.NAVIGATE_TO,
     params,
   }
-  const alreadyNavigatedTo = navigationStack.find(navigation => navigation.params.name === screenName);
-  if (!alreadyNavigatedTo) {
+  const alreadyNavigatedTo = navigationStack.find(navigation => navigation.params.tabOptions.screenName === screenName);
+  if (!alreadyNavigatedTo && !resetNavigation) {
     navigationStack.push(currentNavigation);
   }
   backNavigated = false;
@@ -735,7 +739,9 @@ function showRifLandingPage () {
   return {
     type: rifActions.RIF_LANDING_PAGE,
     params: {
-      showBack: true,
+      tabOptions: {
+        showBack: true,
+      },
     },
   }
 }

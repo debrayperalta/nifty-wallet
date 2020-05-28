@@ -347,8 +347,8 @@ const mapDispatchToProps = dispatch => {
   return {
     dispatch: dispatch,
     showThis: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainRegister, {
-      navBar: {
-        title: 'Domain Register',
+      tabOptions: {
+        screenTitle: 'Domain Register',
       },
       ...data,
     })),
@@ -359,8 +359,8 @@ const mapDispatchToProps = dispatch => {
     completeRegistration: (domainName) => dispatch(rifActions.finishRegistration(domainName)),
     canCompleteRegistration: (commitment) => dispatch(rifActions.canFinishRegistration(commitment)),
     viewDomainDetails: (params) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, {
-      navBar: {
-        title: 'Domain Details',
+      tabOptions: {
+        screenTitle: 'Domain Details',
       },
       ...params,
     })),

@@ -122,10 +122,8 @@ function mapDispatchToProps (dispatch) {
     navigateTo: (screenName, title, params) => {
       dispatch(rifActions.navigateTo(screenName, {
         ...params,
-        showDomainsSearch: true,
-        navBar: {
-          title,
-          backAction: () => dispatch(rifActions.navigateBack()),
+        tabOptions: {
+          screenTitle: title,
         },
       }));
       dispatch(rifActions.hideMenu());

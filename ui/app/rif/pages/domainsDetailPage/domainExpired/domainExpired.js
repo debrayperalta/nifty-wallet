@@ -75,8 +75,8 @@ const mapDispatchToProps = dispatch => {
 		addNewNetwork: (message) => dispatch(rifActions.showModal(message)),
     showDomainRegisterPage: (domainName) => dispatch(rifActions.navigateTo(pageNames.rns.domainRegister, {
       domainName,
-      navBar: {
-        title: 'Domain Register',
+      tabOptions: {
+        screenTitle: 'Domain Register',
       },
     })),
 	}
