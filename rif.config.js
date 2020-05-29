@@ -1,10 +1,11 @@
+// This is file is going to be overwritten by gulp, to setup you can use the folde rif/rif.config.someenvironment.js files to specify your setup.
 module.exports = {
   lumino: {
     hub: {
-      endpoint: 'http://127.0.0.1:5001/api/v1',
+      endpoint: '',
     },
     explorer: {
-      endpoint: 'http://localhost:8080/api/v1',
+      endpoint: '',
     },
   },
   rns: {
