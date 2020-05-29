@@ -10,7 +10,6 @@
 
 
 /* HEADER */
-
 .arrow-left {
   width: 17px;
   height: 17px;
@@ -22,10 +21,20 @@
   left: 25px;
 }
 
+.page-title {
+  font-family: var(--primary-font);
+  color: var(--primary-color);
+  font-size: 18px;
+  font-weight: 600;
+  padding: 0 28px;
+  margin: 30px 0 18px;
+}
+
 .search-bar {
   width: 100%;
   max-width: 290px;
   margin: 34px auto;
+  display: block;
   border-width: 0 0 1px 0;
   border-color: var(--primary-color);
   padding: 6px 0;

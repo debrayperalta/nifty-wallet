@@ -7,7 +7,7 @@
 
 .chiplet {
   display: flex;
-  border-bottom: 1px solid var(--gray-soft);
+  border-top: 1px solid var(--gray-soft);
   padding: 14px 30px;
 }
 

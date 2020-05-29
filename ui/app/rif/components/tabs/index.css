@@ -1,10 +1,28 @@
 .rif-tabs-bar {
+  height: 75px;
+  background: var(--primary-color);
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
+  align-items: center;
 }
+
+.rif-tabs-bar li {
+  margin: 0 15px;
+}
+
 .rif-tabs-bar-item {
   cursor: pointer;
+  font-family: var(--primary-font);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
 }
+
+.rif-tabs-back-button {
+  position: absolute;
+  left: 5px;
+}
+
 .rif-tabs-bar .rif-tabs-bar-item-active {
-  border-bottom: solid 2px #1b243d;
+  border-bottom: solid 2px #fff;
 }
