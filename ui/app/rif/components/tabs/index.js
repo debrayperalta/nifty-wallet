@@ -46,7 +46,7 @@ class Tabs extends Component {
       tabComponents.push(<li key="-1" className="rif-tabs-back-button">
                            <i onClick={(event) => {
                               this.props.backAction();
-                            }} className="fa fa-arrow-left fa-lg cursor-pointer"/>
+                            }} className="fa fa-chevron-left cursor-pointer"/>
                          </li>);
     }
     tabComponents.push(...tabs.map(tab => {
