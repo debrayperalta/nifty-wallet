@@ -26,8 +26,8 @@ function getSearchBarComponent (show) {
   return (<SearchDomains />);
 }
 
-function getTabTitleComponent (title) {
-  if (!title) {
+function getTabTitleComponent (title, hideTitle) {
+  if (!title || hideTitle) {
     return null;
   }
   return (
@@ -56,7 +56,7 @@ function buildTabs (screenName, tabOptions) {
       component: (
         <div>
           {getSearchBarComponent(showSearchbar)}
-          {getTabTitleComponent(tabTitle)}
+          {getTabTitleComponent(tabTitle, tabOptions.hideTitle)}
           {tabComponent}
         </div>
       ),
