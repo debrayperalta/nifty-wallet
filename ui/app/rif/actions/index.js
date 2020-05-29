@@ -350,6 +350,8 @@ function navigateTo (screenName, params, resetNavigation = false) {
   }
   if (params.tabOptions) {
     params.tabOptions = extend(defaultTabOptions, params.tabOptions);
+  } else {
+    params.tabOptions = defaultTabOptions;
   }
   if (params.tabOptions.showBack === false || resetNavigation) {
     // we reset the navigation since we can't go back in the next page or any other after that
