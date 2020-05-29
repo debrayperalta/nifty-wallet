@@ -19,8 +19,6 @@ import ErrorComponent from '../../../../old-ui/app/components/error';
 import LuminoHome from './lumino/index';
 import {pageNames} from './names';
 
-
-
 function getSearchBarComponent (show) {
   if (!show) {
     return null;
