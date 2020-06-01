@@ -342,6 +342,7 @@ function navigateTo (screenName, params, resetNavigation = false) {
     showSearchbar: true,
     screenName,
     tabIndex: 0,
+    hideTitle: false,
   };
   if (!params) {
     params = {

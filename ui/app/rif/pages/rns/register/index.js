@@ -1,10 +1,11 @@
-import React, {Component} from 'react'
-import {connect} from 'react-redux'
-import PropTypes from 'prop-types'
-import rifActions from '../../../actions'
-import niftyActions from '../../../../actions'
-import {registrationTimeouts} from '../../../constants'
-import {pageNames} from '../../index'
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
+import rifActions from '../../../actions';
+import niftyActions from '../../../../actions';
+import {registrationTimeouts} from '../../../constants';
+import {pageNames} from '../../index';
+import extend from 'xtend';
 
 class DomainRegisterScreen extends Component {
 
@@ -34,8 +35,15 @@ class DomainRegisterScreen extends Component {
     showLoading: PropTypes.func,
   }
 
-  initialize () {
-    const {domain, currentStep} = this.props;
+  componentDidMount () {
+    this.props.showLoading();
+    this.initialize().then(() => {
+      this.props.showLoading(false);
+    });
+  }
+
+  async initialize () {
+    const {domain, domainName, currentStep} = this.props;
     if (domain && !currentStep) {
       if (domain.registration) {
         if (domain.registration.readyToRegister) {
@@ -51,30 +59,24 @@ class DomainRegisterScreen extends Component {
       }
     } else if (!currentStep) {
       // otherwise is available and ready for register
-      const available = this.props.isDomainAvailable(this.props.domainName);
+      const available = this.props.isDomainAvailable(domainName);
       if (!available) {
         // is not available for registration so we redirect to domain list with a warning
         this.props.showToast('Domain not available, can not be registered!', false);
         this.props.showDomainList();
+      } else {
+        await this.calculateAndFillCost(domainName, 1);
       }
     }
   }
 
-  showWaitingForRegister () {
-    this.props.showThis({
-      ...this.props,
-      currentStep: 'waitingForRegister',
-      tabOptions: {
-        showBack: false,
-        screenTitle: this.props.tabOptions.screenTitle,
-      },
-    });
-  }
-
-  componentDidMount () {
-    this.props.showLoading();
-    this.initialize();
-    this.props.showLoading(false);
+  async calculateAndFillCost (domainName, yearsToRegister) {
+    const costInWei = await this.props.getCost(domainName, yearsToRegister);
+    const costInRif = costInWei / 1e18;
+    this.props.showThis(extend(this.props, {
+      yearsToRegister,
+      costInRif,
+    }));
   }
 
   async getUpdatedDomain () {
@@ -87,20 +89,39 @@ class DomainRegisterScreen extends Component {
     await this.props.updateDomains(domain);
   }
 
-  showRegistration () {
-    this.props.getCost(this.props.domainName, 1)
-      .then(costInWei => {
-        const costInRif = costInWei / 1e18;
-        this.props.showThis({
-          ...this.props,
-          currentStep: 'setupRegister',
-          yearsToRegister: 1,
-          costInRif: costInRif,
-        });
-      });
+  showWaitingForRegister () {
+    this.props.showThis(extend(this.props, {
+      currentStep: 'waitingForRegister',
+      tabOptions: {
+        showBack: false,
+        hideTitle: true,
+      },
+    }));
   }
 
-  async initiateRegistration () {
+  showWaitingForConfirmation () {
+    this.props.showThis({
+      ...this.props,
+      currentStep: 'waitingForConfirmation',
+      tabOptions: {
+        showBack: false,
+        hideTitle: true,
+      },
+    });
+  }
+
+  showReadyToRegister () {
+    this.props.showThis({
+      ...this.props,
+      currentStep: 'readyToRegister',
+      tabOptions: {
+        showBack: false,
+        hideTitle: true,
+      },
+    });
+  }
+
+  async requestDomain () {
     const result = await this.props.requestRegistration(this.props.domainName, this.props.yearsToRegister);
     this.props.waitForListener(result.transactionListenerId)
       .then(transactionReceipt => {
@@ -151,17 +172,6 @@ class DomainRegisterScreen extends Component {
     });
   }
 
-  showWaitingForConfirmation () {
-    this.props.showThis({
-      ...this.props,
-      currentStep: 'waitingForConfirmation',
-      tabOptions: {
-        showBack: false,
-        screenTitle: this.props.tabOptions.screenTitle,
-      },
-    });
-  }
-
   async changeYearsToRegister (yearsToRegister) {
     if (yearsToRegister && yearsToRegister > 0) {
       const costInWei = await this.props.getCost(this.props.domainName, yearsToRegister);
@@ -175,29 +185,17 @@ class DomainRegisterScreen extends Component {
     }
   }
 
+  getTitle (currentStep) {
+    if (currentStep !== 'registered') {
+      return (<div>Buying {this.props.domainName}</div>);
+    }
+    return null;
+  }
+
   getBody (currentStep) {
     const partials = {
-      available: (
-        <div className="domainRegisterAnimation">
-          <svg
-            className="checkmark"
-            xmlns="http://www.w3.org/2000/svg"
-            width="96"
-            height="96"
-            viewBox="0 0 52 52">
-            <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
-            <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-          </svg>
-          <div>
-            Domain Available
-          </div>
-        </div>
-      ),
       setupRegister: (
         <div className="domainRegisterInitiate">
-          <div>
-            You are going to register <span className="bold">{this.props.domainName}</span>
-          </div>
           <div>
             <span>Number of years:</span>
             <span className="hand-over" onClick={() => this.changeYearsToRegister(this.props.yearsToRegister - 1)}>
@@ -207,64 +205,46 @@ class DomainRegisterScreen extends Component {
             <span className="hand-over" onClick={() => this.changeYearsToRegister(this.props.yearsToRegister + 1)}>
               <i className="fa fa-plus"/>
             </span>
+            <span>
+              50% discount per year <span>from the third year</span>
+            </span>
           </div>
           <div>
-            <span>Cost in RIF:</span><span>{this.props.costInRif}</span><span>RIF</span>
+            <span>Cost</span><span>{this.props.costInRif}</span><span>RIF</span>
+          </div>
+          <div>
+            You will be asked to confirm the first of two transactions required (request & register)
+            to buy your domain.
           </div>
         </div>
       ),
       waitingForRegister: (
-        <div className="domainRegisterProgress">
+        <div>
           <div>
-            <article className="clock">
-              <div className="minutes-container">
-                <div className="minutes"/>
-              </div>
-              <div className="seconds-container">
-                <div className="seconds"/>
-              </div>
-            </article>
-            <p>
-              Waiting for confirmation. You need to wait while we secure your domain, then you need to confirm the registration at the final step
-            </p>
+            <div>Confirming transaction</div>
+            <div className="app-loader">Loading...</div>
+            <p>Wait until the domain is requested then click Register to buy the domain.</p>
           </div>
         </div>
       ),
       readyToRegister: (
-        <div className="domainRegisterProgress domainRegisterAnimation">
-          <svg
-            className="checkmark"
-            xmlns="http://www.w3.org/2000/svg"
-            width="96"
-            height="96"
-            viewBox="0 0 52 52">
-            <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
-            <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-          </svg>
-          <div>
-            We are ready!
-          </div>
+        <div>
+          <div>Your domain has been requested</div>
+          <div>Click Register to buy the domain.</div>
         </div>
       ),
       waitingForConfirmation: (
-        <div className="domainRegisterAnimation">
-          <div>Waiting for confirmation...</div>
+        <div>
+          <div>Confirming transaction</div>
+          <div>Loading...</div>
         </div>
       ),
       registered: (
-        <div className="domainRegisterAnimation">
-          <svg
-            className="checkmark"
-            xmlns="http://www.w3.org/2000/svg"
-            width="96"
-            height="96"
-            viewBox="0 0 52 52">
-            <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
-            <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-          </svg>
+        <div>
           <div>
-            <div>Congratulations</div>
-            <div>The domain is yours</div>
+            <div>Congrats!</div>
+            <div>{this.props.domainName} is yours</div>
+            <div>Check it in the explorer</div>
           </div>
         </div>
       ),
@@ -284,27 +264,16 @@ class DomainRegisterScreen extends Component {
     return partials[currentStep];
   }
 
-  showReadyToRegister () {
-    this.props.showThis({
-      ...this.props,
-      currentStep: 'readyToRegister',
-      tabOptions: {
-        showBack: false,
-        screenTitle: this.props.tabOptions.screenTitle,
-      },
-    });
-  }
-
   getButtons (currentStep) {
     const partials = {
-      available: (
-        <div className="button-container">
-          <button onClick={() => this.showRegistration()}>Register Domain</button>
-        </div>
-      ),
       setupRegister: (
         <div className="button-container">
-          <button onClick={() => this.initiateRegistration()}>Initiate Registration</button>
+          <button onClick={() => this.requestDomain()}>Request Domain</button>
+        </div>
+      ),
+      waitingForRegister: (
+        <div className="button-container">
+          <button disabled={true}>Register</button>
         </div>
       ),
       readyToRegister: (
@@ -314,7 +283,8 @@ class DomainRegisterScreen extends Component {
       ),
       registered: (
         <div className="button-container">
-          <button onClick={() => this.viewDomainDetails()}>View Domain Details</button>
+          <button onClick={() => this.props.showDomainList()}>My Domains</button>
+          <button onClick={() => this.viewDomainDetails()}>List in Marketplace</button>
         </div>
       ),
     };
@@ -322,15 +292,15 @@ class DomainRegisterScreen extends Component {
   }
 
   render () {
-    const registerBody = this.getBody(this.props.currentStep ? this.props.currentStep : 'available');
-    const registerButtons = this.getButtons(this.props.currentStep ? this.props.currentStep : 'available');
+    const currentStep = this.props.currentStep ? this.props.currentStep : 'setupRegister';
+    const title = this.getTitle(currentStep);
+    const body = this.getBody(currentStep);
+    const buttons = this.getButtons(currentStep);
     return (
       <div className="body">
-        <div id="headerName" className={'domain-name'}>
-          <div>{this.props.domainName}</div>
-        </div>
-        {registerBody}
-        {registerButtons}
+        {title}
+        {body}
+        {buttons}
       </div>
     );
   }
@@ -369,7 +339,11 @@ const mapDispatchToProps = dispatch => {
     updateDomains: (domain) => dispatch(rifActions.updateDomains(domain)),
     showToast: (text, success) => dispatch(niftyActions.displayToast(text, success)),
     isDomainAvailable: (domainName) => dispatch(rifActions.checkDomainAvailable(domainName)),
-    showDomainList: () => dispatch(rifActions.navigateTo(pageNames.rns.domains)),
+    showDomainList: () => dispatch(rifActions.navigateTo(pageNames.rns.domains, {
+      tabOptions: {
+        showBack: false,
+      },
+    })),
     showLoading: (loading = true, message) => loading ? dispatch(niftyActions.showLoadingIndication(message)) : dispatch(niftyActions.hideLoadingIndication()),
   }
 }
