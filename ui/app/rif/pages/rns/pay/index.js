@@ -8,7 +8,11 @@ import {SLIP_ADDRESSES} from '../../../constants/slipAddresses';
 import rifActions from '../../../actions';
 import niftyActions from '../../../../actions';
 import {CallbackHandlers} from '../../../actions/callback-handlers';
-import Tabs from '../../../components/tabs';
+
+const payMode = {
+  NETWORK: 'NETWORK',
+  LUMINO: 'LUMINO',
+}
 
 class Pay extends Component {
 
@@ -37,6 +41,7 @@ class Pay extends Component {
       selectedNetwork: null,
       loading: true,
       selectedToken: null,
+      selectedMode: payMode.NETWORK,
     };
   }
 
@@ -190,13 +195,9 @@ class Pay extends Component {
     }
   }
 
-  onTabChange (index) {
+  onModeChange (selectedMode) {
     this.setState({
-      tabIndex: index,
-      selectedToken: this.getAllowedTokens()[0],
-      selectedNetwork: this.getAllowedNetworks()[0],
-      amount: '',
-      destination: '',
+      selectedMode,
     });
   }
 
@@ -288,7 +289,7 @@ class Pay extends Component {
     );
   }
 
-  getNetworkPanel () {
+  getNetworkBody () {
     return (
       <div>
         <NetworkDropdown onSelectedNetwork={(selectedNetwork => this.onNetworkChange(selectedNetwork))}
@@ -305,7 +306,7 @@ class Pay extends Component {
     );
   }
 
-  getTokenPanel () {
+  getLuminoBody () {
     if (!this.state.loading) {
       return (
         <div>
@@ -334,30 +335,23 @@ class Pay extends Component {
     }
   }
 
-  getTabs (networkPanel, tokenPanel) {
-    return [
-      {
-        title: 'Pay',
-        index: 0,
-        component: networkPanel,
-      },
-      {
-        title: 'Pay with Lumino',
-        index: 1,
-        component: tokenPanel,
-      },
-    ];
+  getBody () {
+    const {selectedMode} = this.state;
+    switch (selectedMode) {
+      case payMode.NETWORK:
+        return this.getNetworkBody();
+      case payMode.LUMINO:
+        return this.getLuminoBody();
+    }
   }
 
   render () {
     const header = this.getHeaderFragment();
-    const tokenPanel = this.getTokenPanel();
-    const networkPanel = this.getNetworkPanel();
-    const tabs = this.getTabs(networkPanel, tokenPanel);
+    const body = this.getBody();
     return (
       <div className="body">
         {header}
-        <Tabs tabs={tabs} onChange={(tab) => this.onTabChange(tab.index)} />
+        {body}
       </div>
     );
   }
