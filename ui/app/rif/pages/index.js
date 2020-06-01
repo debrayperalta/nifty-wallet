@@ -31,9 +31,7 @@ function getTabTitleComponent (title, hideTitle) {
     return null;
   }
   return (
-    <div>
-      <h2>{title}</h2>
-    </div>
+    <h2 className="page-title">{title}</h2>
   );
 }
 
