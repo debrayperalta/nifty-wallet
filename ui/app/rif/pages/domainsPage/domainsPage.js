@@ -40,6 +40,7 @@ class DomainsScreen extends Component {
         }} id="chipletTitle" className={'chiplet-title'}>
           {data.name}
         </div>
+        {/*TODO fmelo, remove this if we are not going to use it in a future*/}
         {/*<div id="chipletDescription" className={'chiplet-description'}>*/}
         {/*  <div id="chipletExpiration">*/}
         {/*    <span>Expires on: {data.details ? data.details.expiration : 'n/a'}</span>*/}
