@@ -2,23 +2,25 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faPen, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { getChainAddressByChainAddress } from '../../../utils/utils';
-import { CustomButton, Menu } from '../../../components'
-import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver'
-import { GET_RESOLVERS, DEFAULT_ICON } from '../../../constants'
-import { SLIP_ADDRESSES } from '../../../constants/slipAddresses'
-import niftyActions from '../../../../actions'
-import {pageNames} from '../../index'
-import rifActions from '../../../actions'
-import DomainHeader from '../../../components/domain-header'
-import {rns} from '../../../../../../rif.config'
+import { CustomButton, Menu } from '../../../components';
+import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver';
+import { GET_RESOLVERS, DEFAULT_ICON } from '../../../constants';
+import { SLIP_ADDRESSES } from '../../../constants/slipAddresses';
+import niftyActions from '../../../../actions';
+import {pageNames} from '../../index';
+import rifActions from '../../../actions';
+import DomainHeader from '../../../components/domain-header';
+import {rns} from '../../../../../../rif.config';
+import GenericTable from '../../../components/table/genericTable';
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
     addNewChainAddress: PropTypes.func.isRequired,
     setNewResolver: PropTypes.func.isRequired,
     setChainAddressForResolver: PropTypes.func.isRequired,
+    deleteChainAddressForResolver: PropTypes.func.isRequired,
 		setAutoRenew: PropTypes.func.isRequired,
     getChainAddresses: PropTypes.func,
     getUnapprovedTransactions: PropTypes.func,
@@ -158,6 +160,42 @@ class DomainsDetailActiveScreen extends Component {
     return rns.contracts.publicResolver;
   }
 
+  convertChainAddressesToTableData () {
+    const data = [];
+    this.state.chainAddresses.map((chainAddress, index) => {
+      const address = getChainAddressByChainAddress(chainAddress.chain);
+      const icon = address.icon ? address.icon : DEFAULT_ICON;
+      const tableRow = {};
+      tableRow.id = index;
+      tableRow.content =
+        <div className={''}>
+          <div className={''}>
+            <FontAwesomeIcon icon={icon.icon} color={icon.color} className={''}/>
+            <span>{address.symbol}</span>
+          </div>
+          <div className={''}>
+            <span>{chainAddress.address}</span>
+          </div>
+        </div>
+      tableRow.actions =
+        <div className={''}>
+          <FontAwesomeIcon
+            icon={faPen}
+            // color={'#FFFFFFFFFFF'}
+            className={''}
+            onClick={() => {}}
+          />
+          <FontAwesomeIcon
+            icon={faTimes}
+            // color={'#FFFFFFFFFFF'}
+            className={''}
+            onClick={() => {}}
+          />
+        </div>
+      data.push(tableRow);
+    });
+    return data;
+  }
 	render () {
 		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress } = this.props;
     const domainInfo = {
@@ -171,6 +209,15 @@ class DomainsDetailActiveScreen extends Component {
       content,
     };
 		const { chainAddresses, disableCombo } = this.state;
+    const columnsChainAddresses = [
+      {
+        selector: 'content',
+      },
+      {
+        selector: 'actions',
+        right: true,
+      },
+    ];
 		return (
       <div className={'body'}>
         <DomainHeader domainName={domainName}
@@ -178,68 +225,46 @@ class DomainsDetailActiveScreen extends Component {
                       showLuminoNodeIcon={isLuminoNode}
                       showRifStorageIcon={isRifStorage}/>
         <div id="domainDetailBody" className={'domain-detail-body'}>
-          <div id="bodyDescription" className={'domain-description'}>
-            <div><span className={'domain-description-field'}>Address:</span><span className={'domain-description-value label-spacing-left'}>{address}</span></div>
-            <div><span className={'domain-description-field'}>Content:</span><span className={'domain-description-value label-spacing-left'}>{content}</span></div>
-            <div><span className={'domain-description-field'}>Expires on:</span><span className={'domain-description-value label-spacing-left'}>{expirationDate}</span></div>
+          {this.state.resolvers &&
+          <div id="resolversBody" className={'resolvers-body'}>
+            <div className="resolver-body-top">
+              {
+                (this.state.resolvers && chainAddresses.length > 0) &&
+                <GenericTable title="Addresses" columns={columnsChainAddresses} data={this.convertChainAddressesToTableData()} pagination={true}/>
+              }
+              {(isOwner && this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) &&
+              <CustomButton
+                icon={faPlus}
+                text={'Add Address'}
+                onClick={() => this.showModalAddChainAddress()}
+                className={
+                  {
+                    button: '',
+                    icon: '',
+                    text: '',
+                  }
+                }
+              />
+              }
+            </div>
+          </div>
+          }
+          <div id="domainDescription" className={'domain-description'}>
+            <div><span className={'domain-description-field'}>Renewal date:</span><span className={'domain-description-value label-spacing-left'}>{expirationDate}</span></div>
             <div><span className={'domain-description-field'}>Auto renew: <a href={this.props.setAutoRenew()}>{autoRenew ? 'on' : 'off'}</a></span></div>
             <div><span className={'domain-description-field'}>Owner:</span><span className={'domain-description-value label-spacing-left'}>{ownerAddress}</span></div>
+            {
+              /* TODO Rodrigo
+                This divs will be not shown anymore?
+              <div><span className={'domain-description-field'}>Address:</span><span className={'domain-description-value label-spacing-left'}>{address}</span></div>
+              <div><span className={'domain-description-field'}>Content:</span><span className={'domain-description-value label-spacing-left'}>{content}</span></div>
+               */
+            }
           </div>
-          {this.state.resolvers &&
-            <div id="resolversBody" className={'resolvers-body'}>
-              <div className="resolver-body-top">
-                <div id="selectResolver" className={'custom-select'}>
-                  <select id="comboResolvers"
-                          defaultValue={this.getDefaultSelectedValue(this.state.resolvers, selectedResolverAddress)}
-                          className="select-css" disabled={disableCombo} onChange={!disableCombo ? this.onChangeComboResolvers.bind(this) : () => {}}>
-                    <option disabled value={rns.contracts.publicResolver} hidden> Select Resolver </option>
-                      {
-                        this.state.resolvers.map((resolver, index) => {
-                          return (<option
-                            key={index}
-                            value={resolver.name}
-                            data-address={resolver.address}
-                          >{resolver.name}</option>)
-                        })
-                      }
-                  </select>
-                </div>
-                {(isOwner && this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) &&
-                  <CustomButton
-                    icon={faPlusCircle}
-                    text={'NEW'}
-                    onClick={() => this.showModalAddChainAddress()}
-                    className={
-                      {
-                        button: 'domain-detail-new-button',
-                        icon: 'domain-icon centerY',
-                        text: 'center',
-                      }
-                    }
-                  />
-                }
-              </div>
-              <div id="resolverChainAddressBody" className={'resolver-chainaddress'}>
-                {
-                  chainAddresses.length <= 0 ? <div></div> :
-                    chainAddresses.map((chainAddress, index) => {
-                    const address = getChainAddressByChainAddress(chainAddress.chain);
-                    const icon = address.icon ? address.icon : DEFAULT_ICON;
-                    return <div key={index} className={'resolver-chainaddress-description'}>
-                      <div className={'resolver-chainaddress-description-chain'}>
-                        <FontAwesomeIcon icon={icon.icon} color={icon.color} className={'domain-icon'}/>
-                        <span>{address.symbol}</span>
-                      </div>
-                      <div className={'resolver-chainaddress-description-chain-address'}>
-                        <span>{chainAddress.address}</span>
-                      </div>
-                    </div>
-                  })
-                }
-              </div>
-            </div>
-          }
-          {!isOwner &&
+          {
+            /* TODO Rodrigo
+             Not anymore watch & register?
+            !isOwner &&
           <CustomButton
             text={'WATCH & REGISTER'}
             onClick={() => {}}
@@ -250,8 +275,8 @@ class DomainsDetailActiveScreen extends Component {
               }
             }
           />
+             */
           }
-          <Menu domainInfo={domainInfo} />
         </div>
       </div>
 		);
@@ -287,6 +312,7 @@ const mapDispatchToProps = dispatch => {
     setNewResolver: (domainName, resolverAddress) => dispatch(rifActions.setResolverAddress(domainName, resolverAddress)),
     getChainAddresses: (domainName) => dispatch(rifActions.getChainAddresses(domainName)),
     setChainAddressForResolver: (domainName, chain, chainAddress) => dispatch(rifActions.setChainAddressForResolver(domainName, chain, chainAddress)),
+    deleteChainAddressForResolver: (domainName, chain, chainAddress) => {},
     getUnapprovedTransactions: () => dispatch(rifActions.getUnapprovedTransactions()),
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
     waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
