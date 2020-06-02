@@ -187,7 +187,7 @@ class DomainRegisterScreen extends Component {
 
   getTitle (currentStep) {
     if (currentStep !== 'registered') {
-      return (<div>Buying {this.props.domainName}</div>);
+      return (<h3 className="buying-name">Buying {this.props.domainName}</h3>);
     }
     return null;
   }
@@ -196,23 +196,29 @@ class DomainRegisterScreen extends Component {
     const partials = {
       setupRegister: (
         <div className="domainRegisterInitiate">
-          <div>
-            <span>Number of years:</span>
-            <span className="hand-over" onClick={() => this.changeYearsToRegister(this.props.yearsToRegister - 1)}>
-              <i className="fa fa-minus"/>
-            </span>
-            <span>{this.props.yearsToRegister}</span>
-            <span className="hand-over" onClick={() => this.changeYearsToRegister(this.props.yearsToRegister + 1)}>
-              <i className="fa fa-plus"/>
-            </span>
-            <span>
-              50% discount per year <span>from the third year</span>
-            </span>
+          <div className="d-flex number-years-to-buy">
+            <span className="title-years">Number of years:</span>
+            <div className="qty-years">
+              <span className="hand-over btn-minus" onClick={() => this.changeYearsToRegister(this.props.yearsToRegister - 1)}>
+                <svg width="8" height="2" viewBox="0 0 8 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 1L8 0.999999" stroke="#602A95"/>
+                </svg>
+              </span>
+              <span className="qty-number">{this.props.yearsToRegister}</span>
+              <span className="hand-over btn-plus" onClick={() => this.changeYearsToRegister(this.props.yearsToRegister + 1)}>
+                <svg width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8.48 5.168H5.216V8.608H4.056V5.168H0.808V4.088H4.056V0.672H5.216V4.088H8.48V5.168Z" fill="#602A95"/>
+                </svg>
+              </span>
+            </div>
+            <small className="discount-msg">
+              <span>50% discount per year</span> from the third year
+            </small>
           </div>
-          <div>
-            <span>Cost</span><span>{this.props.costInRif}</span><span>RIF</span>
+          <div className="d-flex domain-cost">
+            <span>Cost</span><span className="cost-number">{this.props.costInRif} <small>RIF</small></span>
           </div>
-          <div>
+          <div className="domain-register-disclaimer">
             You will be asked to confirm the first of two transactions required (request & register)
             to buy your domain.
           </div>
@@ -268,7 +274,7 @@ class DomainRegisterScreen extends Component {
     const partials = {
       setupRegister: (
         <div className="button-container">
-          <button onClick={() => this.requestDomain()}>Request Domain</button>
+          <button className="btn-primary" onClick={() => this.requestDomain()}>Request Domain</button>
         </div>
       ),
       waitingForRegister: (
