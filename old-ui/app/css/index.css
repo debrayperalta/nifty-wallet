@@ -137,19 +137,11 @@ button, input[type="submit"] {
 
 button[disabled], input[type="submit"][disabled] {
   cursor: not-allowed;
-  background: rgba(197, 197, 197, 1);
-  box-shadow: 0px 3px 6px rgba(197, 197, 197, 0.36);
+  background: #D8D8D8;
 }
 
 button.spaced {
   margin: 2px;
-}
-
-button:not([disabled]):hover, input[type="submit"]:not([disabled]):hover {
-  transform: scale(1.1);
-}
-button:not([disabled]):active, input[type="submit"]:not([disabled]):active {
-  transform: scale(0.95);
 }
 
 .grow-on-hover:hover {
