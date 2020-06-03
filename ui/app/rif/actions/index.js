@@ -3,6 +3,8 @@ import extend from 'xtend';
 import {lumino} from '../../../../app/scripts/controllers/rif/constants';
 import {CallbackHandlers} from './callback-handlers';
 import ethUtils from 'ethereumjs-util';
+import rifConfig from '../../../../rif.config';
+import {mocks} from './mocks';
 
 const rifActions = {
   SHOW_MODAL: 'SHOW_MODAL',
@@ -51,6 +53,7 @@ const rifActions = {
   getTokens,
   cleanStore,
   showRifLandingPage,
+  setupDefaultLuminoCallbacks,
 }
 
 let background = null;
@@ -659,10 +662,12 @@ function createPayment (partner, tokenAddress, netAmount, callbackHandlers = new
       }
       if (callbackHandlers && callbackHandlers.successHandler) {
         handleSdkCallback(lumino.callbacks.COMPLETED_PAYMENT, dispatch, callbackHandlers.successHandler);
+        handleSdkCallback(lumino.callbacks.RECEIVED_PAYMENT, dispatch, callbackHandlers.successHandler);
       }
       if (callbackHandlers && callbackHandlers.errorHandler) {
         handleSdkCallback(lumino.callbacks.FAILED_CREATE_PAYMENT, dispatch, callbackHandlers.errorHandler);
         handleSdkCallback(lumino.callbacks.FAILED_PAYMENT, dispatch, callbackHandlers.errorHandler);
+        handleSdkCallback(lumino.callbacks.EXPIRED_PAYMENT, dispatch, callbackHandlers.errorHandler);
       }
       background.rif.lumino.createPayment(partner, tokenAddress, netAmount, (error) => {
         if (error) {
@@ -678,13 +683,17 @@ function createPayment (partner, tokenAddress, netAmount, callbackHandlers = new
 function getChannels () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      background.rif.lumino.getChannels((error, channels) => {
-        if (error) {
-          dispatch(niftyActions.displayWarning(error));
-          return reject(error);
-        }
-        return resolve(channels);
-      });
+      if (rifConfig.mocksEnabled) {
+        return resolve(mocks.channels);
+      } else {
+        background.rif.lumino.getChannels((error, channels) => {
+          if (error) {
+            dispatch(niftyActions.displayWarning(error));
+            return reject(error);
+          }
+          return resolve(channels);
+        });
+      }
     });
   };
 }
@@ -692,13 +701,17 @@ function getChannels () {
 function getTokens () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      background.rif.lumino.getTokens((error, tokens) => {
-        if (error) {
-          dispatch(niftyActions.displayWarning(error));
-          return reject(error);
-        }
-        return resolve(tokens);
-      });
+      if (rifConfig.mocksEnabled) {
+        return resolve(mocks.tokens);
+      } else {
+        background.rif.lumino.getTokens((error, tokens) => {
+          if (error) {
+            dispatch(niftyActions.displayWarning(error));
+            return reject(error);
+          }
+          return resolve(tokens);
+        });
+      }
     });
   };
 }
@@ -753,6 +766,30 @@ function showRifLandingPage () {
       },
     },
   }
+}
+
+function setupDefaultLuminoCallbacks () {
+  return (dispatch) => {
+    return new Promise(resolve => {
+      handleSdkCallback(lumino.callbacks.SIGNING_FAIL, dispatch, (error) => {
+        console.debug('Error Signing', error);
+        dispatch(niftyActions.displayToast('Error Signing!', false));
+      });
+      handleSdkCallback(lumino.callbacks.REQUEST_CLIENT_ONBOARDING, dispatch, (result) => {
+        console.debug('Requesting onboarding', result);
+        dispatch(niftyActions.displayToast('Requesting onboard to Hub'));
+      });
+      handleSdkCallback(lumino.callbacks.CLIENT_ONBOARDING_SUCCESS, dispatch, (result) => {
+        console.debug('Onboarding success', result);
+        dispatch(niftyActions.displayToast('Onboarding completed successfully'));
+      });
+      handleSdkCallback(lumino.callbacks.RECEIVED_PAYMENT, dispatch, (result) => {
+        console.debug('Received Payment', result);
+        dispatch(niftyActions.displayToast('Received a payment'));
+      });
+      return resolve();
+    });
+  };
 }
 
 module.exports = rifActions

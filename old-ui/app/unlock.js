@@ -3,6 +3,7 @@ const Component = require('react').Component
 const h = require('react-hyperscript')
 const connect = require('react-redux').connect
 const actions = require('../../ui/app/actions')
+const rifActions = require('../../ui/app/rif/actions')
 const log = require('loglevel')
 const EventEmitter = require('events').EventEmitter
 const { getDPath } = require('./util')
@@ -96,6 +97,7 @@ UnlockScreen.prototype.onSubmit = async function (event) {
   const input = document.getElementById('password-box')
   const password = input.value
   try {
+    await this.props.dispatch(rifActions.setupDefaultLuminoCallbacks())
     await this.props.dispatch(actions.tryUnlockMetamask(password, this.props.dPath))
   } catch (e) {
     log.error(e)
@@ -115,6 +117,7 @@ UnlockScreen.prototype.submitPassword = async function (event) {
   element.value = ''
   try {
     const dPath = getDPath(this.props.provider.type) || this.props.dPath
+    await this.props.dispatch(rifActions.setupDefaultLuminoCallbacks())
     await this.props.dispatch(actions.tryUnlockMetamask(password, dPath))
   } catch (e) {
     log.error(e)

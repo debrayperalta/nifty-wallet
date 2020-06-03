@@ -42,9 +42,13 @@ class ModeOptionSelected extends Component {
   }
   render () {
     const {value} = this.props;
+    let fasterWithoutFees = null;
+    if (value.value === payMode.LUMINO) {
+      fasterWithoutFees = (<span>Faster and without fees</span>);
+    }
     return (
-      <div className="add-new-multicrypto-select-value">
-        <span className="add-new-multicrypto-select-value-text">{value.name}</span>
+      <div className="mode-dropdown-item">
+        <span className="mode-dropdown-item-value">{value.name}{fasterWithoutFees}</span>
       </div>
     )
   }
@@ -52,9 +56,20 @@ class ModeOptionSelected extends Component {
 
 
 const payMode = {
-  NETWORK: 'NETWORK',
   LUMINO: 'LUMINO',
+  NETWORK: 'NETWORK',
 }
+
+const modeOptions = [
+  {
+    name: 'Lumino',
+    value: payMode.LUMINO,
+  },
+  {
+    name: 'Pay',
+    value: payMode.NETWORK,
+  },
+];
 
 class Pay extends Component {
 
@@ -80,20 +95,7 @@ class Pay extends Component {
       selectedNetwork: null,
       loading: true,
       selectedToken: null,
-      selectedMode: {
-        name: 'Pay',
-        value: payMode.NETWORK,
-      },
-      modes: [
-        {
-          name: 'Lumino',
-          value: payMode.LUMINO,
-        },
-        {
-          name: 'Pay',
-          value: payMode.NETWORK,
-        },
-      ],
+      selectedMode: modeOptions[0],
     };
   }
 
@@ -202,7 +204,7 @@ class Pay extends Component {
 
   sendLuminoPayment () {
     const callbackHandlers = new CallbackHandlers();
-    callbackHandlers.successHandler = (result) => {
+    callbackHandlers.requestHandler = (result) => {
       console.debug('PAYMENT REQUESTED', result);
       this.props.showToast('Payment Sent');
     };
@@ -210,7 +212,7 @@ class Pay extends Component {
       console.debug('PAYMENT DONE', result);
       this.props.showToast('Payment Delivered');
     };
-    callbackHandlers.successHandler = (error) => {
+    callbackHandlers.errorHandler = (error) => {
       console.debug('PAYMENT ERROR', error);
       this.props.showToast('Error trying to pay!', false);
     };
@@ -255,7 +257,7 @@ class Pay extends Component {
   getDestinationFragment () {
     return (
       <div className="form-segment">
-        <span>Destination:</span><input type="text" placeholder="Address or RNS Domain" onChange={(event) => this.changeDestination(event)}/>
+        <span>To:</span><input type="text" placeholder="Enter Domain or Address" onChange={(event) => this.changeDestination(event)}/>
       </div>
     );
   }
@@ -263,11 +265,11 @@ class Pay extends Component {
   getNetworkBody () {
     return (
       <div>
-        <NetworkDropdown onSelectedNetwork={(selectedNetwork => this.onNetworkChange(selectedNetwork))}
-                         defaultSelectedNetwork={this.getAllowedNetworks()[0]}
-                         networks={this.getAllowedNetworks()}/>
         <div className="form-segment">
-          <span>Amount:</span><input type="text" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
+          <NetworkDropdown onSelectedNetwork={(selectedNetwork => this.onNetworkChange(selectedNetwork))}
+                           defaultSelectedNetwork={this.getAllowedNetworks()[0]}
+                           networks={this.getAllowedNetworks()}/>
+          <input type="text" placeholder="Amount" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
         </div>
         {this.getDestinationFragment()}
         <div className="form-segment">
@@ -281,17 +283,15 @@ class Pay extends Component {
     if (!this.state.loading) {
       return (
         <div>
-          <TokenDropdown onSelectedToken={(selectedToken) => this.onTokenChange(selectedToken)}
-                         defaultSelectedToken={this.getAllowedTokens()[0]}
-                         tokens={this.getAllowedTokens()}/>
-          <div>
-            <div className="form-segment">
-              <span>Amount:</span><input type="text" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
-            </div>
-            {this.getDestinationFragment()}
-            <div className="form-segment">
-              <button disabled={!this.readyToPay()} onClick={() => this.sendLuminoPayment()}>Pay</button>
-            </div>
+          <div className="form-segment">
+            <TokenDropdown onSelectedToken={(selectedToken) => this.onTokenChange(selectedToken)}
+                           defaultSelectedToken={this.getAllowedTokens()[0]}
+                           tokens={this.getAllowedTokens()}/>
+            <input type="text" placeholder="Amount" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
+          </div>
+          {this.getDestinationFragment()}
+          <div className="form-segment">
+            <button disabled={!this.readyToPay()} onClick={() => this.sendLuminoPayment()}>Pay</button>
           </div>
         </div>
       );
@@ -306,13 +306,13 @@ class Pay extends Component {
 
   getModeDropdown () {
     return (
-      <div id="comboChainAddresses" className="add-new-multicrypto-select">
+      <div className="mode-dropdown">
         <Select
           searchable={false}
           arrowRenderer={() => <div className="combo-selector-triangle"/>}
           onChange={selectedMode => this.onModeChange(selectedMode)}
           optionComponent={ModeOption}
-          options={this.state.modes}
+          options={modeOptions}
           clearable={false}
           value={this.state.selectedMode}
           valueComponent={ModeOptionSelected}
