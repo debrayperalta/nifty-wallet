@@ -40,15 +40,15 @@ class DomainsScreen extends Component {
         }} id="chipletTitle" className={'chiplet-title'}>
           {data.name}
         </div>
-        {/*TODO fmelo, remove this if we are not going to use it in a future*/}
-        {/*<div id="chipletDescription" className={'chiplet-description'}>*/}
+        {/* TODO fmelo, remove this if we are not going to use it in a future*/}
+        {/* <div id="chipletDescription" className={'chiplet-description'}>*/}
         {/*  <div id="chipletExpiration">*/}
         {/*    <span>Expires on: {data.details ? data.details.expiration : 'n/a'}</span>*/}
         {/*  </div>*/}
         {/*  <div id="chipletRenew">*/}
         {/*    <span>Auto-renew: <a href={data.details ? this.props.setAutoRenew() : () => {}}>{data.details ? (data.details.autoRenew ? 'on' : 'off') : 'n/a'}</a></span>*/}
         {/*  </div>*/}
-        {/*</div>*/}
+        {/* </div>*/}
       </div>
       <div className={'chiplet-status-wrapper ' + statusStyle(data.status)}>
         <div id="chipletStatus" className={'chiplet-status-text'}>
@@ -71,7 +71,7 @@ class DomainsScreen extends Component {
   }
 
   render () {
-    if (this.props.domains) {
+    if (this.props.domains && this.props.domains.length > 0) {
       return (
         <div className={'domains-list'}>
           {this.props.domains.map((item, index) => {
@@ -79,6 +79,8 @@ class DomainsScreen extends Component {
           })}
         </div>
       )
+    } else if (this.props.domains && this.props.domains.length === 0) {
+      return (<div className={'domains-list'}>No domains registered</div>);
     } else {
       return (<div>Loading domains...</div>);
     }
