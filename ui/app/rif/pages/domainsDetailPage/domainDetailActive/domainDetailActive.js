@@ -15,6 +15,53 @@ import DomainHeader from '../../../components/domain-header';
 import {rns} from '../../../../../../rif.config';
 import GenericTable from '../../../components/table/genericTable';
 
+const mocks = [
+  {
+    content: '1',
+    actions: '11',
+  },
+  {
+    content: '2',
+    actions: '22',
+  },
+  {
+    content: '3',
+    actions: '33',
+  },
+  {
+    content: '4',
+    actions: '44',
+  },
+  {
+    content: '5',
+    actions: '55',
+  },
+  {
+    content: '6',
+    actions: '66',
+  },
+  {
+    content: '7',
+    actions: '77',
+  },
+  {
+    content: '8',
+    actions: '88',
+  },
+  {
+    content: '9',
+    actions: '99',
+  },
+  {
+    content: '100',
+    actions: '1000',
+  },
+  {
+    content: '101',
+    actions: '1010',
+  },
+];
+
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
     addNewChainAddress: PropTypes.func.isRequired,
@@ -166,7 +213,6 @@ class DomainsDetailActiveScreen extends Component {
       const address = getChainAddressByChainAddress(chainAddress.chain);
       const icon = address.icon ? address.icon : DEFAULT_ICON;
       const tableRow = {};
-      tableRow.id = index;
       tableRow.content =
         <div className={''}>
           <div className={''}>
@@ -211,26 +257,48 @@ class DomainsDetailActiveScreen extends Component {
 		const { chainAddresses, disableCombo } = this.state;
     const columnsChainAddresses = [
       {
-        selector: 'content',
+        Header: 'Content',
+        accessor: 'content',
       },
       {
-        selector: 'actions',
-        right: true,
+        Header: 'actions',
+        accessor: 'actions',
       },
     ];
+
+    // TODO Fede
+    // Acá van los styles para la tabla
+    const styles = {
+      title: '',
+      table:'',
+      thead: '',
+      theadTr: '',
+      theadTh: '',
+      tbody: '',
+      tbodyTr: '',
+      tbodyTd: '',
+      pagination: {
+        body: '',
+        buttonBack: '',
+        indexes: '',
+        activePageButton: '',
+        inactivePageButton: '',
+        buttonNext: '',
+      },
+    }
 		return (
       <div className={'body'}>
         <DomainHeader domainName={domainName}
                       showOwnerIcon={isOwner}
                       showLuminoNodeIcon={isLuminoNode}
                       showRifStorageIcon={isRifStorage}/>
-        <div id="domainDetailBody" className={'domain-detail-body'}>
+        <div id="domainDetailBody" className={''}>
           {this.state.resolvers &&
-          <div id="resolversBody" className={'resolvers-body'}>
-            <div className="resolver-body-top">
+          <div id="resolversBody" className={''}>
+            <div className="">
               {
                 (this.state.resolvers && chainAddresses.length > 0) &&
-                <GenericTable title="Addresses" columns={columnsChainAddresses} data={this.convertChainAddressesToTableData()} pagination={true}/>
+                <GenericTable title={'Addresses'} columns={columnsChainAddresses} data={this.convertChainAddressesToTableData()} paginationSize={3} className={styles}/>
               }
               {(isOwner && this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) &&
               <CustomButton
@@ -249,34 +317,41 @@ class DomainsDetailActiveScreen extends Component {
             </div>
           </div>
           }
-          <div id="domainDescription" className={'domain-description'}>
-            <div><span className={'domain-description-field'}>Renewal date:</span><span className={'domain-description-value label-spacing-left'}>{expirationDate}</span></div>
-            <div><span className={'domain-description-field'}>Auto renew: <a href={this.props.setAutoRenew()}>{autoRenew ? 'on' : 'off'}</a></span></div>
-            <div><span className={'domain-description-field'}>Owner:</span><span className={'domain-description-value label-spacing-left'}>{ownerAddress}</span></div>
-            {
-              /* TODO Rodrigo
-                This divs will be not shown anymore?
-              <div><span className={'domain-description-field'}>Address:</span><span className={'domain-description-value label-spacing-left'}>{address}</span></div>
-              <div><span className={'domain-description-field'}>Content:</span><span className={'domain-description-value label-spacing-left'}>{content}</span></div>
-               */
-            }
+          <div id="renewDescription" className={''}>
+            <div className={''}>Renew</div>
+            <div>
+              <span className={''}>Renewal date:</span>
+              <span className={''}>{expirationDate}</span>
+              <CustomButton
+                text={'Renew'}
+                onClick={ () => {} }
+                className={
+                  {
+                    button: '',
+                    text: '',
+                  }
+                }
+              />
+            </div>
           </div>
-          {
-            /* TODO Rodrigo
-             Not anymore watch & register?
-            !isOwner &&
-          <CustomButton
-            text={'WATCH & REGISTER'}
-            onClick={() => {}}
-            className={
-              {
-                button: 'domain-detail-watch-and-register',
-                text: 'center',
-              }
-            }
-          />
-             */
-          }
+          <div id="transferDescription" className={''}>
+            <div className={''}>Transfer</div>
+            <div>
+              <span className={''}>Owner:</span>
+              <span className={''}>{ownerAddress}</span>
+              <CustomButton
+                icon={faPen}
+                onClick={ () => {}}
+                className={
+                {
+                  button: '',
+                  icon: '',
+                  text: '',
+                  }
+                }
+              />
+            </div>
+          </div>
         </div>
       </div>
 		);
