@@ -25,7 +25,7 @@ class DomainsScreen extends Component {
       this.props.showThis({
         ...this.props,
         domains,
-      });
+      })
     }
   }
 
@@ -40,32 +40,47 @@ class DomainsScreen extends Component {
         }} id="chipletTitle" className={'chiplet-title'}>
           {data.name}
         </div>
-        <div id="chipletDescription" className={'chiplet-description'}>
-          <div id="chipletExpiration">
-            <span>Expires on: {data.details ? data.details.expiration : 'n/a'}</span>
-          </div>
-          <div id="chipletRenew">
-            <span>Auto-renew: <a href={data.details ? this.props.setAutoRenew() : () => {}}>{data.details ? (data.details.autoRenew ? 'on' : 'off') : 'n/a'}</a></span>
-          </div>
-        </div>
+        {/* TODO fmelo, remove this if we are not going to use it in a future*/}
+        {/* <div id="chipletDescription" className={'chiplet-description'}>*/}
+        {/*  <div id="chipletExpiration">*/}
+        {/*    <span>Expires on: {data.details ? data.details.expiration : 'n/a'}</span>*/}
+        {/*  </div>*/}
+        {/*  <div id="chipletRenew">*/}
+        {/*    <span>Auto-renew: <a href={data.details ? this.props.setAutoRenew() : () => {}}>{data.details ? (data.details.autoRenew ? 'on' : 'off') : 'n/a'}</a></span>*/}
+        {/*  </div>*/}
+        {/* </div>*/}
       </div>
       <div className={'chiplet-status-wrapper ' + statusStyle(data.status)}>
         <div id="chipletStatus" className={'chiplet-status-text'}>
-          {data.status}
+          <div className="chiplet-status-circle"></div>
+          <span className="chiplet-status">{data.status}</span>
         </div>
       </div>
+
+      <span className="chiplet-arrow" onClick={() => {
+        this.props.showDomainsDetailPage({
+          domain: data,
+          status: data.status,
+        })
+      }}>
+        <svg width="11" height="17" viewBox="0 0 11 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 1L9 8.5L1 16" stroke="#5B2A92" strokeWidth="2"/>
+        </svg>
+      </span>
     </div>
   }
 
   render () {
-    if (this.props.domains) {
+    if (this.props.domains && this.props.domains.length > 0) {
       return (
-        <div className={'body'}>
+        <div className={'domains-list'}>
           {this.props.domains.map((item, index) => {
             return this.chiplet(item, index)
           })}
         </div>
       )
+    } else if (this.props.domains && this.props.domains.length === 0) {
+      return (<div className={'domains-list'}>No domains registered</div>);
     } else {
       return (<div>Loading domains...</div>);
     }
@@ -92,19 +107,13 @@ const mapDispatchToProps = dispatch => {
   return {
     showDomainsDetailPage: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, {
       ...data,
-      tabOptions: {
-        screenTitle: 'Domain Detail',
+      navBar: {
+        title: 'Domain Detail',
         showBack: true,
       },
     })),
     setAutoRenew: (data) => {},
-    showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.domains, {
-      ...params,
-      tabOptions: {
-        screenTitle: 'My Domains',
-        showBack: true,
-      },
-    })),
+    showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.domains, params)),
     getDomains: () => dispatch(rifActions.getDomains()),
   }
 }

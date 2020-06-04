@@ -36,7 +36,7 @@ class AccountDropdowns extends Component {
   }
 
   static propTypes = {
-    identities: PropTypes .objectOf(PropTypes.object),
+    identities: PropTypes.objectOf(PropTypes.object),
     selected: PropTypes.string,
     keyrings: PropTypes.array,
     actions: PropTypes.objectOf(PropTypes.func),

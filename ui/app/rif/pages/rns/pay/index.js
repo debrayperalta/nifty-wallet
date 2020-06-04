@@ -1,14 +1,75 @@
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
 import DomainHeader from '../../../components/domain-header';
 import PropTypes from 'prop-types';
 import NetworkDropdown from '../../../components/networks-dropdown';
 import TokenDropdown from '../../../components/tokens-dropdown';
 import {SLIP_ADDRESSES} from '../../../constants/slipAddresses';
-import rifActions from '../../../actions';
-import niftyActions from '../../../../actions';
 import {CallbackHandlers} from '../../../actions/callback-handlers';
-import Tabs from '../../../components/tabs';
+import Select from 'react-select';
+import rifActions from '../../../actions';
+import niftyActions from '../../../../../../ui/app/actions';
+import {connect} from 'react-redux';
+
+class ModeOption extends Select.Option {
+  render () {
+    const { option } = this.props;
+    let fasterWithoutFees = null;
+    if (option.value === payMode.LUMINO) {
+      fasterWithoutFees = (<span>Faster and without fees</span>);
+    }
+    return (
+      <div
+        onMouseDown={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          this.props.onSelect(option, event);
+        }}
+        onMouseEnter={(event) => this.props.onFocus(option, event)}
+        onMouseMove={(event) => {
+          if (this.props.isFocused) return;
+          this.props.onFocus(option, event)
+        }}
+      >
+        <span className="label-spacing-left">{option.name}{fasterWithoutFees}</span>
+      </div>
+    )
+  }
+}
+
+class ModeOptionSelected extends Component {
+  static propTypes = {
+    value: PropTypes.object,
+  }
+  render () {
+    const {value} = this.props;
+    let fasterWithoutFees = null;
+    if (value.value === payMode.LUMINO) {
+      fasterWithoutFees = (<span>Faster and without fees</span>);
+    }
+    return (
+      <div className="mode-dropdown-item">
+        <span className="mode-dropdown-item-value">{value.name}{fasterWithoutFees}</span>
+      </div>
+    )
+  }
+}
+
+
+const payMode = {
+  LUMINO: 'LUMINO',
+  NETWORK: 'NETWORK',
+}
+
+const modeOptions = [
+  {
+    name: 'Lumino',
+    value: payMode.LUMINO,
+  },
+  {
+    name: 'Pay',
+    value: payMode.NETWORK,
+  },
+];
 
 class Pay extends Component {
 
@@ -20,12 +81,9 @@ class Pay extends Component {
     decimalSeparator: PropTypes.string,
     sendLuminoPayment: PropTypes.func,
     sendNetworkPayment: PropTypes.func,
-    openChannel: PropTypes.func,
     getTokens: PropTypes.func,
     showPopup: PropTypes.func,
-    createDeposit: PropTypes.func,
     showToast: PropTypes.func,
-    getSelectedAddress: PropTypes.func,
   }
 
   constructor (props) {
@@ -37,6 +95,7 @@ class Pay extends Component {
       selectedNetwork: null,
       loading: true,
       selectedToken: null,
+      selectedMode: modeOptions[0],
     };
   }
 
@@ -67,10 +126,13 @@ class Pay extends Component {
     if (this.props.domainInfo) {
       const domainInfo = this.props.domainInfo;
       return (
-        <DomainHeader domainName={domainInfo.domainName}
-                      showOwnerIcon={domainInfo.isOwner}
-                      showLuminoNodeIcon={domainInfo.isLuminoNode}
-                      showRifStorageIcon={domainInfo.isRifStorage}/>
+        <div>
+          <DomainHeader domainName={domainInfo.domainName}
+                        showOwnerIcon={domainInfo.isOwner}
+                        showLuminoNodeIcon={domainInfo.isLuminoNode}
+                        showRifStorageIcon={domainInfo.isRifStorage}/>
+          <h3>Payments Service</h3>
+        </div>
       );
     }
   }
@@ -142,7 +204,7 @@ class Pay extends Component {
 
   sendLuminoPayment () {
     const callbackHandlers = new CallbackHandlers();
-    callbackHandlers.successHandler = (result) => {
+    callbackHandlers.requestHandler = (result) => {
       console.debug('PAYMENT REQUESTED', result);
       this.props.showToast('Payment Sent');
     };
@@ -150,7 +212,7 @@ class Pay extends Component {
       console.debug('PAYMENT DONE', result);
       this.props.showToast('Payment Delivered');
     };
-    callbackHandlers.successHandler = (error) => {
+    callbackHandlers.errorHandler = (error) => {
       console.debug('PAYMENT ERROR', error);
       this.props.showToast('Error trying to pay!', false);
     };
@@ -175,11 +237,7 @@ class Pay extends Component {
     return this.state.amount && this.state.destination && this.state.selectedToken;
   }
 
-  readyToOpenChannel () {
-    return !!this.state.destination;
-  }
-
-  readyToPayOrDeposit () {
+  readyToPay () {
     switch (this.state.tabIndex) {
       case '1':
         return this.checkNetworkPaymentReady();
@@ -190,138 +248,50 @@ class Pay extends Component {
     }
   }
 
-  onTabChange (index) {
+  onModeChange (selectedMode) {
     this.setState({
-      tabIndex: index,
-      selectedToken: this.getAllowedTokens()[0],
-      selectedNetwork: this.getAllowedNetworks()[0],
-      amount: '',
-      destination: '',
-    });
-  }
-
-  depositOnChannel () {
-    const callbackHandlers = new CallbackHandlers();
-    callbackHandlers.requestHandler = (result) => {
-      this.props.showToast('Deposit Requested');
-    };
-    callbackHandlers.successHandler = (result) => {
-      console.debug('DEPOSIT CREATED', result);
-      this.props.showToast('Deposit Done');
-      this.props.getTokens().then(tokens => {
-        this.setState({
-          tokens,
-        });
-      });
-    };
-    callbackHandlers.errorHandler = (error) => {
-      console.debug('ERROR DEPOSIT', error);
-      this.props.showToast('Error trying to deposit!', false);
-    };
-    this.props.showPopup('Deposit on Channel', {
-      text: 'Are you sure you want to deposit ' + this.state.amount + ' tokens?',
-      confirmLabel: 'Deposit',
-      confirmCallback: async () => {
-        if (this.state.destination && this.state.selectedToken && this.state.amount) {
-          const selectedAddress = await this.props.getSelectedAddress();
-          this.props.createDeposit(
-            this.state.destination,
-            this.state.selectedToken,
-            selectedAddress,
-            this.getOpenedChannelForPartner(this.state.destination).channel_identifier,
-            this.state.amount, callbackHandlers);
-        } else {
-          this.props.showToast('You need to fill with a partner address and an amount to deposit first.', false);
-        }
-      },
-    });
-  }
-
-  getOpenedChannelForPartner (partner) {
-    if (partner) {
-      return this.state.selectedToken.openedChannels
-        .find(openedChannel => openedChannel.partner_address === partner && openedChannel.sdk_status === 'CHANNEL_OPENED');
-    }
-    return null;
-  }
-
-  openChannel () {
-    const callbackHandlers = new CallbackHandlers();
-    callbackHandlers.requestHandler = (result) => {
-      this.props.showToast('Requesting open channel');
-      this.props.getTokens().then(tokens => {
-        this.setState({
-          tokens,
-        });
-      });
-    };
-    callbackHandlers.successHandler = (result) => {
-      console.log('OPEN CHANNEL!!!', result);
-      // TODO: this only will work with notifiers, we should move any logic after open channel to here instead of asuming that open channel was success
-      // this.props.getTokens().then(tokens => {
-      //   this.setState({
-      //     tokens,
-      //   });
-      // });
-    };
-    callbackHandlers.errorHandler = (error) => {
-      this.props.showToast(error, false);
-    };
-    this.props.showPopup('Open Channel', {
-      text: 'Are you sure you want to open channel with this partner ' + this.state.destination + '?',
-      confirmLabel: 'Open',
-      confirmCallback: () => {
-        if (this.state.destination && this.state.selectedToken) {
-          this.props.openChannel(this.state.destination, this.state.selectedToken, callbackHandlers);
-        } else {
-          this.props.showToast('You need to fill with a partner address first.', false);
-        }
-      },
+      selectedMode,
     });
   }
 
   getDestinationFragment () {
     return (
       <div className="form-segment">
-        <span>Destination:</span><input type="text" placeholder="Address or RNS Domain" onChange={(event) => this.changeDestination(event)}/>
+        <span>To:</span><input type="text" placeholder="Enter Domain or Address" onChange={(event) => this.changeDestination(event)}/>
       </div>
     );
   }
 
-  getNetworkPanel () {
+  getNetworkBody () {
     return (
       <div>
-        <NetworkDropdown onSelectedNetwork={(selectedNetwork => this.onNetworkChange(selectedNetwork))}
-                         defaultSelectedNetwork={this.getAllowedNetworks()[0]}
-                         networks={this.getAllowedNetworks()}/>
         <div className="form-segment">
-          <span>Amount:</span><input type="text" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
+          <NetworkDropdown onSelectedNetwork={(selectedNetwork => this.onNetworkChange(selectedNetwork))}
+                           defaultSelectedNetwork={this.getAllowedNetworks()[0]}
+                           networks={this.getAllowedNetworks()}/>
+          <input type="text" placeholder="Amount" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
         </div>
         {this.getDestinationFragment()}
         <div className="form-segment">
-          <button disabled={!this.readyToPayOrDeposit()} onClick={() => this.sendNetworkPayment()}>Pay</button>
+          <button disabled={!this.readyToPay()} onClick={() => this.sendNetworkPayment()}>Pay</button>
         </div>
       </div>
     );
   }
 
-  getTokenPanel () {
+  getLuminoBody () {
     if (!this.state.loading) {
       return (
         <div>
-          <TokenDropdown onSelectedToken={(selectedToken) => this.onTokenChange(selectedToken)}
-                         defaultSelectedToken={this.getAllowedTokens()[0]}
-                         tokens={this.getAllowedTokens()}/>
-          <div>
-            <div className="form-segment">
-              <span>Amount:</span><input type="text" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
-            </div>
-            {this.getDestinationFragment()}
-            <div className="form-segment">
-              <button disabled={!this.readyToOpenChannel()} onClick={() => this.openChannel()}>Open Channel</button>
-              <button disabled={!this.readyToPayOrDeposit()} onClick={() => this.depositOnChannel()}>Deposit</button>
-              <button disabled={!this.readyToPayOrDeposit()} onClick={() => this.sendLuminoPayment()}>Pay</button>
-            </div>
+          <div className="form-segment">
+            <TokenDropdown onSelectedToken={(selectedToken) => this.onTokenChange(selectedToken)}
+                           defaultSelectedToken={this.getAllowedTokens()[0]}
+                           tokens={this.getAllowedTokens()}/>
+            <input type="text" placeholder="Amount" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
+          </div>
+          {this.getDestinationFragment()}
+          <div className="form-segment">
+            <button disabled={!this.readyToPay()} onClick={() => this.sendLuminoPayment()}>Pay</button>
           </div>
         </div>
       );
@@ -334,30 +304,42 @@ class Pay extends Component {
     }
   }
 
-  getTabs (networkPanel, tokenPanel) {
-    return [
-      {
-        title: 'Pay',
-        index: 0,
-        component: networkPanel,
-      },
-      {
-        title: 'Pay with Lumino',
-        index: 1,
-        component: tokenPanel,
-      },
-    ];
+  getModeDropdown () {
+    return (
+      <div className="mode-dropdown">
+        <Select
+          searchable={false}
+          arrowRenderer={() => <div className="combo-selector-triangle"/>}
+          onChange={selectedMode => this.onModeChange(selectedMode)}
+          optionComponent={ModeOption}
+          options={modeOptions}
+          clearable={false}
+          value={this.state.selectedMode}
+          valueComponent={ModeOptionSelected}
+        />
+      </div>
+    );
+  }
+
+  getBody () {
+    const {selectedMode} = this.state;
+    switch (selectedMode.value) {
+      case payMode.NETWORK:
+        return this.getNetworkBody();
+      case payMode.LUMINO:
+        return this.getLuminoBody();
+    }
   }
 
   render () {
     const header = this.getHeaderFragment();
-    const tokenPanel = this.getTokenPanel();
-    const networkPanel = this.getNetworkPanel();
-    const tabs = this.getTabs(networkPanel, tokenPanel);
+    const modeDropdown = this.getModeDropdown();
+    const body = this.getBody();
     return (
       <div className="body">
         {header}
-        <Tabs tabs={tabs} onChange={(tab) => this.onTabChange(tab.index)} />
+        {modeDropdown}
+        {body}
       </div>
     );
   }
@@ -377,12 +359,6 @@ function mapDispatchToProps (dispatch) {
     sendNetworkPayment: (network, destination, amount) => {
       console.log('Network Payment', {network, destination, amount});
     },
-    openChannel: (partner, token, callbackHandlers) => {
-      return dispatch(rifActions.openChannel(partner, token.address, callbackHandlers))
-    },
-    createDeposit: (partner, token, address, channelId, amount, callbackHandlers) => {
-      return dispatch(rifActions.createDeposit(partner, token.address, address, token.network_address, channelId, amount, callbackHandlers))
-    },
     getTokens: () => dispatch(rifActions.getTokensWithJoinedCheck()),
     showPopup: (title, opts) => {
       dispatch(rifActions.showModal({
@@ -391,7 +367,6 @@ function mapDispatchToProps (dispatch) {
       }));
     },
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
-    getSelectedAddress: () => dispatch(rifActions.getSelectedAddress()),
   }
 }
 module.exports = connect(mapStateToProps, mapDispatchToProps)(Pay)
