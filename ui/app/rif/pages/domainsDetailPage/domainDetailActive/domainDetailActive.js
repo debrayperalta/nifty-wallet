@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faPen, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { getChainAddressByChainAddress } from '../../../utils/utils';
-import { CustomButton, Menu } from '../../../components';
+import { CustomButton } from '../../../components';
 import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver';
 import { GET_RESOLVERS, DEFAULT_ICON } from '../../../constants';
 import { SLIP_ADDRESSES } from '../../../constants/slipAddresses';
@@ -14,53 +14,6 @@ import rifActions from '../../../actions';
 import DomainHeader from '../../../components/domain-header';
 import {rns} from '../../../../../../rif.config';
 import GenericTable from '../../../components/table/genericTable';
-
-const mocks = [
-  {
-    content: '1',
-    actions: '11',
-  },
-  {
-    content: '2',
-    actions: '22',
-  },
-  {
-    content: '3',
-    actions: '33',
-  },
-  {
-    content: '4',
-    actions: '44',
-  },
-  {
-    content: '5',
-    actions: '55',
-  },
-  {
-    content: '6',
-    actions: '66',
-  },
-  {
-    content: '7',
-    actions: '77',
-  },
-  {
-    content: '8',
-    actions: '88',
-  },
-  {
-    content: '9',
-    actions: '99',
-  },
-  {
-    content: '100',
-    actions: '1000',
-  },
-  {
-    content: '101',
-    actions: '1010',
-  },
-];
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
@@ -243,18 +196,8 @@ class DomainsDetailActiveScreen extends Component {
     return data;
   }
 	render () {
-		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress } = this.props;
-    const domainInfo = {
-      domainName,
-      expirationDate,
-      autoRenew,
-      ownerAddress,
-      isOwner,
-      isLuminoNode,
-      isRifStorage,
-      content,
-    };
-		const { chainAddresses, disableCombo } = this.state;
+		const { domainName, address, expirationDate, ownerAddress, isOwner, isLuminoNode, isRifStorage } = this.props;
+		const { chainAddresses } = this.state;
     const columnsChainAddresses = [
       {
         Header: 'Content',
@@ -270,7 +213,7 @@ class DomainsDetailActiveScreen extends Component {
     // Acá van los styles para la tabla
     const styles = {
       title: '',
-      table:'',
+      table: '',
       thead: '',
       theadTr: '',
       theadTh: '',
@@ -298,7 +241,22 @@ class DomainsDetailActiveScreen extends Component {
             <div className="">
               {
                 (this.state.resolvers && chainAddresses.length > 0) &&
-                <GenericTable title={'Addresses'} columns={columnsChainAddresses} data={this.convertChainAddressesToTableData()} paginationSize={3} className={styles}/>
+                <GenericTable
+                  title={'Addresses'}
+                  columns={[
+                    {
+                      Header: 'Content',
+                      accessor: 'content',
+                    },
+                    {
+                      Header: 'actions',
+                      accessor: 'actions',
+                    },
+                  ]}
+                  data={this.convertChainAddressesToTableData()}
+                  paginationSize={3}
+                  className={styles}
+                />
               }
               {(isOwner && this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) &&
               <CustomButton
