@@ -4,6 +4,7 @@ import {DomainIcon, LuminoNodeIcon, RifStorageIcon} from './commons'
 import Menu from './menu/index'
 import h from 'react-hyperscript'
 import CustomModal from './modal/modal';
+import { GenericTable } from './table';
 
 function buildModal (modalComponent, currentModal) {
   return h(modalComponent, {key: currentModal.name, message: currentModal.message})
@@ -27,4 +28,5 @@ export {
   RifStorageIcon,
   Menu,
   showModal,
+  GenericTable,
 }

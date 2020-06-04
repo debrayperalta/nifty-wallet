@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faPen, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { getChainAddressByChainAddress } from '../../../utils/utils';
-import { CustomButton } from '../../../components';
+import { CustomButton, GenericTable } from '../../../components';
 import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver';
 import { GET_RESOLVERS, DEFAULT_ICON } from '../../../constants';
 import { SLIP_ADDRESSES } from '../../../constants/slipAddresses';
@@ -12,8 +12,8 @@ import niftyActions from '../../../../actions';
 import {pageNames} from '../../index';
 import rifActions from '../../../actions';
 import DomainHeader from '../../../components/domain-header';
-import {rns} from '../../../../../../rif.config';
-import GenericTable from '../../../components/table/genericTable';
+import { rns } from '../../../../../../rif.config';
+import Subdomains from '../../rns/subdomains';
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
@@ -196,18 +196,18 @@ class DomainsDetailActiveScreen extends Component {
     return data;
   }
 	render () {
-		const { domainName, address, expirationDate, ownerAddress, isOwner, isLuminoNode, isRifStorage } = this.props;
+    const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress } = this.props;
+    const domainInfo = {
+      domainName,
+      expirationDate,
+      autoRenew,
+      ownerAddress,
+      isOwner,
+      isLuminoNode,
+      isRifStorage,
+      content,
+    };
 		const { chainAddresses } = this.state;
-    const columnsChainAddresses = [
-      {
-        Header: 'Content',
-        accessor: 'content',
-      },
-      {
-        Header: 'actions',
-        accessor: 'actions',
-      },
-    ];
 
     // TODO Fede
     // Acá van los styles para la tabla
@@ -228,7 +228,26 @@ class DomainsDetailActiveScreen extends Component {
         inactivePageButton: '',
         buttonNext: '',
       },
+      subdomains: {
+        title: '',
+        table: '',
+        thead: '',
+        theadTr: '',
+        theadTh: '',
+        tbody: '',
+        tbodyTr: '',
+        tbodyTd: '',
+        pagination: {
+          body: '',
+          buttonBack: '',
+          indexes: '',
+          activePageButton: '',
+          inactivePageButton: '',
+          buttonNext: '',
+        },
+      },
     }
+    console.debug('========================================================================domainDetailActive');
 		return (
       <div className={'body'}>
         <DomainHeader domainName={domainName}
@@ -275,6 +294,7 @@ class DomainsDetailActiveScreen extends Component {
             </div>
           </div>
           }
+          <Subdomains domainInfo={domainInfo} className={styles.subdomains} paginationSize={3}/>
           <div id="renewDescription" className={''}>
             <div className={''}>Renew</div>
             <div>

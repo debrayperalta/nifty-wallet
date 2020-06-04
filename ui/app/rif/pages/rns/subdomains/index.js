@@ -1,13 +1,13 @@
-import React, {Component} from 'react'
-import {connect} from 'react-redux'
-import DomainHeader from '../../../components/domain-header'
-import PropTypes from 'prop-types'
-import rifActions from '../../../actions'
-import niftyActions from '../../../../actions'
-import {pageNames} from '../../../pages/index'
-import {faCopy, faPlusCircle, faTimes} from '@fortawesome/free-solid-svg-icons'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import copyToClipboard from 'copy-to-clipboard'
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
+import rifActions from '../../../actions';
+import niftyActions from '../../../../actions';
+import {pageNames} from '../../../pages/index';
+import {faCopy, faTimes} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import copyToClipboard from 'copy-to-clipboard';
+import { GenericTable } from '../../../components';
 
 class Subdomains extends Component {
 
@@ -23,6 +23,8 @@ class Subdomains extends Component {
     showTransactionConfirmPage: PropTypes.func,
     isSubdomainAvailable: PropTypes.func,
     deleteSubdomain: PropTypes.func,
+    paginationSize: PropTypes.number,
+    className: PropTypes.any,
   }
 
   constructor (props) {
@@ -179,43 +181,43 @@ class Subdomains extends Component {
     });
   }
 
-  getList () {
-    const listItems = [];
+  getData () {
+    const data = [];
     if (this.props.subdomains) {
-      this.props.subdomains.forEach((subdomain, index) => {
-        listItems.push((
-          <li className="hand-over list-item" key={'subdomain-' + index} onClick={() => this.openSubdomainPopup(subdomain)}>
-            <span>{subdomain.name}</span>
-            <FontAwesomeIcon onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              this.openDeletePopup(subdomain);
-            }} icon={faTimes}/>
-          </li>
-        ))
-      })
+      this.props.subdomains.map((subdomain, index) => {
+        const tableRow = {};
+        tableRow.content = <span>{subdomain.name}</span>
+        tableRow.actions = <FontAwesomeIcon onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.openDeletePopup(subdomain);
+        }} icon={faTimes}/>
+        data.push(tableRow);
+      });
     }
-    return listItems.length > 0 ? <ul>{listItems}</ul> : <div>No Subdomains Found</div>;
+    return data;
   }
 
   render () {
-    const list = this.getList();
-    const {domainName, isOwner, isLuminoNode, isRifStorage} = this.props.domainInfo;
+    const { className, paginationSize } = this.props;
+    console.debug('========================================================================SUBDOMAINS');
     return (
-      <div className="body subdomains">
-        <DomainHeader domainName={domainName}
-                      showOwnerIcon={isOwner}
-                      showLuminoNodeIcon={isLuminoNode}
-                      showRifStorageIcon={isRifStorage}/>
-        <div className="new-button-container">
-          <button onClick={() => this.openNewSubdomainPopup()} className="new-button">
-            <FontAwesomeIcon icon={faPlusCircle}/> new
-          </button>
-        </div>
-        <div className="list">
-          {list}
-        </div>
-      </div>
+      <GenericTable
+        title={'Subdomains'}
+        columns={[
+          {
+            Header: 'Content',
+            accessor: 'content',
+          },
+          {
+            Header: 'actions',
+            accessor: 'actions',
+          },
+        ]}
+        data={this.getData()}
+        paginationSize={paginationSize || 3}
+        className={className}
+      />
     );
   }
 }
@@ -244,4 +246,4 @@ function mapDispatchToProps (dispatch) {
     deleteSubdomain: (domainName, subdomain) => dispatch(rifActions.deleteSubdomain(domainName, subdomain)),
   }
 }
-module.exports = connect(mapStateToProps, mapDispatchToProps)(Subdomains)
+module.exports = connect(mapStateToProps, mapDispatchToProps)(Subdomains);

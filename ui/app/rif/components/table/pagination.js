@@ -8,7 +8,7 @@ export default class Pagination extends Component {
     super(props);
     this.changePage = this.changePage.bind(this);
     this.state = {
-      visiblePages: this.getVisiblePages(null, props.pages),
+      visiblePages: this.getVisiblePages(null, props.pages > 0 ? props.pages : 1),
     };
   }
 
