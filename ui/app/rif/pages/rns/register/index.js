@@ -225,33 +225,34 @@ class DomainRegisterScreen extends Component {
         </div>
       ),
       waitingForRegister: (
-        <div>
-          <div>
-            <div>Confirming transaction</div>
-            <div className="app-loader">Loading...</div>
-            <p>Wait until the domain is requested then click Register to buy the domain.</p>
-          </div>
+        <div className="waiting-for-register text-center">
+          <h4 className="waiting-for-register__title">Confirming transaction</h4>
+          <div className="app-loader"/>
+          <p className="waiting-for-register__text">Wait until the domain is requested then click Register to buy the domain.</p>
         </div>
       ),
       readyToRegister: (
-        <div>
-          <div>Your domain has been requested</div>
-          <div>Click Register to buy the domain.</div>
+        <div className="ready-to-register">
+          <div className="ready-to-register__msg">
+            <svg width="38" height="23" viewBox="0 0 38 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1.09302 10.5L12.9674 21L37.2326 1" stroke="#602A95" strokeWidth="2"/>
+            </svg>
+            <span>Your domain has been requested</span>
+          </div>
+          <p className="ready-to-register__text">Click Register to buy the domain.</p>
         </div>
       ),
       waitingForConfirmation: (
-        <div>
-          <div>Confirming transaction</div>
-          <div>Loading...</div>
+        <div className="waiting-for-confirm text-center">
+          <h4 className="waiting-for-confirm__title">Confirming transaction</h4>
+          <div className="app-loader"/>
         </div>
       ),
       registered: (
-        <div>
-          <div>
-            <div>Congrats!</div>
-            <div>{this.props.domainName} is yours</div>
-            <div>Check it in the explorer</div>
-          </div>
+        <div className="domain-registered text-center">
+          <h4 className="domain-registered__title">Congrats!</h4>
+          <p  className="domain-registered__name">{this.props.domainName} is yours</p>
+          <p className="domain-registered__text">Check it in the explorer</p>
         </div>
       ),
     };
@@ -274,23 +275,23 @@ class DomainRegisterScreen extends Component {
     const partials = {
       setupRegister: (
         <div className="button-container">
-          <button className="btn-primary" onClick={() => this.requestDomain()}>Request Domain</button>
+          <button className="btn-primary btn-register" onClick={() => this.requestDomain()}>Request Domain</button>
         </div>
       ),
       waitingForRegister: (
         <div className="button-container">
-          <button disabled={true}>Register</button>
+          <button className="btn-primary btn-register" disabled={true}>Register</button>
         </div>
       ),
       readyToRegister: (
         <div className="button-container">
-          <button onClick={() => this.completeRegistration()}>Register</button>
+          <button className="btn-primary btn-register" onClick={() => this.completeRegistration()}>Register</button>
         </div>
       ),
       registered: (
         <div className="button-container">
-          <button onClick={() => this.props.showDomainList()}>My Domains</button>
-          <button onClick={() => this.viewDomainDetails()}>List in Marketplace</button>
+          <button className="btn-primary-outlined"  onClick={() => this.props.showDomainList()}>My Domains</button>
+          <button className="btn-primary-outlined"  onClick={() => this.viewDomainDetails()}>List in Marketplace</button>
         </div>
       ),
     };
