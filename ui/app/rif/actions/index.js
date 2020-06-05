@@ -681,12 +681,18 @@ function createPayment (partner, tokenAddress, netAmount, callbackHandlers = new
 }
 
 function getChannels () {
+  console.debug('=================================================================im here1');
   return (dispatch) => {
+    console.debug('=================================================================im here2');
     return new Promise((resolve, reject) => {
+      console.debug('=================================================================im here3');
       if (rifConfig.mocksEnabled) {
         return resolve(mocks.channels);
       } else {
         background.rif.lumino.getChannels((error, channels) => {
+          console.debug('=================================================================im here4');
+          console.debug('=================================================================error', error);
+          console.debug('=================================================================channels', channels);
           if (error) {
             dispatch(niftyActions.displayWarning(error));
             return reject(error);

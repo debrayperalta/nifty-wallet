@@ -7,6 +7,7 @@ import CustomModal from './modal/modal';
 import { GenericTable } from './table';
 import Subdomains from './subDomains';
 import ChainAddresses from './chainAddresses';
+import LuminoChannels from './luminoChannels';
 
 function buildModal (modalComponent, currentModal) {
   return h(modalComponent, {key: currentModal.name, message: currentModal.message})
@@ -33,4 +34,5 @@ export {
   GenericTable,
   Subdomains,
   ChainAddresses,
+  LuminoChannels,
 }

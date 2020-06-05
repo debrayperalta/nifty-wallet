@@ -80,8 +80,6 @@ class ChainAddresses extends Component {
   render () {
     const { paginationSize, classes } = this.state;
     const data = this.convertChainAddressesToTableData();
-    console.debug('========================================================================================data', data);
-    console.debug('========================================================================================data.length', data.length);
     return (
       <GenericTable
         title={'Addresses'}

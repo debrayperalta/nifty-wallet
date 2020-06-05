@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { faPlus, faPen } from '@fortawesome/free-solid-svg-icons';
-import { CustomButton, ChainAddresses, Subdomains } from '../../../components';
+import { CustomButton, ChainAddresses, Subdomains, LuminoChannels } from '../../../components';
 import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver';
 import { GET_RESOLVERS } from '../../../constants';
 import { SLIP_ADDRESSES } from '../../../constants/slipAddresses';
@@ -192,6 +192,25 @@ class DomainsDetailActiveScreen extends Component {
           buttonNext: '',
         },
       },
+      luminoChannels: {
+        title: '',
+        table: '',
+        thead: '',
+        theadTr: '',
+        theadTh: '',
+        tbody: '',
+        tbodyTr: '',
+        tbodyTd: '',
+        noData: '',
+        pagination: {
+          body: '',
+          buttonBack: '',
+          indexes: '',
+          activePageButton: '',
+          inactivePageButton: '',
+          buttonNext: '',
+        },
+      },
     }
 		return (
       <div className={'body'}>
@@ -200,6 +219,7 @@ class DomainsDetailActiveScreen extends Component {
                       showLuminoNodeIcon={isLuminoNode}
                       showRifStorageIcon={isRifStorage}/>
         <div id="domainDetailBody" className={''}>
+          <LuminoChannels />
           {resolvers &&
           <div id="chainAddressesBody" className={''}>
             <ChainAddresses
