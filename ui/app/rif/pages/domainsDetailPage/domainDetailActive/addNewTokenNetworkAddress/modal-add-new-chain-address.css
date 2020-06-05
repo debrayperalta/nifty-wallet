@@ -14,26 +14,28 @@
     color: #3399FF;
 }
 .add-new-multicrypto-select {
-    text-align: left;
-    font-size: 1rem;
-    width: 90%;
-    margin-left: 5%;
-    margin-top: 1rem;
+  flex: 0 0 auto;
 }
-.add-new-multicrypto-select .Select-control {
-    border-top: 0;
-    border-left: 0;
-    border-right: 0;
+
+.add-new-multicrypto-select-value {
+  padding-right: 40px;
+  align-items: center;
+  font-family: var(--primary-font);
+  color: var(--gray-text);
+  font-size: 14px;
+  font-weight: 400;
 }
+
 .add-new-multicrypto-select .Select-input {
     display: none !important;
 }
 .add-new-multicrypto-select-value-icon {
-    margin-left: 5%;
+    margin-right: 5px;
 }
 .add-new-multicrypto-select-value-text {
     margin-left: 5%;
 }
+
 .add-new-multicrypto-input {
     margin-top: 1rem;
     margin-bottom: 4rem;
