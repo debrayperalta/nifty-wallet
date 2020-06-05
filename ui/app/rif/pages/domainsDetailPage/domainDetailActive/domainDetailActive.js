@@ -1,19 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faPen, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { getChainAddressByChainAddress } from '../../../utils/utils';
-import { CustomButton, GenericTable } from '../../../components';
+import { faPlus, faPen } from '@fortawesome/free-solid-svg-icons';
+import { CustomButton, ChainAddresses, Subdomains } from '../../../components';
 import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver';
-import { GET_RESOLVERS, DEFAULT_ICON } from '../../../constants';
+import { GET_RESOLVERS } from '../../../constants';
 import { SLIP_ADDRESSES } from '../../../constants/slipAddresses';
 import niftyActions from '../../../../actions';
 import {pageNames} from '../../index';
 import rifActions from '../../../actions';
 import DomainHeader from '../../../components/domain-header';
 import { rns } from '../../../../../../rif.config';
-import Subdomains from '../../rns/subdomains';
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
@@ -22,7 +19,6 @@ class DomainsDetailActiveScreen extends Component {
     setChainAddressForResolver: PropTypes.func.isRequired,
     deleteChainAddressForResolver: PropTypes.func.isRequired,
 		setAutoRenew: PropTypes.func.isRequired,
-    getChainAddresses: PropTypes.func,
     getUnapprovedTransactions: PropTypes.func,
     showTransactionConfirmPage: PropTypes.func,
     domain: PropTypes.object.isRequired,
@@ -55,7 +51,6 @@ class DomainsDetailActiveScreen extends Component {
       slipChainAddresses: slipChainAddresses,
       selectedChainAddress: slipChainAddresses[0].chain,
 			insertedAddress: '',
-      chainAddresses: [],
       updateChains: true,
 		};
 	}
@@ -127,28 +122,10 @@ class DomainsDetailActiveScreen extends Component {
       }
     }
   }
-  componentDidMount () {
-    this.loadChainAddresses();
-  }
 
   componentDidUpdate (prevProps, prevState) {
-    if (prevProps.domainName !== this.props.domainName) {
-      this.loadChainAddresses();
-    } else if (this.props.updateChains) {
-      if (this.state.updateChains) {
-        this.setState({ updateChains: false });
-        this.loadChainAddresses();
-      }
-    }
     if (this.props.disableResolvers !== this.state.disableCombo) {
       this.setState({ disableCombo: this.props.disableResolvers });
-    }
-  }
-
-  async loadChainAddresses () {
-    if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {
-      const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
-      this.setState({chainAddresses: chainAddresses});
     }
   }
 
@@ -160,43 +137,8 @@ class DomainsDetailActiveScreen extends Component {
     return rns.contracts.publicResolver;
   }
 
-  convertChainAddressesToTableData () {
-    const data = [];
-    this.state.chainAddresses.map((chainAddress, index) => {
-      const address = getChainAddressByChainAddress(chainAddress.chain);
-      const icon = address.icon ? address.icon : DEFAULT_ICON;
-      const tableRow = {};
-      tableRow.content =
-        <div className={''}>
-          <div className={''}>
-            <FontAwesomeIcon icon={icon.icon} color={icon.color} className={''}/>
-            <span>{address.symbol}</span>
-          </div>
-          <div className={''}>
-            <span>{chainAddress.address}</span>
-          </div>
-        </div>
-      tableRow.actions =
-        <div className={''}>
-          <FontAwesomeIcon
-            icon={faPen}
-            // color={'#FFFFFFFFFFF'}
-            className={''}
-            onClick={() => {}}
-          />
-          <FontAwesomeIcon
-            icon={faTimes}
-            // color={'#FFFFFFFFFFF'}
-            className={''}
-            onClick={() => {}}
-          />
-        </div>
-      data.push(tableRow);
-    });
-    return data;
-  }
 	render () {
-    const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress } = this.props;
+    const { domainName, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress } = this.props;
     const domainInfo = {
       domainName,
       expirationDate,
@@ -207,26 +149,29 @@ class DomainsDetailActiveScreen extends Component {
       isRifStorage,
       content,
     };
-		const { chainAddresses } = this.state;
+		const { resolvers } = this.state;
 
-    // TODO Fede
-    // Acá van los styles para la tabla
+    // TODO @fmelo
+    // Here you can set the classnames for the entire page
     const styles = {
-      title: '',
-      table: '',
-      thead: '',
-      theadTr: '',
-      theadTh: '',
-      tbody: '',
-      tbodyTr: '',
-      tbodyTd: '',
-      pagination: {
-        body: '',
-        buttonBack: '',
-        indexes: '',
-        activePageButton: '',
-        inactivePageButton: '',
-        buttonNext: '',
+      chainAddresses: {
+        title: '',
+        table: '',
+        thead: '',
+        theadTr: '',
+        theadTh: '',
+        tbody: '',
+        tbodyTr: '',
+        tbodyTd: '',
+        noData: '',
+        pagination: {
+          body: '',
+          buttonBack: '',
+          indexes: '',
+          activePageButton: '',
+          inactivePageButton: '',
+          buttonNext: '',
+        },
       },
       subdomains: {
         title: '',
@@ -237,6 +182,7 @@ class DomainsDetailActiveScreen extends Component {
         tbody: '',
         tbodyTr: '',
         tbodyTd: '',
+        noData: '',
         pagination: {
           body: '',
           buttonBack: '',
@@ -247,7 +193,6 @@ class DomainsDetailActiveScreen extends Component {
         },
       },
     }
-    console.debug('========================================================================domainDetailActive');
 		return (
       <div className={'body'}>
         <DomainHeader domainName={domainName}
@@ -255,46 +200,45 @@ class DomainsDetailActiveScreen extends Component {
                       showLuminoNodeIcon={isLuminoNode}
                       showRifStorageIcon={isRifStorage}/>
         <div id="domainDetailBody" className={''}>
-          {this.state.resolvers &&
-          <div id="resolversBody" className={''}>
-            <div className="">
-              {
-                (this.state.resolvers && chainAddresses.length > 0) &&
-                <GenericTable
-                  title={'Addresses'}
-                  columns={[
-                    {
-                      Header: 'Content',
-                      accessor: 'content',
-                    },
-                    {
-                      Header: 'actions',
-                      accessor: 'actions',
-                    },
-                  ]}
-                  data={this.convertChainAddressesToTableData()}
-                  paginationSize={3}
-                  className={styles}
-                />
-              }
-              {(isOwner && this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) &&
-              <CustomButton
-                icon={faPlus}
-                text={'Add Address'}
-                onClick={() => this.showModalAddChainAddress()}
-                className={
-                  {
-                    button: '',
-                    icon: '',
-                    text: '',
-                  }
+          {resolvers &&
+          <div id="chainAddressesBody" className={''}>
+            <ChainAddresses
+              domainName={domainName}
+              selectedResolverAddress={selectedResolverAddress}
+              paginationSize={3}
+              classes={styles.chainAddresses}
+            />
+            {(isOwner && resolvers.find(resolver => resolver.address === selectedResolverAddress)) &&
+            <CustomButton
+              icon={faPlus}
+              text={'Add Address'}
+              onClick={() => this.showModalAddChainAddress()}
+              className={
+                {
+                  button: '',
+                  icon: '',
+                  text: '',
                 }
-              />
               }
-            </div>
+            />
+            }
           </div>
           }
           <Subdomains domainInfo={domainInfo} className={styles.subdomains} paginationSize={3}/>
+          {isOwner &&
+          <CustomButton
+            icon={faPlus}
+            text={'Add Subdomain'}
+            onClick={() => { }}
+            className={
+              {
+                button: '',
+                icon: '',
+                text: '',
+              }
+            }
+          />
+          }
           <div id="renewDescription" className={''}>
             <div className={''}>Renew</div>
             <div>
@@ -363,7 +307,6 @@ const mapDispatchToProps = dispatch => {
 	return {
 		addNewChainAddress: (message) => dispatch(rifActions.showModal(message)),
     setNewResolver: (domainName, resolverAddress) => dispatch(rifActions.setResolverAddress(domainName, resolverAddress)),
-    getChainAddresses: (domainName) => dispatch(rifActions.getChainAddresses(domainName)),
     setChainAddressForResolver: (domainName, chain, chainAddress) => dispatch(rifActions.setChainAddressForResolver(domainName, chain, chainAddress)),
     deleteChainAddressForResolver: (domainName, chain, chainAddress) => {},
     getUnapprovedTransactions: () => dispatch(rifActions.getUnapprovedTransactions()),

@@ -5,6 +5,8 @@ import Menu from './menu/index'
 import h from 'react-hyperscript'
 import CustomModal from './modal/modal';
 import { GenericTable } from './table';
+import Subdomains from './subDomains';
+import ChainAddresses from './chainAddresses';
 
 function buildModal (modalComponent, currentModal) {
   return h(modalComponent, {key: currentModal.name, message: currentModal.message})
@@ -29,4 +31,6 @@ export {
   Menu,
   showModal,
   GenericTable,
+  Subdomains,
+  ChainAddresses,
 }

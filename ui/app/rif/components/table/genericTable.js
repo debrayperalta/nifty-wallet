@@ -31,45 +31,52 @@ const Table = ({ title, columns, data, pageSize, displayColumnHeader, className 
       {title &&
       <span className={classNames.title}>{title}</span>
       }
-      <table className={classNames.table} {...getTableProps()}>
-        { displayColumnHeader &&
-          <thead className={classNames.thead}>
-          {headerGroups.map(headerGroup => (
-            <tr className={classNames.theadTr} {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
-                <th className={classNames.theadTh} {...column.getHeaderProps()}>{column.render('Header')}</th>
-              ))}
-            </tr>
-          ))}
-          </thead>
-        }
-        <tbody className={classNames.tbody} {...getTableBodyProps()}>
-        {page.map((row, i) => {
-          prepareRow(row);
-          return (
-            <tr className={classNames.tbodyTr} {...row.getRowProps()}>
-              {row.cells.map(cell => {
-                return (
-                  <td className={classNames.tbodyTd} {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                );
-              })}
-            </tr>
-          );
-        })}
-        </tbody>
-      </table>
-      <div>
-        <Pagination
-          pages={pageOptions.length}
-          page={pageIndex}
-          onPageChange={gotoPage}
-          previousPage={previousPage}
-          nextPage={nextPage}
-          canPreviousPage={canPreviousPage}
-          canNextPage={canNextPage}
-          className={classNames.pagination}
-        />
-      </div>
+      {data.length > 0 &&
+        <div>
+          <table className={classNames.table} {...getTableProps()}>
+            {displayColumnHeader &&
+            <thead className={classNames.thead}>
+            {headerGroups.map(headerGroup => (
+              <tr className={classNames.theadTr} {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map(column => (
+                  <th className={classNames.theadTh} {...column.getHeaderProps()}>{column.render('Header')}</th>
+                ))}
+              </tr>
+            ))}
+            </thead>
+            }
+            <tbody className={classNames.tbody} {...getTableBodyProps()}>
+            {page.map((row, i) => {
+              prepareRow(row);
+              return (
+                <tr className={classNames.tbodyTr} {...row.getRowProps()}>
+                  {row.cells.map(cell => {
+                    return (
+                      <td className={classNames.tbodyTd} {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+            </tbody>
+          </table>
+          <div>
+            <Pagination
+            pages={pageOptions.length}
+            page={pageIndex}
+            onPageChange={gotoPage}
+            previousPage={previousPage}
+            nextPage={nextPage}
+            canPreviousPage={canPreviousPage}
+            canNextPage={canNextPage}
+            className={classNames.pagination}
+            />
+          </div>
+        </div>
+      }
+      {data.length === 0 &&
+        <span className={classNames.noData}>No data to display</span>
+      }
     </>
   );
 };
