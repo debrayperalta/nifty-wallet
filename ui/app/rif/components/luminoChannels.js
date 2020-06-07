@@ -3,6 +3,8 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import { GenericTable } from './index';
 import rifActions from '../actions';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faPen, faTimes} from "@fortawesome/free-solid-svg-icons";
 
 class LuminoChannels extends Component {
 
@@ -21,6 +23,21 @@ class LuminoChannels extends Component {
 
   getData () {
     const data = [];
+    const channels = this.getChannels();
+    channels.map((channel, index) => {
+      const tableRow = {};
+      tableRow.content =
+        <div className={''}>
+          <div className={''}>
+            Here goes something, partner address?
+          </div>
+        </div>
+      tableRow.actions =
+        <div className={''}>
+          Here goes the actions for lumino channel
+        </div>
+      data.push(tableRow);
+    });
     return data;
   }
 
@@ -32,10 +49,10 @@ class LuminoChannels extends Component {
 
   render () {
     const { paginationSize, classes } = this.props;
-    const channels = this.getChannels();
+
     return (
       <GenericTable
-        title={'Subdomains'}
+        title={'Lumino Channels'}
         columns={[
           {
             Header: 'Content',
