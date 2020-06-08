@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { faPen, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTimes, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 /**
@@ -20,6 +20,10 @@ class ItemWithActions extends Component {
     leftIcon: PropTypes.shape({icon: PropTypes.string, color: PropTypes.string }),
     leftContent: PropTypes.element,
     children: PropTypes.element,
+    contentClasses: PropTypes.string,
+    actionClasses: PropTypes.string,
+    enableRightChevron: PropTypes.bool,
+    onRightChevronClick: PropTypes.func,
   }
 
   constructor (props) {
@@ -38,8 +42,20 @@ class ItemWithActions extends Component {
     };
 
    render = () => {
-      const {leftIcon, leftContent, text, enableEdit, enableDelete, children, onDeleteClick} = this.props;
-      const {showEditChildren } = this.state;
+      const {
+        leftIcon,
+        leftContent,
+        text,
+        enableEdit,
+        enableDelete,
+        children,
+        onDeleteClick,
+        enableRightChevron,
+        onRightChevronClick,
+        contentClasses = "",
+        actionClasses = ""
+      } = this.props;
+      const {showEditChildren} = this.state;
       return (
        <div>
          {leftIcon && (
@@ -52,10 +68,10 @@ class ItemWithActions extends Component {
            </div>
          )}
          {leftContent && <div>{leftContent}</div>}
-         <div>
+         <div className={contentClasses}>
            <p>{text}</p>
          </div>
-         <div className={''}>
+         <div className={actionClasses}>
            {enableEdit && (
              <FontAwesomeIcon icon={faPen} className={''} onClick={this.onEditClick} />
            )}
@@ -66,6 +82,16 @@ class ItemWithActions extends Component {
                onClick={onDeleteClick}
              />
            )}
+           {enableRightChevron && (
+             <div>
+               <FontAwesomeIcon
+                 icon={faChevronRight}
+                 className={''}
+                 onClick={onRightChevronClick}
+               />
+             </div>
+           )
+           }
          </div>
          {showEditChildren && children && (
            children

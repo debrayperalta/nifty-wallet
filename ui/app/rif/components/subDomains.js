@@ -4,10 +4,8 @@ import PropTypes from 'prop-types';
 import rifActions from '../actions';
 import niftyActions from '../../actions';
 import {pageNames} from '../pages';
-import {faCopy, faTimes} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import copyToClipboard from 'copy-to-clipboard';
 import { GenericTable } from './index';
+import ItemWithActions from './item-with-actions';
 
 class Subdomains extends Component {
 
@@ -46,33 +44,21 @@ class Subdomains extends Component {
   }
 
   getData () {
-    const data = [];
-    const { classes } = this.props;
-    if (this.state.subdomains) {
-      this.state.subdomains.map((subdomain, index) => {
-        const tableRow = {};
-        tableRow.content =
-          <div className={classes.content}>
-            <span>{subdomain.name}</span>
-          </div>
-        tableRow.actions =
-          <div className={classes.contentActions}>
-            <FontAwesomeIcon
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.openDeletePopup(subdomain);
-              }}
-              icon={faTimes}/>
-          </div>
-        data.push(tableRow);
+  const { classes } = this.props;
+  if (this.props.subdomains) {
+      return this.props.subdomains.map((subdomain) => {
+        const item = <ItemWithActions contentClasses={classes.content} actionClasses={classes.contentActions} text={subdomain.name} enableRightChevron={true} />
+        return {
+          content: item,
+        }
       });
     }
-    return data;
+    return [];
   }
 
   render () {
     const { classes, paginationSize } = this.props;
+    const data = this.getData();
     return (
       <GenericTable
         title={'Subdomains'}
@@ -81,12 +67,8 @@ class Subdomains extends Component {
             Header: 'Content',
             accessor: 'content',
           },
-          {
-            Header: 'actions',
-            accessor: 'actions',
-          },
         ]}
-        data={this.getData()}
+        data={data}
         paginationSize={paginationSize || 3}
         className={classes}
       />
