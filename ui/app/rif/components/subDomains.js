@@ -183,15 +183,24 @@ class Subdomains extends Component {
 
   getData () {
     const data = [];
+    const { classes } = this.props;
     if (this.props.subdomains) {
       this.props.subdomains.map((subdomain, index) => {
         const tableRow = {};
-        tableRow.content = <span>{subdomain.name}</span>
-        tableRow.actions = <FontAwesomeIcon onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.openDeletePopup(subdomain);
-        }} icon={faTimes}/>
+        tableRow.content =
+          <div className={classes.content}>
+            <span>{subdomain.name}</span>
+          </div>
+        tableRow.actions =
+          <div className={classes.contentActions}>
+            <FontAwesomeIcon
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.openDeletePopup(subdomain);
+              }}
+              icon={faTimes}/>
+          </div>
         data.push(tableRow);
       });
     }
