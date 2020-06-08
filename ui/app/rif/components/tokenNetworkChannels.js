@@ -6,7 +6,7 @@ import rifActions from '../actions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
-class LuminoChannels extends Component {
+class TokenNetworkChannels extends Component {
 
   static propTypes = {
     paginationSize: PropTypes.number,
@@ -87,4 +87,4 @@ function mapDispatchToProps (dispatch) {
     getChannel: () => {},
   }
 }
-module.exports = connect(mapStateToProps, mapDispatchToProps)(LuminoChannels);
+module.exports = connect(mapStateToProps, mapDispatchToProps)(TokenNetworkChannels);

@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { faPlus, faPen } from '@fortawesome/free-solid-svg-icons';
 import { CustomButton, ChainAddresses, Subdomains, LuminoChannels } from '../../../components';
 import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver';
+import AddNewSubdomain from './addNewSubdomain';
 import { GET_RESOLVERS } from '../../../constants';
 import { SLIP_ADDRESSES } from '../../../constants/slipAddresses';
 import niftyActions from '../../../../actions';
@@ -52,6 +53,8 @@ class DomainsDetailActiveScreen extends Component {
       selectedChainAddress: slipChainAddresses[0].chain,
 			insertedAddress: '',
       updateChains: true,
+      addChainAddress: false,
+      addSubdomain: false,
 		};
 	}
   updateChainAddress = (selectedOption) => {
@@ -60,7 +63,8 @@ class DomainsDetailActiveScreen extends Component {
 	updateAddress = (address) => {
 		this.setState({ insertedAddress: address });
 	}
-  async addAddress () {
+  async addAddress (e) {
+    e.preventDefault();
     const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
     this.props.waitForListener(transactionListenerId)
       .then(transactionReceipt => {
@@ -70,28 +74,39 @@ class DomainsDetailActiveScreen extends Component {
       action: () => this.props.showDomainsDetailPage(this.props.domain),
     });
 	}
-  showModalAddChainAddress = () => {
-    const elements = [];
-		elements.push(<AddNewChainAddressToResolver
-      updateChainAddress={this.updateChainAddress.bind(this)}
-			updateAddress={this.updateAddress.bind(this)}
-      slipChainAddresses={this.state.slipChainAddresses}
-		/>);
-    const message = {
-			title: 'Add new chain address',
-			body: {
-				elements: elements,
-			},
-			confirmLabel: 'SAVE',
-			cancelLabel: 'CANCEL',
-			confirmCallback: () => {
-				this.addAddress()
-			},
-			cancelCallback: () => {
-			},
-		};
-		this.props.addNewChainAddress(message);
-	}
+
+  async addSubdomain () {
+    const transactionListenerId = await this.props.createSubdomain(
+      this.props.domainName,
+      this.state.newSubdomain.name.toLowerCase(),
+      this.state.newSubdomain.owner,
+      this.props.domainInfo.ownerAddress);
+    this.props.waitForListener(transactionListenerId).then(transactionReceipt => {
+      this.showCreationSuccess();
+    });
+    this.props.showPopup('Confirmation', {
+      text: 'Please confirm the operation in the next screen to create the subdomain.',
+      hideCancel: true,
+      confirmCallback: async () => {
+        this.props.showTransactionConfirmPage({
+          action: (payload) => {
+            this.props.showThis({
+              ...this.props,
+            });
+            this.props.showToast('Waiting Confirmation');
+          },
+          payload: null,
+        });
+      },
+    });
+  }
+
+  showAddChainAddress = () => {
+    this.setState({addChainAddress: !this.state.addChainAddress})
+  }
+  showAddSubdomain = () => {
+    this.setState({addSubdomain: !this.state.addSubdomain})
+  }
 
 	async onChangeComboResolvers (e) {
     for (const resolverItem of e.target.children) {
@@ -219,13 +234,12 @@ class DomainsDetailActiveScreen extends Component {
       },
     }
 		return (
-      <div className={'body'}>
+      <div className={''}>
         <DomainHeader domainName={domainName}
                       showOwnerIcon={isOwner}
                       showLuminoNodeIcon={isLuminoNode}
                       showRifStorageIcon={isRifStorage}/>
         <div id="domainDetailBody" className={''}>
-          <LuminoChannels />
           {resolvers &&
           <div id="chainAddressesBody" className={''}>
             <ChainAddresses
@@ -235,26 +249,61 @@ class DomainsDetailActiveScreen extends Component {
               classes={styles.chainAddresses}
             />
             {(isOwner && resolvers.find(resolver => resolver.address === selectedResolverAddress)) &&
-            <CustomButton
-              icon={faPlus}
-              text={'Add Address'}
-              onClick={() => this.showModalAddChainAddress()}
-              className={
-                {
-                  button: '',
-                  icon: '',
-                  text: '',
+            <div>
+              <CustomButton
+                icon={faPlus}
+                text={'Add Address'}
+                onClick={() => this.showAddChainAddress()}
+                className={
+                  {
+                    button: '',
+                    icon: '',
+                    text: '',
+                  }
                 }
+              />
+              {this.state.addChainAddress &&
+                <AddNewChainAddressToResolver
+                  updateChainAddress={this.updateChainAddress.bind(this)}
+                  updateAddress={this.updateAddress.bind(this)}
+                  slipChainAddresses={this.state.slipChainAddresses}
+                  confirmCallback={this.addAddress()}
+                />
               }
-            />
+            </div>
             }
           </div>
           }
-          <Subdomains domainInfo={domainInfo} className={styles.subdomains} paginationSize={3}/>
+          <Subdomains domainInfo={domainInfo} classes={styles.subdomains} paginationSize={3}/>
+          {isOwner &&
+            <div>
+              <CustomButton
+                icon={faPlus}
+                text={'Add Subdomain'}
+                onClick={() => this.showAddSubdomain()}
+                className={
+                  {
+                    button: '',
+                    icon: '',
+                    text: '',
+                  }
+                }
+              />
+              {this.state.addSubdomain &&
+              <AddNewSubdomain
+                confirmCallback={this.addSubdomain()}
+              />
+              }
+            </div>
+          }
+          <LuminoChannels
+            paginationSize={3}
+            classes={styles.luminoChannels}
+          />
           {isOwner &&
           <CustomButton
             icon={faPlus}
-            text={'Add Subdomain'}
+            text={'Add channel'}
             onClick={() => { }}
             className={
               {
