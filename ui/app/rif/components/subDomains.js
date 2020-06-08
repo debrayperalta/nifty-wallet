@@ -70,7 +70,7 @@ class Subdomains extends Component {
         ]}
         data={data}
         paginationSize={paginationSize || 3}
-        className={classes}
+        classes={classes}
       />
     );
   }

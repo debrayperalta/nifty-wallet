@@ -69,7 +69,7 @@ class LuminoChannels extends Component {
         ]}
         data={channelsData}
         paginationSize={paginationSize || 3}
-        className={classes}
+        classes={classes}
       />
     );
   }
