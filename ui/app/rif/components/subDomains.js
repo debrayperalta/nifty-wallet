@@ -184,9 +184,11 @@ class Subdomains extends Component {
   getData () {
     const data = [];
     const { classes } = this.props;
+    console.debug('===================================================================classes', classes);
     if (this.props.subdomains) {
       this.props.subdomains.map((subdomain, index) => {
         const tableRow = {};
+        console.debug('===================================================================classes2', classes);
         tableRow.content =
           <div className={classes.content}>
             <span>{subdomain.name}</span>

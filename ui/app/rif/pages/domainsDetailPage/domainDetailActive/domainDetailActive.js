@@ -60,7 +60,8 @@ class DomainsDetailActiveScreen extends Component {
 	updateAddress = (address) => {
 		this.setState({ insertedAddress: address });
 	}
-  async addAddress () {
+  async addAddress (e) {
+    e.preventDefault();
     const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
     this.props.waitForListener(transactionListenerId)
       .then(transactionReceipt => {
@@ -219,13 +220,12 @@ class DomainsDetailActiveScreen extends Component {
       },
     }
 		return (
-      <div className={'body'}>
+      <div className={''}>
         <DomainHeader domainName={domainName}
                       showOwnerIcon={isOwner}
                       showLuminoNodeIcon={isLuminoNode}
                       showRifStorageIcon={isRifStorage}/>
         <div id="domainDetailBody" className={''}>
-          <LuminoChannels />
           {resolvers &&
           <div id="chainAddressesBody" className={''}>
             <ChainAddresses
@@ -235,26 +235,52 @@ class DomainsDetailActiveScreen extends Component {
               classes={styles.chainAddresses}
             />
             {(isOwner && resolvers.find(resolver => resolver.address === selectedResolverAddress)) &&
-            <CustomButton
-              icon={faPlus}
-              text={'Add Address'}
-              onClick={() => this.showModalAddChainAddress()}
-              className={
-                {
-                  button: '',
-                  icon: '',
-                  text: '',
+            <div>
+              <CustomButton
+                icon={faPlus}
+                text={'Add Address'}
+                onClick={() => this.showModalAddChainAddress()}
+                className={
+                  {
+                    button: '',
+                    icon: '',
+                    text: '',
+                  }
                 }
-              }
-            />
+              />
+              <AddNewChainAddressToResolver
+                updateChainAddress={this.updateChainAddress.bind(this)}
+                updateAddress={this.updateAddress.bind(this)}
+                slipChainAddresses={this.state.slipChainAddresses}
+                confirmCallback={this.addAddress()}
+              />
+            </div>
             }
           </div>
           }
-          <Subdomains domainInfo={domainInfo} className={styles.subdomains} paginationSize={3}/>
+          <Subdomains domainInfo={domainInfo} classes={styles.subdomains} paginationSize={3}/>
           {isOwner &&
           <CustomButton
             icon={faPlus}
             text={'Add Subdomain'}
+            onClick={() => { }}
+            className={
+              {
+                button: '',
+                icon: '',
+                text: '',
+              }
+            }
+          />
+          }
+          <LuminoChannels
+            paginationSize={3}
+            classes={styles.luminoChannels}
+          />
+          {isOwner &&
+          <CustomButton
+            icon={faPlus}
+            text={'Add channel'}
             onClick={() => { }}
             className={
               {
