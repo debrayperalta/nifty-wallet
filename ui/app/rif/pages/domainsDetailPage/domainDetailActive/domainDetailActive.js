@@ -13,6 +13,74 @@ import rifActions from '../../../actions';
 import DomainHeader from '../../../components/domain-header';
 import { rns } from '../../../../../../rif.config';
 
+// TODO @fmelo
+// Here you can set the classnames for the entire page
+const styles = {
+  chainAddresses: {
+    title: 'domain-table-title',
+    table: '',
+    thead: '',
+    theadTr: '',
+    theadTh: '',
+    tbody: '',
+    tbodyTr: '',
+    tbodyTd: '',
+    noData: '',
+    content: '',
+    contentActions: '',
+    pagination: {
+      body: '',
+      buttonBack: '',
+      indexes: '',
+      activePageButton: '',
+      inactivePageButton: '',
+      buttonNext: '',
+    },
+  },
+  subdomains: {
+    title: '',
+    table: '',
+    thead: '',
+    theadTr: '',
+    theadTh: '',
+    tbody: '',
+    tbodyTr: '',
+    tbodyTd: '',
+    noData: '',
+    content: '',
+    contentActions: '',
+    pagination: {
+      body: '',
+      buttonBack: '',
+      indexes: '',
+      activePageButton: '',
+      inactivePageButton: '',
+      buttonNext: '',
+    },
+  },
+  luminoChannels: {
+    title: '',
+    table: '',
+    thead: '',
+    theadTr: '',
+    theadTh: '',
+    tbody: '',
+    tbodyTr: '',
+    tbodyTd: '',
+    noData: '',
+    content: '',
+    contentActions: '',
+    pagination: {
+      body: '',
+      buttonBack: '',
+      indexes: '',
+      activePageButton: '',
+      inactivePageButton: '',
+      buttonNext: '',
+    },
+  },
+}
+
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
     addNewChainAddress: PropTypes.func.isRequired,
@@ -64,7 +132,7 @@ class DomainsDetailActiveScreen extends Component {
 		this.setState({ insertedAddress: address });
 	}
   async addAddress (e) {
-    e.preventDefault();
+    /*
     const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
     this.props.waitForListener(transactionListenerId)
       .then(transactionReceipt => {
@@ -73,33 +141,8 @@ class DomainsDetailActiveScreen extends Component {
     this.props.showTransactionConfirmPage({
       action: () => this.props.showDomainsDetailPage(this.props.domain),
     });
+	   */
 	}
-
-  async addSubdomain () {
-    const transactionListenerId = await this.props.createSubdomain(
-      this.props.domainName,
-      this.state.newSubdomain.name.toLowerCase(),
-      this.state.newSubdomain.owner,
-      this.props.domainInfo.ownerAddress);
-    this.props.waitForListener(transactionListenerId).then(transactionReceipt => {
-      this.showCreationSuccess();
-    });
-    this.props.showPopup('Confirmation', {
-      text: 'Please confirm the operation in the next screen to create the subdomain.',
-      hideCancel: true,
-      confirmCallback: async () => {
-        this.props.showTransactionConfirmPage({
-          action: (payload) => {
-            this.props.showThis({
-              ...this.props,
-            });
-            this.props.showToast('Waiting Confirmation');
-          },
-          payload: null,
-        });
-      },
-    });
-  }
 
   showAddChainAddress = () => {
     this.setState({addChainAddress: !this.state.addChainAddress})
@@ -165,74 +208,6 @@ class DomainsDetailActiveScreen extends Component {
       content,
     };
 		const { resolvers } = this.state;
-
-    // TODO @fmelo
-    // Here you can set the classnames for the entire page
-    const styles = {
-      chainAddresses: {
-        title: '',
-        table: '',
-        thead: '',
-        theadTr: '',
-        theadTh: '',
-        tbody: '',
-        tbodyTr: '',
-        tbodyTd: '',
-        noData: '',
-        content: '',
-        contentActions: '',
-        pagination: {
-          body: '',
-          buttonBack: '',
-          indexes: '',
-          activePageButton: '',
-          inactivePageButton: '',
-          buttonNext: '',
-        },
-      },
-      subdomains: {
-        title: '',
-        table: '',
-        thead: '',
-        theadTr: '',
-        theadTh: '',
-        tbody: '',
-        tbodyTr: '',
-        tbodyTd: '',
-        noData: '',
-        content: '',
-        contentActions: '',
-        pagination: {
-          body: '',
-          buttonBack: '',
-          indexes: '',
-          activePageButton: '',
-          inactivePageButton: '',
-          buttonNext: '',
-        },
-      },
-      luminoChannels: {
-        title: '',
-        table: '',
-        thead: '',
-        theadTr: '',
-        theadTh: '',
-        tbody: '',
-        tbodyTr: '',
-        tbodyTd: '',
-        noData: '',
-        content: '',
-        contentActions: '',
-        pagination: {
-          body: '',
-          buttonBack: '',
-          indexes: '',
-          activePageButton: '',
-          inactivePageButton: '',
-          buttonNext: '',
-        },
-      },
-    }
 		return (
       <div className={''}>
         <DomainHeader domainName={domainName}
