@@ -2,11 +2,11 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import rifActions from '../actions';
-import {faPen, faTimes} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { GenericTable } from './index';
 import {getChainAddressByChainAddress} from '../utils/utils';
 import {DEFAULT_ICON, GET_RESOLVERS} from '../constants';
+import ItemWithActions from './item-with-actions';
+import InputWithSubmit from './InputWithSubmit';
 
 class ChainAddresses extends Component {
 
@@ -45,32 +45,17 @@ class ChainAddresses extends Component {
   }
 
   convertChainAddressesToTableData () {
-    const data = [];
     const { classes } = this.props;
-    this.state.chainAddresses.map((chainAddress, index) => {
+    return this.state.chainAddresses.map((chainAddress) => {
       const address = getChainAddressByChainAddress(chainAddress.chain);
       const icon = address.icon ? address.icon : DEFAULT_ICON;
-      const tableRow = {};
-      tableRow.content =
-        <div className={classes.content}>
-            <FontAwesomeIcon icon={icon.icon} color={icon.color}/>
-            <span>{chainAddress.address}</span>
-        </div>
-      tableRow.actions =
-        <div className={classes.contentActions}>
-          <FontAwesomeIcon
-            icon={faPen}
-            onClick={() => {}}
-          />
-          <FontAwesomeIcon
-            icon={faTimes}
-            onClick={() => {}}
-          />
-        </div>
-      data.push(tableRow);
+      const item = <ItemWithActions classes={classes} enableEdit={true} enableDelete={true} text={chainAddress.address} leftIcon={icon}><InputWithSubmit/></ItemWithActions>
+      return {
+        content: item,
+      };
     });
-    return data;
   }
+
   render () {
     const { paginationSize, classes } = this.props;
     const data = this.convertChainAddressesToTableData();
@@ -81,10 +66,6 @@ class ChainAddresses extends Component {
           {
             Header: 'Content',
             accessor: 'content',
-          },
-          {
-            Header: 'actions',
-            accessor: 'actions',
           },
         ]}
         data={data}
