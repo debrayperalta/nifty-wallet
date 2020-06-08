@@ -8,6 +8,14 @@ function cleanDomainName (domainName) {
   return (toLowerCaseDomainName && toLowerCaseDomainName.indexOf('.rsk') === -1) ? (toLowerCaseDomainName + '.rsk') : toLowerCaseDomainName;
 }
 
+function isValidRNSDomain (value) {
+  if (!value) {
+    return false;
+  }
+  return value.match('.*\\.rsk');
+}
+
 export {
   cleanDomainName,
+  isValidRNSDomain,
 }

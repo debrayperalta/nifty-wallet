@@ -9,6 +9,9 @@ import Select from 'react-select';
 import rifActions from '../../../actions';
 import niftyActions from '../../../../../../ui/app/actions';
 import {connect} from 'react-redux';
+import ethUtils from 'ethereumjs-util';
+import {isValidRNSDomain} from '../../../utils/parse';
+import web3Utils from 'web3-utils';
 
 class ModeOption extends Select.Option {
   render () {
@@ -84,6 +87,7 @@ class Pay extends Component {
     getTokens: PropTypes.func,
     showPopup: PropTypes.func,
     showToast: PropTypes.func,
+    getDomainAddress: PropTypes.func,
   }
 
   constructor (props) {
@@ -114,7 +118,8 @@ class Pay extends Component {
 
   getAllowedNetworks () {
     return SLIP_ADDRESSES.filter(network => {
-      return network.symbol === 'ETH' || network.symbol === 'RBTC';
+      // return network.symbol === 'ETH' || network.symbol === 'RBTC';
+      return network.symbol === 'RBTC';
     });
   }
 
@@ -194,7 +199,20 @@ class Pay extends Component {
       confirmLabel: 'Pay',
       confirmCallback: async () => {
         if (this.state.selectedNetwork && this.state.destination && this.state.amount) {
-          this.props.sendNetworkPayment(this.state.selectedNetwork, this.state.destination, this.state.amount);
+          if (this.state.amount <= 0) {
+            this.props.showToast('Amount has to be greater than 0.', false);
+          }
+          if (!ethUtils.isValidChecksumAddress(this.state.destination) && !isValidRNSDomain(this.state.destination)) {
+            this.props.showToast('Destination has to be a valid checksum address.', false);
+          }
+          if (this.state.amount > 0 && (ethUtils.isValidChecksumAddress(this.state.destination) || isValidRNSDomain(this.state.destination))) {
+            let destination = this.state.destination;
+            if (isValidRNSDomain(destination)) {
+              destination = await this.props.getDomainAddress(destination);
+            }
+            const amountInWei = web3Utils.toWei(this.state.amount);
+            this.props.sendNetworkPayment(this.state.selectedNetwork, destination, amountInWei);
+          }
         } else {
           this.props.showToast('You need to select a network and put the partner and amount first.', false);
         }
@@ -283,7 +301,7 @@ class Pay extends Component {
         </div>
         {this.getDestinationFragment()}
         <div className="form-segment">
-          <button className="btn-primary btn-pay"  disabled={!this.readyToPay()} onClick={() => this.sendNetworkPayment()}>Pay</button>
+          <button className="btn-primary btn-pay" disabled={!this.readyToPay()} onClick={() => this.sendNetworkPayment()}>Pay</button>
         </div>
       </div>
     );
@@ -364,8 +382,9 @@ function mapDispatchToProps (dispatch) {
     sendLuminoPayment: (token, destination, amount, callbackHandlers) => {
       return dispatch(rifActions.createPayment(destination, token.address, amount, callbackHandlers));
     },
-    sendNetworkPayment: (network, destination, amount) => {
-      console.log('Network Payment', {network, destination, amount});
+    sendNetworkPayment: async (network, destination, amountInWei) => {
+      await dispatch(rifActions.createNetworkPayment(network, destination, amountInWei));
+      dispatch(rifActions.goToConfirmPageForLastTransaction());
     },
     getTokens: () => dispatch(rifActions.getTokensWithJoinedCheck()),
     showPopup: (title, opts) => {
@@ -375,6 +394,7 @@ function mapDispatchToProps (dispatch) {
       }));
     },
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
+    getDomainAddress: (domainName) => dispatch(rifActions.getDomainAddress(domainName)),
   }
 }
 module.exports = connect(mapStateToProps, mapDispatchToProps)(Pay)

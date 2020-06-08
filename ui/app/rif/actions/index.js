@@ -54,6 +54,8 @@ const rifActions = {
   cleanStore,
   showRifLandingPage,
   setupDefaultLuminoCallbacks,
+  createNetworkPayment,
+  getDomainAddress,
 }
 
 let background = null;
@@ -485,6 +487,22 @@ function getDomain (domainName) {
   };
 }
 
+function getDomainAddress (domainName) {
+  return (dispatch) => {
+    dispatch(niftyActions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      dispatch(niftyActions.hideLoadingIndication());
+      background.rif.rns.register.getDomainAddress(domainName, (error, domainAddress) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(domainAddress);
+      });
+    });
+  };
+}
+
 function getDomains () {
   return (dispatch) => {
     dispatch(niftyActions.showLoadingIndication())
@@ -788,6 +806,27 @@ function setupDefaultLuminoCallbacks () {
         dispatch(niftyActions.displayToast('Received a payment'));
       });
       return resolve();
+    });
+  };
+}
+
+function createNetworkPayment (network, destination, amountInWei) {
+  // TODO: network is not being used for now because we can't switch the network just to make a payment, we should
+  // TODO: think about the ui and maybe refactor this, for now it will only pay on RBTC
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      dispatch(getSelectedAddress()).then(selectedAddress => {
+        const txData = {
+          from: selectedAddress,
+          to: destination,
+        };
+        global.ethQuery.sendTransaction(txData, (err, _data) => {
+          if (err) {
+            return dispatch(niftyActions.displayWarning(err.message))
+          }
+        });
+        resolve();
+      }).catch(error => reject(error));
     });
   };
 }
