@@ -2,35 +2,31 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { faPen, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { DEFAULT_ICON } from '../../constants';
 
 /**
  *
  * This component is a generic item with a edit/delete icon
- * By default the icons are disabled, and must be explicilty rendered with the enable prop
- * By default the edit click  will display an input and a submit button, the submit function can be passed as props
- * If the behaviour of the edit were to change
+ * By default the icons are disabled, and must be explicitly rendered with the enable prop
+ * By default the edit click will render the children that are passed to it
  */
 const ItemWithActions = (props) => {
-  const [showEditInput, setshowEditInput] = useState(false);
-  const [editInputValue, seteditInputValue] = useState('');
+  const [showEditChildren, setshowEditChildren] = useState(false);
   const {
     enableEdit = false,
     enableDelete = false,
     text = '',
     onEditClick = null,
-    onSubmitEdit = (value) => {},
     onDeleteClick = () => {},
     leftIcon = null,
+    children,
   } = props;
 
-  const onEditInputChange = (e) => seteditInputValue(e.target.value);
 
-  const toggleShowEditInput = () => setshowEditInput(!showEditInput);
+  const toggleShowEditChildren = () => setshowEditChildren(!showEditChildren);
 
   const editClick = () => {
     if (onEditClick) return onEditClick();
-    return toggleShowEditInput();
+    return toggleShowEditChildren();
   };
 
   return (
@@ -59,11 +55,8 @@ const ItemWithActions = (props) => {
           />
         )}
       </div>
-      {showEditInput && (
-        <div>
-          <input onChange={onEditInputChange} value={editInputValue} />
-          <button onSubmit={() => onSubmitEdit(editInputValue)}>Submit</button>
-        </div>
+      {showEditChildren && children && (
+        {children}
       )}
     </div>
   );
@@ -74,9 +67,9 @@ ItemWithActions.propTypes = {
   enableDelete: PropTypes.bool,
   text: PropTypes.string.isRequired,
   onEditClick: PropTypes.func,
-  onSubmitEdit: PropTypes.func,
   onDeleteClick: PropTypes.func,
   leftIcon: PropTypes.shape({icon: PropTypes.string, color: PropTypes.string }),
+  children: PropTypes.element,
 };
 
 export default ItemWithActions;
