@@ -15,7 +15,7 @@ class ModeOption extends Select.Option {
     const { option } = this.props;
     let fasterWithoutFees = null;
     if (option.value === payMode.LUMINO) {
-      fasterWithoutFees = (<span>Faster and without fees</span>);
+      fasterWithoutFees = (<small className="payment-legend">Faster and without fees</small>);
     }
     return (
       <div
@@ -44,7 +44,7 @@ class ModeOptionSelected extends Component {
     const {value} = this.props;
     let fasterWithoutFees = null;
     if (value.value === payMode.LUMINO) {
-      fasterWithoutFees = (<span>Faster and without fees</span>);
+      fasterWithoutFees = (<small className="payment-legend">Faster and without fees</small>);
     }
     return (
       <div className="mode-dropdown-item">
@@ -126,12 +126,12 @@ class Pay extends Component {
     if (this.props.domainInfo) {
       const domainInfo = this.props.domainInfo;
       return (
-        <div>
+        <div className="domain-info-container">
           <DomainHeader domainName={domainInfo.domainName}
                         showOwnerIcon={domainInfo.isOwner}
                         showLuminoNodeIcon={domainInfo.isLuminoNode}
                         showRifStorageIcon={domainInfo.isRifStorage}/>
-          <h3>Payments Service</h3>
+          <h3 className="payments-title">Payments Service</h3>
         </div>
       );
     }
@@ -257,7 +257,17 @@ class Pay extends Component {
   getDestinationFragment () {
     return (
       <div className="form-segment">
-        <span>To:</span><input type="text" placeholder="Enter Domain or Address" onChange={(event) => this.changeDestination(event)}/>
+        <span>To:</span>
+        <input className="domain-address-input" type="text" placeholder="Enter address / domain" onChange={(event) => this.changeDestination(event)}/>
+        <span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3.5" y="3.5" width="9" height="9" stroke="#979797"/>
+              <path d="M1 5V1H5" stroke="#979797"/>
+              <path d="M15 11L15 15L11 15" stroke="#979797"/>
+              <path d="M11 1L15 1L15 5" stroke="#979797"/>
+              <path d="M5 15L1 15L1 11" stroke="#979797"/>
+            </svg>
+          </span>
       </div>
     );
   }
@@ -269,11 +279,11 @@ class Pay extends Component {
           <NetworkDropdown onSelectedNetwork={(selectedNetwork => this.onNetworkChange(selectedNetwork))}
                            defaultSelectedNetwork={this.getAllowedNetworks()[0]}
                            networks={this.getAllowedNetworks()}/>
-          <input type="text" placeholder="Amount" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
+          <input type="text" className="amount-input" placeholder="Amount" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
         </div>
         {this.getDestinationFragment()}
         <div className="form-segment">
-          <button disabled={!this.readyToPay()} onClick={() => this.sendNetworkPayment()}>Pay</button>
+          <button className="btn-primary btn-pay"  disabled={!this.readyToPay()} onClick={() => this.sendNetworkPayment()}>Pay</button>
         </div>
       </div>
     );
@@ -287,26 +297,24 @@ class Pay extends Component {
             <TokenDropdown onSelectedToken={(selectedToken) => this.onTokenChange(selectedToken)}
                            defaultSelectedToken={this.getAllowedTokens()[0]}
                            tokens={this.getAllowedTokens()}/>
-            <input type="text" placeholder="Amount" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
+            <input className="amount-input" type="text" placeholder="Amount" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
           </div>
           {this.getDestinationFragment()}
           <div className="form-segment">
-            <button disabled={!this.readyToPay()} onClick={() => this.sendLuminoPayment()}>Pay</button>
+            <button className="btn-primary btn-pay" disabled={!this.readyToPay()} onClick={() => this.sendLuminoPayment()}>Pay</button>
           </div>
         </div>
       );
     } else {
       return (
-        <div>
-          <span>Loading...</span>
-        </div>
+        <div className="app-loader"/>
       );
     }
   }
 
   getModeDropdown () {
     return (
-      <div className="mode-dropdown">
+      <div className="payment-mode-dropdown">
         <Select
           searchable={false}
           arrowRenderer={() => <div className="combo-selector-triangle"/>}
