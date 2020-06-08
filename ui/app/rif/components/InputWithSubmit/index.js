@@ -30,7 +30,7 @@ class InputWithSubmit extends Component {
       <input onChange={this.onSubmit} value={value} />
       <button onSubmit={this.onSubmit}>Submit</button>
     </div>;
-}
+  }
 }
 
 export default InputWithSubmit;
