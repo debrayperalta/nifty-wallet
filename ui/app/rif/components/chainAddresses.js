@@ -6,6 +6,7 @@ import { GenericTable } from './index';
 import {getChainAddressByChainAddress} from '../utils/utils';
 import {DEFAULT_ICON, GET_RESOLVERS} from '../constants';
 import ItemWithActions from './item-with-actions';
+import InputWithSubmit from './InputWithSubmit';
 
 class ChainAddresses extends Component {
 
@@ -48,8 +49,9 @@ class ChainAddresses extends Component {
     return this.state.chainAddresses.map((chainAddress) => {
       const address = getChainAddressByChainAddress(chainAddress.chain);
       const icon = address.icon ? address.icon : DEFAULT_ICON;
+      const item = <ItemWithActions classes={classes} enableEdit={true} enableDelete={true} text={chainAddress.address} leftIcon={icon}><InputWithSubmit/></ItemWithActions>
       return {
-        content: <ItemWithActions classes={classes} enableEdit={true} enableDelete={true} text={chainAddress.address} leftIcon={icon} />,
+        content: item,
       };
     });
   }

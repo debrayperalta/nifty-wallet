@@ -56,7 +56,7 @@ const ItemWithActions = (props) => {
         )}
       </div>
       {showEditChildren && children && (
-        {children}
+        children
       )}
     </div>
   );
