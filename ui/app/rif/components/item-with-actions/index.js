@@ -20,6 +20,8 @@ class ItemWithActions extends Component {
     leftIcon: PropTypes.shape({icon: PropTypes.string, color: PropTypes.string }),
     leftContent: PropTypes.element,
     children: PropTypes.element,
+    contentClasses: PropTypes.string,
+    actionClasses: PropTypes.string,
     enableRightChevron: PropTypes.bool,
     onRightChevronClick: PropTypes.func,
   }
@@ -40,8 +42,20 @@ class ItemWithActions extends Component {
     };
 
    render = () => {
-      const {leftIcon, leftContent, text, enableEdit, enableDelete, children, onDeleteClick, enableRightChevron, onRightChevronClick} = this.props;
-      const {showEditChildren } = this.state;
+      const {
+        leftIcon,
+        leftContent,
+        text,
+        enableEdit,
+        enableDelete,
+        children,
+        onDeleteClick,
+        enableRightChevron,
+        onRightChevronClick,
+        contentClasses = "",
+        actionClasses = ""
+      } = this.props;
+      const {showEditChildren} = this.state;
       return (
        <div>
          {leftIcon && (
@@ -54,10 +68,10 @@ class ItemWithActions extends Component {
            </div>
          )}
          {leftContent && <div>{leftContent}</div>}
-         <div>
+         <div className={contentClasses}>
            <p>{text}</p>
          </div>
-         <div className={''}>
+         <div className={actionClasses}>
            {enableEdit && (
              <FontAwesomeIcon icon={faPen} className={''} onClick={this.onEditClick} />
            )}
