@@ -27,7 +27,7 @@ class InputWithSubmit extends Component {
   render = () => {
     const {value} = this.state;
     return <div>
-      <input onChange={this.onSubmit} value={value} />
+      <input onChange={this.onChange} value={value} />
       <button onSubmit={this.onSubmit}>Submit</button>
     </div>;
   }
