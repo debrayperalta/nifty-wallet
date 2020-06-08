@@ -38,8 +38,8 @@ const ItemWithActions = (props) => {
       {leftIcon && (
         <div>
           <FontAwesomeIcon
-            icon={DEFAULT_ICON.icon}
-            color={DEFAULT_ICON.color}
+            icon={leftIcon.icon}
+            color={leftIcon.color}
             className={''}
           />
         </div>
@@ -76,7 +76,7 @@ ItemWithActions.propTypes = {
   onEditClick: PropTypes.func,
   onSubmitEdit: PropTypes.func,
   onDeleteClick: PropTypes.func,
-  leftIcon: PropTypes.string,
+  leftIcon: PropTypes.shape({icon: PropTypes.string, color: PropTypes.string }),
 };
 
 export default ItemWithActions;
