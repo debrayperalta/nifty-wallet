@@ -40,11 +40,9 @@ class TokensDropdownOptionSelected extends Component {
     const {value} = this.props;
     const icon = value.icon ? value.icon : DEFAULT_ICON;
     return (
-      <div className="add-new-multicrypto-select-value">
-          <span>
-            <FontAwesomeIcon className="add-new-multicrypto-select-value-icon" icon={icon.icon} color={icon.color}/>
-            <span className="add-new-multicrypto-select-value-text">{value.name}</span>
-          </span>
+      <div className="add-new-multicrypto-select-value d-flex">
+        <FontAwesomeIcon className="add-new-multicrypto-select-value-icon" icon={icon.icon} color={icon.color}/>
+        <span className="add-new-multicrypto-select-value-text">{value.name}</span>
       </div>
     )
   }
