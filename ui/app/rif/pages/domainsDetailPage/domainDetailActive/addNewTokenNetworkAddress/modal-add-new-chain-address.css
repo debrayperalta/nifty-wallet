@@ -13,6 +13,7 @@
     font-size: 1.5rem;
     color: #3399FF;
 }
+
 .add-new-multicrypto-select {
   flex: 0 0 auto;
 }
@@ -29,6 +30,7 @@
 .add-new-multicrypto-select .Select-input {
     display: none !important;
 }
+
 .add-new-multicrypto-select-value-icon {
     margin-right: 5px;
 }

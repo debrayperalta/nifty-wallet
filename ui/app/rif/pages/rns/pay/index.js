@@ -297,7 +297,7 @@ class Pay extends Component {
             <TokenDropdown onSelectedToken={(selectedToken) => this.onTokenChange(selectedToken)}
                            defaultSelectedToken={this.getAllowedTokens()[0]}
                            tokens={this.getAllowedTokens()}/>
-            <input type="text" placeholder="Amount" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
+            <input className="amount-input" type="text" placeholder="Amount" onKeyDown={event => this.validateAmount(event)} onChange={event => this.changeAmount(event)} />
           </div>
           {this.getDestinationFragment()}
           <div className="form-segment">
