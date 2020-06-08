@@ -1,19 +1,36 @@
-import React, {useState} from 'react';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 
-const InputWithSubmit = (submit) => {
-  const [value, setValue] = useState('');
 
-  const onChange = e => setValue(e.target.value);
+class InputWithSubmit extends Component {
 
-  const onSubmit = (e) => {
+  static propTypes = {
+    submit: PropTypes.func,
+  }
+
+  constructor (props) {
+    super(props);
+    this.state = {
+      value: '',
+    }
+  }
+
+  onChange = e => this.setState({value: e.target.value})
+
+  onSubmit = (e) => {
     e.preventDefault();
+    const {submit} = this.props;
+    const {value} = this.state;
     submit(value);
   }
 
-  return <div>
-      <input onChange={onChange} value={value} />
-      <button onSubmit={onSubmit}>Submit</button>
-  </div>
+  render = () => {
+    const {value} = this.state;
+    return <div>
+      <input onChange={this.onSubmit} value={value} />
+      <button onSubmit={this.onSubmit}>Submit</button>
+    </div>;
+}
 }
 
 export default InputWithSubmit;
