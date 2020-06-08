@@ -3,53 +3,57 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import { GenericTable } from './index';
 import rifActions from '../actions';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPen, faTimes} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 class LuminoChannels extends Component {
 
   static propTypes = {
     paginationSize: PropTypes.number,
     getChannels: PropTypes.func,
+    getChannel: PropTypes.func,
     classes: PropTypes.any,
   }
 
   constructor (props) {
     super(props);
     this.state = {
-
+      channelsData: [],
     };
   }
 
-  getData () {
-    const data = [];
-    const channels = this.getChannels();
-    channels.map((channel, index) => {
-      const tableRow = {};
-      tableRow.content =
-        <div className={''}>
-          <div className={''}>
-            Here goes something, partner address?
+  loadData () {
+    const { classes } = this.props;
+    this.getChannels().then(channels => {
+      channels.map((channelJson) => {
+        const channel = channelJson[Object.keys(channelJson)[0]];
+        const tableRow = {};
+        tableRow.content =
+          <div className={classes.content}>
+            <span>{channel.partner_address}</span>
           </div>
-        </div>
-      tableRow.actions =
-        <div className={''}>
-          Here goes the actions for lumino channel
-        </div>
-      data.push(tableRow);
+        tableRow.actions =
+          <div className={classes.contentActions}>
+            <FontAwesomeIcon icon={faChevronRight} onClick={() => this.props.getChannel()}/>
+          </div>
+        this.setState({
+          channelsData: [...this.state.channelsData, tableRow],
+        });
+      });
     });
-    return data;
   }
 
-  async getChannels() {
-    const channels = await this.props.getChannels();
-    console.debug('====================================================================== channels', channels);
-    return channels;
+  componentDidMount () {
+    this.loadData();
+  }
+
+  async getChannels () {
+    return await this.props.getChannels();
   }
 
   render () {
     const { paginationSize, classes } = this.props;
-
+    const { channelsData } = this.state;
     return (
       <GenericTable
         title={'Lumino Channels'}
@@ -63,7 +67,7 @@ class LuminoChannels extends Component {
             accessor: 'actions',
           },
         ]}
-        data={this.getData()}
+        data={channelsData}
         paginationSize={paginationSize || 3}
         className={classes}
       />
@@ -80,6 +84,7 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     getChannels: () => dispatch(rifActions.getChannels()),
+    getChannel: () => {},
   }
 }
 module.exports = connect(mapStateToProps, mapDispatchToProps)(LuminoChannels);

@@ -46,30 +46,24 @@ class ChainAddresses extends Component {
 
   convertChainAddressesToTableData () {
     const data = [];
+    const { classes } = this.props;
     this.state.chainAddresses.map((chainAddress, index) => {
       const address = getChainAddressByChainAddress(chainAddress.chain);
       const icon = address.icon ? address.icon : DEFAULT_ICON;
       const tableRow = {};
       tableRow.content =
-        <div className={''}>
-          <div className={''}>
-            <FontAwesomeIcon icon={icon.icon} color={icon.color} className={''}/>
-            <span>{address.symbol}</span>
-          </div>
-          <div className={''}>
+        <div className={classes.content}>
+            <FontAwesomeIcon icon={icon.icon} color={icon.color}/>
             <span>{chainAddress.address}</span>
-          </div>
         </div>
       tableRow.actions =
-        <div className={''}>
+        <div className={classes.contentActions}>
           <FontAwesomeIcon
             icon={faPen}
-            className={''}
             onClick={() => {}}
           />
           <FontAwesomeIcon
             icon={faTimes}
-            className={''}
             onClick={() => {}}
           />
         </div>
@@ -78,7 +72,7 @@ class ChainAddresses extends Component {
     return data;
   }
   render () {
-    const { paginationSize, classes } = this.state;
+    const { paginationSize, classes } = this.props;
     const data = this.convertChainAddressesToTableData();
     return (
       <GenericTable

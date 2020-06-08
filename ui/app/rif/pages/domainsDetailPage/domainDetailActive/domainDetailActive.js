@@ -164,6 +164,8 @@ class DomainsDetailActiveScreen extends Component {
         tbodyTr: '',
         tbodyTd: '',
         noData: '',
+        content: '',
+        contentActions: '',
         pagination: {
           body: '',
           buttonBack: '',
@@ -183,6 +185,8 @@ class DomainsDetailActiveScreen extends Component {
         tbodyTr: '',
         tbodyTd: '',
         noData: '',
+        content: '',
+        contentActions: '',
         pagination: {
           body: '',
           buttonBack: '',
@@ -202,6 +206,8 @@ class DomainsDetailActiveScreen extends Component {
         tbodyTr: '',
         tbodyTd: '',
         noData: '',
+        content: '',
+        contentActions: '',
         pagination: {
           body: '',
           buttonBack: '',
