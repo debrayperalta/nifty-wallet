@@ -7,6 +7,7 @@ import {getChainAddressByChainAddress} from '../utils/utils';
 import {DEFAULT_ICON, GET_RESOLVERS} from '../constants';
 import ItemWithActions from './item-with-actions';
 import InputWithSubmit from './InputWithSubmit';
+import rifConfig from "../../../../rif.config";
 
 class ChainAddresses extends Component {
 
@@ -39,6 +40,9 @@ class ChainAddresses extends Component {
 
   async loadChainAddresses () {
     if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {
+      const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
+      this.setState({chainAddresses: chainAddresses});
+    } else if (rifConfig.mocksEnabled) {
       const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
       this.setState({chainAddresses: chainAddresses});
     }
