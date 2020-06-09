@@ -17,7 +17,7 @@ class ItemWithActions extends Component {
     text: PropTypes.string.isRequired,
     onEditClick: PropTypes.func,
     onDeleteClick: PropTypes.func,
-    leftIcon: PropTypes.shape({icon: PropTypes.string, color: PropTypes.string }),
+    leftIcon: PropTypes.shape({icon: PropTypes.object, color: PropTypes.string }),
     leftContent: PropTypes.element,
     children: PropTypes.element,
     contentClasses: PropTypes.string,
