@@ -265,9 +265,7 @@ class DomainsDetailActiveScreen extends Component {
                 }
               />
               {this.state.addSubdomain &&
-              <AddNewSubdomain
-                confirmCallback={this.addSubdomain()}
-              />
+                <AddNewSubdomain />
               }
             </div>
           }
