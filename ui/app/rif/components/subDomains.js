@@ -45,8 +45,8 @@ class Subdomains extends Component {
 
   getData () {
   const { classes } = this.props;
-  if (this.props.subdomains) {
-      return this.props.subdomains.map((subdomain) => {
+  if (this.state.subdomains) {
+      return this.state.subdomains.map((subdomain) => {
         const item = <ItemWithActions contentClasses={classes.content} actionClasses={classes.contentActions} text={subdomain.name} enableRightChevron={true} />
         return {
           content: item,

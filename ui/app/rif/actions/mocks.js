@@ -59,4 +59,28 @@ export const mocks = {
         'votes': {'open': {}, 'close': {}},
       },
     }],
+  chainAddresses: [
+    {
+      address: '0x123456789123456789123456789123456',
+      chain: '0x80000000',
+    },
+    {
+      address: '0x987654321123113213456465464564489',
+      chain: '0x8000003c',
+    },
+  ],
+  subdomains: [
+    {
+      domainName: 'dominio.rsk',
+      name: 'subdomain',
+      ownerAddress: '0x219123123213213578237891723891231231123213654',
+      parentOwnerAddress: '0x219123123213213578237891723891231231654',
+    },
+    {
+      domainName: 'dominio.rsk',
+      name: 'subdomain2',
+      ownerAddress: '0x219123123213213578237891723891231231123213654',
+      parentOwnerAddress: '0x219123123213213578237891723891231231654',
+    },
+  ],
 };

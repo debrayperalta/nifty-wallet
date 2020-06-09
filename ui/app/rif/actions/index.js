@@ -183,13 +183,17 @@ function setChainAddressForResolver (domainName, chain, chainAddress) {
 function getChainAddresses (domainName) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      background.rif.rns.resolver.getChainAddressForResolvers(domainName, (error, result) => {
-        if (error) {
-          dispatch(niftyActions.displayWarning(error));
-          return reject(error);
-        }
-        return resolve(result);
-      });
+      if (rifConfig.mocksEnabled) {
+        return resolve(mocks.chainAddresses);
+      } else {
+        background.rif.rns.resolver.getChainAddressForResolvers(domainName, (error, result) => {
+          if (error) {
+            dispatch(niftyActions.displayWarning(error));
+            return reject(error);
+          }
+          return resolve(result);
+        });
+      }
     })
   }
 }
@@ -381,13 +385,17 @@ function getSubdomains (domainName) {
     dispatch(niftyActions.showLoadingIndication())
     return new Promise((resolve, reject) => {
       dispatch(niftyActions.hideLoadingIndication());
-      background.rif.rns.register.getSubdomainsForDomain(domainName, (error, result) => {
-        if (error) {
-          dispatch(niftyActions.displayWarning(error));
-          return reject(error);
-        }
-        return resolve(result);
-      });
+      if (rifConfig.mocksEnabled) {
+        return resolve(mocks.subdomains);
+      } else {
+        background.rif.rns.register.getSubdomainsForDomain(domainName, (error, result) => {
+          if (error) {
+            dispatch(niftyActions.displayWarning(error));
+            return reject(error);
+          }
+          return resolve(result);
+        });
+      }
     });
   };
 }
