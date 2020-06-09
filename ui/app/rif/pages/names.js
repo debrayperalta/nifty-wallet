@@ -11,6 +11,7 @@ const pageNames = {
     sellOnMKP: 'sell-on-mkp',
     transfer: 'transfer',
     luminoTokensPage: 'luminoTokensPage',
+    subDomainDetail: 'subDomainDetail',
   },
   lumino: {
     home: 'luminoHome',

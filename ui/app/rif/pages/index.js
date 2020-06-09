@@ -1,5 +1,6 @@
 import DomainsScreen from './domainsPage/domainsPage';
 import DomainsDetailScreen from './domainsDetailPage/domainsDetailPage';
+import SubDomainDetail from './domainsDetailPage/domainDetailActive/subDomainDetail';
 import Subdomains from './rns/subdomains';
 import Exchange from './rns/exchange';
 import LuminoChannels from './rns/lumino-channels';
@@ -125,6 +126,8 @@ function getPageComponent (screenName) {
       return (<DomainRegisterScreen/>);
     case pageNames.rns.luminoTokensPage:
       return (<LuminoTokensPage/>);
+    case pageNames.rns.subDomainDetail:
+      return (<SubDomainDetail />);
     case pageNames.lumino.home:
       return (<LuminoHome />);
   }

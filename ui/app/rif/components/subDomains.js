@@ -16,6 +16,7 @@ class Subdomains extends Component {
     subdomains: PropTypes.array,
     showPopup: PropTypes.func,
     createSubdomain: PropTypes.func,
+    showSubDomainDetail: PropTypes.func,
     waitForListener: PropTypes.func,
     showToast: PropTypes.func,
     showTransactionConfirmPage: PropTypes.func,
@@ -44,10 +45,17 @@ class Subdomains extends Component {
   }
 
   getData () {
-  const { classes } = this.props;
+  const { classes, showSubDomainDetail } = this.props;
   if (this.state.subdomains) {
       return this.state.subdomains.map((subdomain) => {
-        const item = <ItemWithActions contentClasses={classes.content} actionClasses={classes.contentActions} text={subdomain.name} enableRightChevron={true} />
+        const chevronRightClick = () => showSubDomainDetail(subdomain);
+        const item = <ItemWithActions
+          contentClasses={classes.content}
+          actionClasses={classes.contentActions}
+          text={subdomain.name}
+          enableRightChevron={true}
+          onRightChevronClick={chevronRightClick}
+        />
         return {
           content: item,
         }
@@ -92,6 +100,13 @@ function mapDispatchToProps (dispatch) {
         ...opts,
       }));
     },
+    showSubDomainDetail: (data) => dispatch(rifActions.navigateTo(pageNames.rns.subDomainDetail, {
+      ...data,
+      navBar: {
+        title: 'SubDomain Detail',
+        showBack: true,
+      },
+    })),
     createSubdomain: (domainName, subdomain, ownerAddress, parentOwnerAddress) => dispatch(rifActions.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress)),
     waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
