@@ -207,7 +207,7 @@ class DomainsDetailActiveScreen extends Component {
       isRifStorage,
       content,
     };
-		const { resolvers } = this.state;
+		const { resolvers, addSubdomain } = this.state;
 		return (
       <div className={''}>
         <DomainHeader domainName={domainName}
@@ -264,11 +264,7 @@ class DomainsDetailActiveScreen extends Component {
                   }
                 }
               />
-              {this.state.addSubdomain &&
-              <AddNewSubdomain
-                confirmCallback={this.addSubdomain()}
-              />
-              }
+              {addSubdomain && <AddNewSubdomain domainName={domainName} ownerAddress={ownerAddress} />}
             </div>
           }
           <LuminoChannels
