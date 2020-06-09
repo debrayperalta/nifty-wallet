@@ -5,6 +5,7 @@ import { GenericTable } from './index';
 import rifActions from '../actions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import ItemWithActions from "./item-with-actions";
 
 class LuminoChannels extends Component {
 
@@ -18,42 +19,42 @@ class LuminoChannels extends Component {
   constructor (props) {
     super(props);
     this.state = {
-      channelsData: [],
+      channels: [],
     };
   }
 
-  loadData () {
-    const { classes } = this.props;
-    this.getChannels().then(channels => {
-      channels.map((channelJson) => {
+  getData () {
+    const {classes} = this.props;
+    if (this.state.channels) {
+      return this.state.channels.map((channel) => {
+        const item = <ItemWithActions contentClasses={classes.content} actionClasses={classes.contentActions}
+                                      text={channel.partner_address} enableRightChevron={true}/>
+        return {
+          content: item,
+        }
+      });
+    }
+    return [];
+  }
+
+  componentDidMount () {
+    this.loadChannels();
+  }
+
+  loadChannels () {
+    this.props.getChannels().then(channels => {
+      channels.map(channelJson => {
         const channel = channelJson[Object.keys(channelJson)[0]];
-        const tableRow = {};
-        tableRow.content =
-          <div className={classes.content}>
-            <span>{channel.partner_address}</span>
-          </div>
-        tableRow.actions =
-          <div className={classes.contentActions}>
-            <FontAwesomeIcon icon={faChevronRight} onClick={() => this.props.getChannel()}/>
-          </div>
         this.setState({
-          channelsData: [...this.state.channelsData, tableRow],
+          channels: [...this.state.channels, channel],
         });
       });
     });
   }
 
-  componentDidMount () {
-    this.loadData();
-  }
-
-  async getChannels () {
-    return await this.props.getChannels();
-  }
-
   render () {
     const { paginationSize, classes } = this.props;
-    const { channelsData } = this.state;
+    const data = this.getData();
     return (
       <GenericTable
         title={'Lumino Channels'}
@@ -62,12 +63,8 @@ class LuminoChannels extends Component {
             Header: 'Content',
             accessor: 'content',
           },
-          {
-            Header: 'actions',
-            accessor: 'actions',
-          },
         ]}
-        data={channelsData}
+        data={data}
         paginationSize={paginationSize || 3}
         classes={classes}
       />

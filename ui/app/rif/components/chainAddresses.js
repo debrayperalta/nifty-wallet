@@ -7,7 +7,7 @@ import {getChainAddressByChainAddress} from '../utils/utils';
 import {DEFAULT_ICON, GET_RESOLVERS} from '../constants';
 import ItemWithActions from './item-with-actions';
 import InputWithSubmit from './InputWithSubmit';
-import rifConfig from "../../../../rif.config";
+import rifConfig from '../../../../rif.config';
 
 class ChainAddresses extends Component {
 
@@ -53,7 +53,7 @@ class ChainAddresses extends Component {
     return this.state.chainAddresses.map((chainAddress) => {
       const address = getChainAddressByChainAddress(chainAddress.chain);
       const icon = address.icon ? address.icon : DEFAULT_ICON;
-      const item = <ItemWithActions classes={classes} enableEdit={true} enableDelete={true} text={chainAddress.address} leftIcon={icon}><InputWithSubmit/></ItemWithActions>
+      const item = <ItemWithActions contentClasses={classes.content} actionClasses={classes.contentActions} enableEdit={true} enableDelete={true} text={chainAddress.address} leftIcon={icon}><InputWithSubmit/></ItemWithActions>
       return {
         content: item,
       };
