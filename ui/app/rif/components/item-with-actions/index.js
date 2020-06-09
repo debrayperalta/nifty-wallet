@@ -52,8 +52,8 @@ class ItemWithActions extends Component {
         onDeleteClick,
         enableRightChevron,
         onRightChevronClick,
-        contentClasses = "",
-        actionClasses = ""
+        contentClasses = '',
+        actionClasses = '',
       } = this.props;
       const {showEditChildren} = this.state;
       return (
