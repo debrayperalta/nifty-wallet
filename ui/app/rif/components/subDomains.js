@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import rifActions from '../actions';
 import niftyActions from '../../actions';
 import {pageNames} from '../pages';
-import { GenericTable } from './index';
+import {GenericTable} from './index';
 import ItemWithActions from './item-with-actions';
 
 class Subdomains extends Component {
@@ -45,8 +45,8 @@ class Subdomains extends Component {
   }
 
   getData () {
-  const { classes, showSubDomainDetail } = this.props;
-  if (this.state.subdomains) {
+    const {classes, showSubDomainDetail} = this.props;
+    if (this.state.subdomains) {
       return this.state.subdomains.map((subdomain) => {
         const chevronRightClick = () => showSubDomainDetail(subdomain);
         const item = <ItemWithActions
@@ -65,7 +65,7 @@ class Subdomains extends Component {
   }
 
   render () {
-    const { classes, paginationSize } = this.props;
+    const {classes, paginationSize} = this.props;
     const data = this.getData();
     return (
       <GenericTable
@@ -83,6 +83,7 @@ class Subdomains extends Component {
     );
   }
 }
+
 function mapStateToProps (state) {
   const params = state.appState.currentView.params;
   return {
@@ -102,10 +103,6 @@ function mapDispatchToProps (dispatch) {
     },
     showSubDomainDetail: (data) => dispatch(rifActions.navigateTo(pageNames.rns.subDomainDetail, {
       ...data,
-      navBar: {
-        title: 'SubDomain Detail',
-        showBack: true,
-      },
     })),
     createSubdomain: (domainName, subdomain, ownerAddress, parentOwnerAddress) => dispatch(rifActions.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress)),
     waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
@@ -115,4 +112,5 @@ function mapDispatchToProps (dispatch) {
     deleteSubdomain: (domainName, subdomain) => dispatch(rifActions.deleteSubdomain(domainName, subdomain)),
   }
 }
+
 module.exports = connect(mapStateToProps, mapDispatchToProps)(Subdomains);
