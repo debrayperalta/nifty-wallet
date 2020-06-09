@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { faPlus, faPen } from '@fortawesome/free-solid-svg-icons';
-import { CustomButton, ChainAddresses, Subdomains, LuminoChannels } from '../../../components';
+import { CustomButton, ChainAddresses, Subdomains, LuminoNetworkChannels } from '../../../components';
 import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver';
 import AddNewSubdomain from './addNewSubdomain';
 import { GET_RESOLVERS } from '../../../constants';
@@ -58,7 +58,7 @@ const styles = {
       buttonNext: '',
     },
   },
-  luminoChannels: {
+  LuminoNetworkChannels: {
     title: '',
     table: '',
     thead: '',
@@ -271,9 +271,9 @@ class DomainsDetailActiveScreen extends Component {
               }
             </div>
           }
-          <LuminoChannels
+          <LuminoNetworkChannels
             paginationSize={3}
-            classes={styles.luminoChannels}
+            classes={styles.LuminoNetworkChannels}
           />
           {isOwner &&
           <CustomButton

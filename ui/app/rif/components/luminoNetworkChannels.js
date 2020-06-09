@@ -4,12 +4,13 @@ import PropTypes from 'prop-types';
 import { GenericTable } from './index';
 import rifActions from '../actions';
 import ItemWithActions from './item-with-actions';
+import { faCoins } from '@fortawesome/free-solid-svg-icons';
 
-class LuminoChannels extends Component {
+class LuminoNetworkChannels extends Component {
 
   static propTypes = {
     paginationSize: PropTypes.number,
-    getChannels: PropTypes.func,
+    getChannelsGroupedByNetwork: PropTypes.func,
     getChannel: PropTypes.func,
     classes: PropTypes.any,
   }
@@ -17,16 +18,16 @@ class LuminoChannels extends Component {
   constructor (props) {
     super(props);
     this.state = {
-      channels: [],
+      networkChannels: [],
     };
   }
 
   getData () {
     const {classes} = this.props;
-    if (this.state.channels) {
-      return this.state.channels.map((channel) => {
-        const item = <ItemWithActions contentClasses={classes.content} actionClasses={classes.contentActions}
-                                      text={channel.partner_address} enableRightChevron={true}/>
+    if (this.state.networkChannels) {
+      return this.state.networkChannels.map(networkChannel => {
+        const item = <ItemWithActions leftIcon={{icon: faCoins, color: '#05836D'}} contentClasses={classes.content} actionClasses={classes.contentActions}
+                                      text={networkChannel.token_symbol} enableRightChevron={true}/>
         return {
           content: item,
         }
@@ -40,12 +41,18 @@ class LuminoChannels extends Component {
   }
 
   loadChannels () {
-    this.props.getChannels().then(channels => {
-      channels.map(channelJson => {
-        const channel = channelJson[Object.keys(channelJson)[0]];
-        this.setState({
-          channels: [...this.state.channels, channel],
-        });
+    this.props.getChannelsGroupedByNetwork().then(networkChannels => {
+      const arrayNetworks = [];
+      for (let key of Object.keys(networkChannels)) {
+        const network = {
+          token_network_identifier: key,
+          token_symbol: networkChannels[key][0].token_symbol,
+          channels: networkChannels[key],
+        }
+        arrayNetworks.push(network);
+      }
+      this.setState({
+        networkChannels: arrayNetworks,
       });
     });
   }
@@ -69,7 +76,6 @@ class LuminoChannels extends Component {
     );
   }
 }
-
 function mapStateToProps (state) {
   const params = state.appState.currentView.params;
   return {
@@ -79,8 +85,8 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    getChannels: () => dispatch(rifActions.getChannels()),
+    getChannelsGroupedByNetwork: () => dispatch(rifActions.getChannelsGroupedByNetwork()),
     getChannel: () => {},
   }
 }
-module.exports = connect(mapStateToProps, mapDispatchToProps)(LuminoChannels);
+module.exports = connect(mapStateToProps, mapDispatchToProps)(LuminoNetworkChannels);

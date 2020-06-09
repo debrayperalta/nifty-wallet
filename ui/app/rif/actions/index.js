@@ -1,5 +1,6 @@
 import * as niftyActions from '../../actions';
 import extend from 'xtend';
+import _ from 'lodash';
 import {lumino} from '../../../../app/scripts/controllers/rif/constants';
 import {CallbackHandlers} from './callback-handlers';
 import ethUtils from 'ethereumjs-util';
@@ -45,6 +46,7 @@ const rifActions = {
   openChannel,
   closeChannel,
   getChannels,
+  getChannelsGroupedByNetwork,
   getAvailableCallbacks,
   getTokensWithJoinedCheck,
   listenCallback,
@@ -701,6 +703,36 @@ function getChannels () {
           }
           return resolve(channels);
         });
+      }
+    });
+  };
+}
+
+function getChannelsGroupedByNetwork () {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      if (rifConfig.mocksEnabled) {
+        const channelObject = mocks.channels;
+        const arrayWithoutKeys = [];
+        channelObject.map(channelJson => {
+          const channel = channelJson[Object.keys(channelJson)[0]];
+          arrayWithoutKeys.push(channel);
+        });
+        const groupedBy = _.groupBy(arrayWithoutKeys, 'token_network_identifier');
+        return resolve(groupedBy);
+      } else {
+      dispatch(this.getChannels()).then(channelObject => {
+        const arrayWithoutKeys = [];
+        channelObject.map(channelJson => {
+          const channel = channelJson[Object.keys(channelJson)[0]];
+          arrayWithoutKeys.push(channel);
+        });
+        const groupedBy = _.groupBy(arrayWithoutKeys, 'token_network_identifier');
+        return resolve(groupedBy);
+      }).catch(error => {
+        dispatch(niftyActions.displayWarning(error));
+        reject(error)
+      });
       }
     });
   };
