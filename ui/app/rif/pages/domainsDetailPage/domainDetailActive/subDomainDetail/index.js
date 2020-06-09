@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import ItemWithActions from '../../../../components/item-with-actions';
 
 class SubDomainDetail extends Component {
 
@@ -11,7 +12,12 @@ class SubDomainDetail extends Component {
 
   render = () => {
     const {domainName, name} = this.props;
-    return <div><h3>{name}.{domainName}</h3></div>
+    const mockController = 'Controller: 0x123456789012345'
+    return <div>
+      <h3>{name}.{domainName}</h3>
+      <h6>Transfer</h6>
+      <ItemWithActions text={mockController} enableEdit={true}/>
+    </div>
   }
 }
 
