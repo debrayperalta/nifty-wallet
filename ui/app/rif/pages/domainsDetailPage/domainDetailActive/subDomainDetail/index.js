@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import { ChainAddresses } from '../../../../components';
-import ItemWithActions from '../../../../components/item-with-actions';
+import {ChainAddresses, LuminoChannels} from '../../../../components';
+import TransferTable from '../../../../components/transferTable';
 
 class SubDomainDetail extends Component {
 
@@ -13,13 +13,19 @@ class SubDomainDetail extends Component {
 
   render = () => {
     const {domainName, name} = this.props;
-    const mockController = 'Controller: 0x123456789012345'
+    const mockAddress = '0x123456789012345'
     const subDomainFullName = `${name}.${domainName}`
     return <div>
       <h3>{subDomainFullName}</h3>
-      <ChainAddresses domainName={subDomainFullName} />
-      <h6>Transfer</h6>
-      <ItemWithActions text={mockController} enableEdit={true}/>
+      <div>
+        <ChainAddresses domainName={subDomainFullName}/>
+      </div>
+      <div>
+        <TransferTable controllerAddress={mockAddress}/>
+      </div>
+      <div>
+        <LuminoChannels/>
+      </div>
     </div>
   }
 }
