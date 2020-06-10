@@ -3,6 +3,7 @@ import extend from 'xtend';
 import {lumino} from '../../../../app/scripts/controllers/rif/constants';
 import {CallbackHandlers} from './callback-handlers';
 import ethUtils from 'ethereumjs-util';
+import { sumValuesOfArray } from '../utils/utils';
 import rifConfig from '../../../../rif.config';
 import {mocks} from './mocks';
 
@@ -40,6 +41,7 @@ const rifActions = {
   getDomains,
   getDomain,
   updateDomains,
+  getDomainByAddress,
   // Lumino
   onboarding,
   openChannel,
@@ -146,6 +148,25 @@ function getDomainDetails (domainName) {
           }
           return resolve(details);
         });
+    })
+  }
+}
+
+/*
+  TODO: rorolopetegui
+   This action isn't used for now, but it resolves an address using reverse lookup
+ */
+function getDomainByAddress(address) {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.rns.resolver.getAddressDomain(address, (error, domain) => {
+        console.debug('this is the domain bringed', domain);
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(domain);
+      });
     })
   }
 }
@@ -743,8 +764,14 @@ function getTokensWithJoinedCheck () {
           const channels = Object.keys(channelObject).map(channelKey => channelObject[channelKey]);
           tokens.map(token => {
             const tokenJoined = token;
-            tokenJoined.joined = !!channels.find(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
-            tokenJoined.openedChannels = channels.filter(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
+            tokenJoined.openedChannels = channels.filter(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address));
+            if (channels.find(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address))) {
+              tokenJoined.joined = true;
+            } else {
+              tokenJoined.joined = false;
+            }
+            const userBalance = sumValuesOfArray(tokenJoined.openedChannels, 'balance');
+            tokenJoined.userBalance = userBalance;
             tokensJoined.push(tokenJoined);
           });
           resolve(tokensJoined);

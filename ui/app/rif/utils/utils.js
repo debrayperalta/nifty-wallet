@@ -5,6 +5,21 @@ const getChainAddressByChainAddress = function (chainAddress) {
     return SLIP_ADDRESSES.find(e => e.chain === chainAddress);
 }
 
+const getStatusForChannel = (SDK_STATUS) => {
+  switch (SDK_STATUS) {
+    case 'CHANNEL_OPENED':
+      return 'OPEN';
+    default:
+      return 'CLOSE';
+  }
+}
+const sumValuesOfArray = (items, prop) => {
+  return items.reduce( function(a, b){
+    return a + b[prop];
+  }, 0);
+};
 export {
   getChainAddressByChainAddress,
+  getStatusForChannel,
+  sumValuesOfArray,
 }

@@ -9,6 +9,7 @@ import SellOnMKP from './rns/sell-on-mkp';
 import Transfer from './rns/transfer';
 import DomainRegisterScreen from './rns/register';
 import LuminoTokensPage from './lumino/tokensPage/tokensPage';
+import LuminoTokenDetailPage from './lumino/tokenDetailPage/tokenDetailPage';
 import React from 'react';
 import SearchDomains from '../components/searchDomains';
 import rifActions from '../actions';
@@ -125,6 +126,8 @@ function getPageComponent (screenName) {
       return (<DomainRegisterScreen/>);
     case pageNames.rns.luminoTokensPage:
       return (<LuminoTokensPage/>);
+    case pageNames.rns.luminoTokenDetailPage:
+      return (<LuminoTokenDetailPage/>);
     case pageNames.lumino.home:
       return (<LuminoHome />);
   }
