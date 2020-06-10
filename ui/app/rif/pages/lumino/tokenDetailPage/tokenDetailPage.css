@@ -75,6 +75,7 @@
   float: left;
   border-bottom: 0.05em solid #cdcdcd;
   margin-top: 0.25em;
+  margin-bottom: 0.25em;
   padding: 0.5em;
 }
 .channels-info-chiplet-text {
@@ -113,6 +114,7 @@
   width: 95%;
   margin-left: 5%;
   background-color: #ff0119;
+  display: flow-root;
   color: white;
   text-align: center;
   border-radius: 0.5em;
