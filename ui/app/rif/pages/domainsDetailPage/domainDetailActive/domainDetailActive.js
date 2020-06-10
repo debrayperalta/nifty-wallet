@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { faPlus, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { CustomButton, ChainAddresses, Subdomains, LuminoNetworkChannels } from '../../../components';
 import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver';
 import AddNewSubdomain from './addNewSubdomain';
@@ -222,6 +222,7 @@ class DomainsDetailActiveScreen extends Component {
               selectedResolverAddress={selectedResolverAddress}
               paginationSize={3}
               classes={styles.chainAddresses}
+              isOwner={isOwner}
             />
             {(isOwner && resolvers.find(resolver => resolver.address === selectedResolverAddress)) &&
             <div>
@@ -287,41 +288,6 @@ class DomainsDetailActiveScreen extends Component {
             }
           />
           }
-          <div id="renewDescription" className={''}>
-            <div className={''}>Renew</div>
-            <div>
-              <span className={''}>Renewal date:</span>
-              <span className={''}>{expirationDate}</span>
-              <CustomButton
-                text={'Renew'}
-                onClick={ () => {} }
-                className={
-                  {
-                    button: '',
-                    text: '',
-                  }
-                }
-              />
-            </div>
-          </div>
-          <div id="transferDescription" className={''}>
-            <div className={''}>Transfer</div>
-            <div>
-              <span className={''}>Owner:</span>
-              <span className={''}>{ownerAddress}</span>
-              <CustomButton
-                icon={faPen}
-                onClick={ () => {}}
-                className={
-                {
-                  button: '',
-                  icon: '',
-                  text: '',
-                  }
-                }
-              />
-            </div>
-          </div>
         </div>
       </div>
 		);

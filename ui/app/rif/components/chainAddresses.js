@@ -13,6 +13,7 @@ class ChainAddresses extends Component {
 
   static propTypes = {
     domainName: PropTypes.string.isRequired,
+    isOwner: PropTypes.bool.isRequired,
     selectedResolverAddress: PropTypes.string,
     getChainAddresses: PropTypes.func,
     paginationSize: PropTypes.number,
@@ -49,11 +50,11 @@ class ChainAddresses extends Component {
   }
 
   convertChainAddressesToTableData () {
-    const { classes } = this.props;
+    const { isOwner, classes } = this.props;
     return this.state.chainAddresses.map((chainAddress) => {
       const address = getChainAddressByChainAddress(chainAddress.chain);
       const icon = address.icon ? address.icon : DEFAULT_ICON;
-      const item = <ItemWithActions contentClasses={classes.content} actionClasses={classes.contentActions} enableEdit={true} enableDelete={true} text={chainAddress.address} leftIcon={icon}><InputWithSubmit/></ItemWithActions>
+      const item = <ItemWithActions contentClasses={classes.content} actionClasses={classes.contentActions} enableEdit={isOwner} enableDelete={isOwner} text={chainAddress.address} leftIcon={icon}><InputWithSubmit/></ItemWithActions>
       return {
         content: item,
       };
