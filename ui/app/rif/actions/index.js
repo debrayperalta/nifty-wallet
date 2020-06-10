@@ -764,8 +764,8 @@ function getTokensWithJoinedCheck () {
           const channels = Object.keys(channelObject).map(channelKey => channelObject[channelKey]);
           tokens.map(token => {
             const tokenJoined = token;
-            tokenJoined.openedChannels = channels.filter(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
-            if (channels.find(channel => channel.token_address === ethUtils.toChecksumAddress(token.address))) {
+            tokenJoined.openedChannels = channels.filter(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address));
+            if (channels.find(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address))) {
               tokenJoined.joined = true;
             } else {
               tokenJoined.joined = false;
