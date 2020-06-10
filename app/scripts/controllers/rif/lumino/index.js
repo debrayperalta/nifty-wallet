@@ -1,3 +1,4 @@
+import {Lumino} from '@rsksmart/lumino-light-client-sdk';
 import {lumino} from '../../../../../rif.config';
 import {LuminoSigningHandler} from './signing-handler';
 import {AbstractManager} from '../abstract-manager';
@@ -7,7 +8,6 @@ import {LuminoCallbacks} from './callbacks';
 import ethUtils from 'ethereumjs-util';
 import { LuminoExplorer } from './explorer';
 import {LuminoStorageHandler} from './storage';
-let sdk = require('@rsksmart/lumino-light-client-sdk');
 
 /**
  * Manager to control the access to lumino api
@@ -18,16 +18,16 @@ export class LuminoManager extends AbstractManager {
     super(props, {
       apiKey: null,
     });
-    this.lumino = sdk.Lumino;
+    this.lumino = Lumino;
+    this.operations = new LuminoOperations(this.lumino);
+    this.callbacks = new LuminoCallbacks(this.lumino);
+    this.keyringController = props.keyringController;
     this.signingHandler = new LuminoSigningHandler({
       transactionController: this.transactionController,
       address: this.address,
       keyringController: this.keyringController,
     });
     this.luminoExplorer = new LuminoExplorer();
-    this.operations = new LuminoOperations(this.lumino);
-    this.callbacks = new LuminoCallbacks(this.lumino);
-    this.keyringController = props.keyringController;
   }
 
   async initializeLumino (cleanApiKey = false) {
@@ -52,42 +52,19 @@ export class LuminoManager extends AbstractManager {
         saveLuminoData: (data) => {
           luminoStorageHandler.saveLuminoData(data);
         },
-      };
+      }
       await this.lumino.init(signingHandler, storageHandler, configParams);
       const state = this.store.getState();
-      try {
         if (state.apiKey && !cleanApiKey) {
           await this.operations.setApiKey(state.apiKey);
-          try {
-            await this.operations.onboarding();
-          } catch (onboardingError) {
-            console.debug('Error trying to intialize SDK: ', onboardingError);
-            if (onboardingError.response &&
-                  onboardingError.response.data &&
-                    onboardingError.response.data.errors &&
-            onboardingError.response.data.errors === 'There is no light client associated with the api key provided.') {
-              // we need to refresh the api key with a new one
-              await this.destroyLumino();
-              await this.initializeLumino(true);
-            }
-          }
+        await this.operations.onboarding();
         } else {
           await this.operations.onboarding();
           state.apiKey = await this.operations.getApiKey();
           this.store.putState(state);
         }
-      } catch (generalError) {
-        console.error('Lumino SDK cannot initialize: ', generalError);
-      }
     }
   };
-
-  async destroyLumino () {
-    await this.lumino.destroy();
-    sdk = null;
-    sdk = require('@rsksmart/lumino-light-client-sdk');
-    this.lumino = sdk.Lumino;
-  }
 
   onUnlock () {
     super.onUnlock();
