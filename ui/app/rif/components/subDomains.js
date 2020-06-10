@@ -57,21 +57,35 @@ class Subdomains extends Component {
   }
 
   render () {
-    const { classes, paginationSize } = this.props;
+    const {classes, paginationSize} = this.props;
     const data = this.getData();
     return (
-      <GenericTable
-        title={'Subdomains'}
-        columns={[
-          {
-            Header: 'Content',
-            accessor: 'content',
-          },
-        ]}
-        data={data}
-        paginationSize={paginationSize || 3}
-        classes={classes}
-      />
+      <div>
+        {
+          data.length > 0 &&
+          <div>
+            <GenericTable
+              title={'Subdomains'}
+              columns={[
+                {
+                  Header: 'Content',
+                  accessor: 'content',
+                },
+              ]}
+              data={data}
+              paginationSize={paginationSize || 3}
+              classes={classes}
+            />
+          </div>
+        }
+        {
+          data.length === 0 &&
+          <div>
+            <span>Subdomains</span>
+            <span>No subdomains found</span>
+          </div>
+        }
+      </div>
     );
   }
 }

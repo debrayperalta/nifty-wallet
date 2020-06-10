@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { CustomButton, ChainAddresses, Subdomains, LuminoNetworkChannels } from '../../../components';
 import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver';
 import AddNewSubdomain from './addNewSubdomain';
-import { GET_RESOLVERS } from '../../../constants';
+import { GET_RESOLVERS, SVG_PLUS } from '../../../constants';
 import { SLIP_ADDRESSES } from '../../../constants/slipAddresses';
 import niftyActions from '../../../../actions';
 import {pageNames} from '../../index';
@@ -132,7 +131,6 @@ class DomainsDetailActiveScreen extends Component {
 		this.setState({ insertedAddress: address });
 	}
   async addAddress (e) {
-    /*
     const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
     this.props.waitForListener(transactionListenerId)
       .then(transactionReceipt => {
@@ -141,7 +139,6 @@ class DomainsDetailActiveScreen extends Component {
     this.props.showTransactionConfirmPage({
       action: () => this.props.showDomainsDetailPage(this.props.domain),
     });
-	   */
 	}
 
   showAddChainAddress = () => {
@@ -227,7 +224,7 @@ class DomainsDetailActiveScreen extends Component {
             {(isOwner && resolvers.find(resolver => resolver.address === selectedResolverAddress)) &&
             <div>
               <CustomButton
-                icon={faPlus}
+                svgIcon={SVG_PLUS}
                 text={'Add Address'}
                 onClick={() => this.showAddChainAddress()}
                 className={
@@ -254,7 +251,7 @@ class DomainsDetailActiveScreen extends Component {
           {isOwner &&
             <div>
               <CustomButton
-                icon={faPlus}
+                svgIcon={SVG_PLUS}
                 text={'Add Subdomain'}
                 onClick={() => this.showAddSubdomain()}
                 className={
@@ -271,23 +268,10 @@ class DomainsDetailActiveScreen extends Component {
             </div>
           }
           <LuminoNetworkChannels
+            isOwner={isOwner}
             paginationSize={3}
             classes={styles.LuminoNetworkChannels}
           />
-          {isOwner &&
-          <CustomButton
-            icon={faPlus}
-            text={'Add channel'}
-            onClick={() => { }}
-            className={
-              {
-                button: '',
-                icon: '',
-                text: '',
-              }
-            }
-          />
-          }
         </div>
       </div>
 		);

@@ -7,10 +7,7 @@ import {DEFAULT_ICON} from '../../../../constants';
 
 class AddNewChainAddressToResolver extends Component {
   static propTypes = {
-    updateChainAddress: PropTypes.func.isRequired,
-    updateAddress: PropTypes.func.isRequired,
     slipChainAddresses: PropTypes.array.isRequired,
-    confirmCallback: PropTypes.func.isRequired,
     option: PropTypes.object,
   }
   constructor(props) {
@@ -24,11 +21,9 @@ class AddNewChainAddressToResolver extends Component {
 	}
   updateChainAddress = (selectedOption) => {
 		this.setState({ selectedChainAddress: selectedOption });
-		this.props.updateChainAddress(selectedOption.chain);
 	}
 	updateAddress = (e) => {
 		this.setState({ insertedAddress: e.target.value });
-		this.props.updateAddress(e.target.value);
 	}
 
 	render () {
@@ -81,7 +76,7 @@ class AddNewChainAddressToResolver extends Component {
       <div id="inputAddress" className={''}>
         <input type="text" placeholder="value" onChange={this.updateAddress} />
       </div>
-      <button className={''} onClick={() => this.props.confirmCallback} >Change</button>
+      <button className={''} onClick={() => console.debug('===================== YOU CLICK ON CONFIRM')} >Add Address</button>
 		</div>
 		)
 	}

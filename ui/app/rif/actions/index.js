@@ -723,10 +723,12 @@ function getChannelsGroupedByNetwork () {
       } else {
       dispatch(this.getChannels()).then(channelObject => {
         const arrayWithoutKeys = [];
-        channelObject.map(channelJson => {
-          const channel = channelJson[Object.keys(channelJson)[0]];
-          arrayWithoutKeys.push(channel);
-        });
+        if (Object.keys(channelObject).length !== 0 && channelObject.constructor !== Object) {
+          channelObject.map(channelJson => {
+            const channel = channelJson[Object.keys(channelJson)[0]];
+            arrayWithoutKeys.push(channel);
+          });
+        }
         const groupedBy = _.groupBy(arrayWithoutKeys, 'token_network_identifier');
         return resolve(groupedBy);
       }).catch(error => {

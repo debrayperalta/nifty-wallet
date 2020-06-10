@@ -1,14 +1,16 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import { GenericTable } from './index';
+import {CustomButton, GenericTable} from './index';
 import rifActions from '../actions';
 import ItemWithActions from './item-with-actions';
-import { faCoins } from '@fortawesome/free-solid-svg-icons';
+import {faCoins} from '@fortawesome/free-solid-svg-icons';
+import { SVG_PLUS } from '../constants';
 
 class LuminoNetworkChannels extends Component {
 
   static propTypes = {
+    isOwner: PropTypes.bool,
     paginationSize: PropTypes.number,
     getChannelsGroupedByNetwork: PropTypes.func,
     getChannel: PropTypes.func,
@@ -58,21 +60,50 @@ class LuminoNetworkChannels extends Component {
   }
 
   render () {
-    const { paginationSize, classes } = this.props;
+    const {isOwner, paginationSize, classes} = this.props;
     const data = this.getData();
     return (
-      <GenericTable
-        title={'Lumino Channels'}
-        columns={[
-          {
-            Header: 'Content',
-            accessor: 'content',
-          },
-        ]}
-        data={data}
-        paginationSize={paginationSize || 3}
-        classes={classes}
-      />
+      <div>
+      {
+        data.length > 0 &&
+          <div>
+            <GenericTable
+              title={'Lumino Channels'}
+              columns={[
+                {
+                  Header: 'Content',
+                  accessor: 'content',
+                },
+              ]}
+              data={data}
+              paginationSize={paginationSize || 3}
+              classes={classes}
+            />
+            {(isOwner || false) &&
+            <CustomButton
+              svgIcon={SVG_PLUS}
+              text={'Add channel'}
+              onClick={() => {
+              }}
+              className={
+                {
+                  button: '',
+                  icon: '',
+                  text: '',
+                }
+              }
+            />
+            }
+          </div>
+      }
+      {
+        data.length === 0 &&
+        <div>
+          <span>Lumino Channels</span>
+          <span>No channels found</span>
+        </div>
+      }
+      </div>
     );
   }
 }
