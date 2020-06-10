@@ -141,28 +141,37 @@ export default class RnsRegister extends RnsJsDelegate {
     const cleanDomainName = this.cleanDomainFromRskSuffix(domainName);
     const pendingDomain = this.getDomain(domainName);
     if (pendingDomain) {
-      const registerInformation = pendingDomain.registration;
-      if (registerInformation) {
-        const rifCost = registerInformation.rifCost;
-        const secret = registerInformation.secret;
-        const durationBN = this.web3.toBigNumber(registerInformation.yearsToRegister);
-        const data = this.getAddrRegisterData(cleanDomainName, this.address, secret, durationBN, this.address);
-        const transactionListener = this.send(this.rifContractInstance, 'transferAndCall', [this.rifConfig.rns.contracts.fifsAddrRegistrar, rifCost, data]);
-        transactionListener.transactionConfirmed()
-          .then(transactionReceipt => {
-            console.debug('Transaction success', transactionReceipt);
-            pendingDomain.registration = null;
-            this.container.resolver.getDomainDetails(domainName).then(domainDetails => {
-              pendingDomain.details = domainDetails;
-              this.updateDomains(pendingDomain);
-            });
-        }).catch(transactionReceipt => {
-          console.debug('Transaction failed', transactionReceipt);
+      return new Promise((resolve, reject) => {
+        this.isDomainAvailable(domainName).then(available => {
+          if (available) {
+            const registerInformation = pendingDomain.registration;
+            if (registerInformation) {
+              const rifCost = registerInformation.rifCost;
+              const secret = registerInformation.secret;
+              const durationBN = this.web3.toBigNumber(registerInformation.yearsToRegister);
+              const data = this.getAddrRegisterData(cleanDomainName, this.address, secret, durationBN, this.address);
+              const transactionListener = this.send(this.rifContractInstance, 'transferAndCall', [this.rifConfig.rns.contracts.fifsAddrRegistrar, rifCost, data]);
+              transactionListener.transactionConfirmed()
+                .then(transactionReceipt => {
+                  console.debug('Transaction success', transactionReceipt);
+                  pendingDomain.registration = null;
+                  this.container.resolver.getDomainDetails(domainName).then(domainDetails => {
+                    pendingDomain.details = domainDetails;
+                    this.updateDomains(pendingDomain);
+                  });
+                }).catch(transactionReceipt => {
+                console.debug('Transaction failed', transactionReceipt);
+              });
+              return resolve(transactionListener.id);
+            } else {
+              return reject('Invalid domainName, you need to use the same as the first request');
+            }
+          } else {
+            this.deleteDomain(domainName);
+            return reject('This domain is not available anymore, probably someone else already claim this');
+          }
         });
-        return Promise.resolve(transactionListener.id);
-      } else {
-        return Promise.reject('Invalid domainName, you need to use the same as the first request');
-      }
+      });
     } else {
       return Promise.reject('You dont have any registration pending, you need to request registration first');
     }

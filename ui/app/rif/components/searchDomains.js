@@ -1,10 +1,10 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import rifActions from '../../rif/actions'
-import actions from '../../actions'
-import {pageNames} from '../pages'
-import {cleanDomainName} from '../utils/parse'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
+import rifActions from '../../rif/actions';
+import actions from '../../actions';
+import {pageNames} from '../pages';
+import {cleanDomainName} from '../utils/parse';
 
 class SearchDomains extends Component {
 
@@ -27,30 +27,35 @@ class SearchDomains extends Component {
         storedDomains: domains,
       });
     })
-    }
+  }
 
-  _handleKeyDown = (e) => {
+  cleanDomainName (domainName) {
+    return cleanDomainName(domainName);
+  }
+
+  handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      const typedDomain = cleanDomainName(e.target.value);
+      const typedDomain = e.target.value;
       // There is a limitation in rns that domains with less 5 characters are blocked
       if (typedDomain.length < 5) {
         this.props.displayWarning('Domains with less than 5 characters are blocked.');
         return;
       }
 
+      const domainName = this.cleanDomainName(e.target.value);
       const storedDomains = this.state.storedDomains;
 
-      if (storedDomains && storedDomains.find(storedDomain => storedDomain.name === typedDomain)) {
-        const storedDomain = storedDomains.find(storedDomain => storedDomain.name === typedDomain);
+      if (storedDomains && storedDomains.find(storedDomain => storedDomain.name === domainName)) {
+        const storedDomain = storedDomains.find(storedDomain => storedDomain.name === domainName);
         return this.props.showDomainsDetailPage({domain: storedDomain, status: storedDomain.status});
       } else {
         // Checks if the domain is available, so if it is, it need to render a screen so the user can register it
-        this.props.checkDomainAvailable(typedDomain).then(domain => {
+        this.props.checkDomainAvailable(domainName).then(domain => {
           if (domain) {
-            this.props.showDomainRegisterPage(typedDomain);
+            this.props.showDomainRegisterPage(domainName);
           } else {
             // We need to put an else here, so we can redirect to details page, remember that the localstorage part of code, will not be anymore here
-            this.props.getDomainDetails(typedDomain).then(details => {
+            this.props.getDomainDetails(domainName).then(details => {
               console.debug('Details retrieved', details);
               return this.props.showDomainsDetailPage(details);
             }).catch(error => {
@@ -68,7 +73,7 @@ class SearchDomains extends Component {
       <input
         placeholder="Search for domains"
         className={'search-bar'}
-        onKeyDown={this._handleKeyDown}
+        onKeyDown={(event) => this.handleKeyDown(event)}
       />
     )
   }
@@ -89,8 +94,8 @@ const mapDispatchToProps = dispatch => {
     showDomainsDetailPage: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, data)),
     showDomainRegisterPage: (domainName) => dispatch(rifActions.navigateTo(pageNames.rns.domainRegister, {
       domainName,
-      navBar: {
-        title: 'Domain Register',
+      tabOptions: {
+        hideTitle: true,
       },
     })),
     checkDomainAvailable: (domainName) => dispatch(rifActions.checkDomainAvailable(domainName)),

@@ -37,9 +37,18 @@ function navigateTo (appState, action) {
   return extend(appState, {
     currentView: {
       name: 'rif',
-      screenName: action.data.screenName,
       context: appState.currentView.context,
-      params: action.data.params,
+      params: action.params,
+    },
+  })
+}
+
+function landingPage (appState, action) {
+  return extend(appState, {
+    currentView: {
+      name: 'rif.landingPage',
+      context: appState.currentView.context,
+      params: action.params,
     },
   })
 }
@@ -48,4 +57,5 @@ export const rifReducers = {
   navigateTo,
   showMenu,
   showModal,
+  landingPage,
 }

@@ -1,11 +1,8 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import { Dropdown, DropdownMenuItemWithAvatar } from '../dropdown'
+import {Dropdown, DropdownMenuItemWithAvatar} from '../dropdown'
 import actions from '../../../../ui/app/actions'
-import rifActions from '../../../../ui/app/rif/actions'
-import { connect } from 'react-redux'
-import { faMoneyBill, faAddressCard } from '@fortawesome/free-solid-svg-icons'
-import {pageNames} from '../../../../ui/app/rif/pages'
+import {connect} from 'react-redux'
 
 class MainMenu extends Component {
   static propTypes = {
@@ -14,8 +11,6 @@ class MainMenu extends Component {
     showInfoPage: PropTypes.func.isRequired,
     changeState: PropTypes.func.isRequired,
     openMainMenu: PropTypes.func.isRequired,
-    showDomainsPage: PropTypes.func.isRequired,
-    showPaymentsPage: PropTypes.func.isRequired,
     isMainMenuOpen: PropTypes.bool,
   }
 
@@ -66,20 +61,6 @@ class MainMenu extends Component {
           onClick={() => { this.props.showInfoPage() }}
           title={'Info/Help'}
         />
-
-        <DropdownMenuItemWithAvatar
-          closeMenu={() => this.props.changeState(isMainMenuOpen)}
-          onClick={() => { this.props.showDomainsPage() }}
-          title={'Your Domains'}
-          icon={faAddressCard}
-        />
-
-        <DropdownMenuItemWithAvatar
-          closeMenu={() => this.props.changeState(isMainMenuOpen)}
-          onClick={() => { this.props.showPaymentsPage() }}
-          title={'Payments'}
-          icon={faMoneyBill}
-        />
       </Dropdown>
     )
   }
@@ -90,21 +71,6 @@ const mapDispatchToProps = dispatch => {
     showConfigPage: () => dispatch(actions.showConfigPage()),
     lockMetamask: () => dispatch(actions.lockMetamask()),
     showInfoPage: () => dispatch(actions.showInfoPage()),
-    showDomainsPage: () => dispatch(rifActions.navigateTo(
-      pageNames.rns.domains,
-      {
-        navBar: {
-          showTitle: false,
-        },
-      })),
-    showPaymentsPage: () => dispatch(rifActions.navigateTo(
-      pageNames.rns.pay,
-      {
-        navBar: {
-          title: 'Payments',
-        },
-        showDomainsSearch: false,
-      })),
   }
 }
 

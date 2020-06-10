@@ -86,7 +86,13 @@ const mapDispatchToProps = dispatch => {
   return {
     showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokensPage, params)),
     getTokensWithJoinedCheck: () => dispatch(rifActions.getTokensWithJoinedCheck()),
-    showTokenDetail: (params) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokenDetailPage, params)),
+    showTokenDetail: (data) => dispatch(rifActions.navigateTo(pageNames.rns.luminoTokenDetailPage, {
+      ...data,
+      navBar: {
+        title: 'Lumino Token Detail',
+        showBack: true,
+      },
+    })),
   }
 }
 

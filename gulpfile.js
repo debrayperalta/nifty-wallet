@@ -24,6 +24,7 @@ const pify = require('pify')
 const gulpMultiProcess = require('gulp-multi-process')
 const endOfStream = pify(require('end-of-stream'))
 const concat = require('gulp-concat')
+const rename = require('gulp-rename')
 
 function gulpParallel (...args) {
   return function spawnGulpChildProcess (cb) {
@@ -323,6 +324,7 @@ gulp.task('zip', gulp.parallel('zip:chrome', 'zip:firefox', 'zip:edge', 'zip:ope
 // high level tasks
 
 gulp.task('rifCss', watchRifCss)
+gulp.task('rifConfig', rifConfig)
 
 gulp.task('dev',
   gulp.series(
@@ -339,6 +341,7 @@ gulp.task('dev',
 gulp.task('dev:extension',
   gulp.series(
     'clean',
+    'rifConfig',
     'rifCss',
     gulp.parallel(
       'dev:extension:js',
@@ -362,6 +365,7 @@ gulp.task('dev:mascara',
 gulp.task('build',
   gulp.series(
     'clean',
+    'rifConfig',
     'rifCss',
     gulpParallel(
       'build:extension:js',
@@ -526,6 +530,23 @@ function bundleTask (opts) {
 
 function beep () {
   process.stdout.write('\x07')
+}
+
+function getEnvironmentFromArguments () {
+  const args = process.argv.slice(2);
+  const environment = args.find(arg => arg.indexOf('--environment=') !== -1);
+  if (environment) {
+    return environment.split('=')[1];
+  }
+  return 'production';
+}
+
+function rifConfig () {
+  const environment = getEnvironmentFromArguments();
+  console.log('Using RIF environment', environment);
+  return gulp.src(`rif/rif.config.${environment}.js`)
+    .pipe(rename('rif.config.js'))
+    .pipe(gulp.dest('./'))
 }
 
 function watchRifCss () {

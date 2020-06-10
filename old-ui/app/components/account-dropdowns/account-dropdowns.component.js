@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import actions from '../../../../ui/app/actions'
+import rifActions from '../../../../ui/app/rif/actions'
 import { connect } from 'react-redux'
 import { Dropdown, DropdownMenuItem } from '../dropdown'
 import copyToClipboard from 'copy-to-clipboard'
@@ -177,16 +178,16 @@ class AccountDropdowns extends Component {
       >
         <DropdownMenuItem
           closeMenu={() => {}}
+          onClick={() => this.exploreRifServices()}
+        >Explore RIF Services</DropdownMenuItem>
+        <DropdownMenuItem
+          closeMenu={() => {}}
           onClick={() => this.viewOnBlockExplorer()}
         >View on block explorer</DropdownMenuItem>
         <DropdownMenuItem
           closeMenu={() => {}}
           onClick={() => this.showQRCode()}
         >Show QR Code</DropdownMenuItem>
-        <DropdownMenuItem
-          closeMenu={() => {}}
-          onClick={() => this.copyAddress()}
-        >Copy address to clipboard</DropdownMenuItem>
         {ifContractAcc(keyring) ? <DropdownMenuItem
           closeMenu={() => {}}
           onClick={() => this.copyABI()}
@@ -208,6 +209,10 @@ class AccountDropdowns extends Component {
     const networkCode = parseInt(network, 10)
     const url = ethNetProps.explorerLinks.getExplorerAccountLinkFor(selected, networkCode)
     global.platform.openWindow({ url })
+  }
+
+  exploreRifServices () {
+    this.props.actions.exploreRifServices();
   }
 
   showQRCode = () => {
@@ -344,6 +349,7 @@ const mapDispatchToProps = (dispatch) => {
       showQrView: (selected, identity) => dispatch(actions.showQrView(selected, identity)),
       getContract: (addr) => dispatch(actions.getContract(addr)),
       updateABI: (address, network, abi) => dispatch(actions.updateABI(address, network, abi)),
+      exploreRifServices: () => dispatch(rifActions.showRifLandingPage()),
     },
   }
 }

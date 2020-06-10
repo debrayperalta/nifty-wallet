@@ -6,7 +6,7 @@ class SellOnMKP extends Component {
   static propTypes = {}
 
   render () {
-    return (<div>SellOnMKP</div>);
+    return (<div className="body">SellOnMKP</div>);
   }
 }
 function mapStateToProps (state) {

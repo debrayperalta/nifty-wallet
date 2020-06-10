@@ -4,11 +4,14 @@ import {lumino} from '../../../../app/scripts/controllers/rif/constants';
 import {CallbackHandlers} from './callback-handlers';
 import ethUtils from 'ethereumjs-util';
 import { sumValuesOfArray } from '../utils/utils';
+import rifConfig from '../../../../rif.config';
+import {mocks} from './mocks';
 
 const rifActions = {
   SHOW_MODAL: 'SHOW_MODAL',
   SHOW_MENU: 'SHOW_MENU',
   NAVIGATE_TO: 'NAVIGATE_TO',
+  RIF_LANDING_PAGE: 'RIF_LANDING_PAGE',
   setBackgroundConnection,
   // RNS
   checkDomainAvailable,
@@ -51,6 +54,10 @@ const rifActions = {
   createDeposit,
   getTokens,
   cleanStore,
+  showRifLandingPage,
+  setupDefaultLuminoCallbacks,
+  createNetworkPayment,
+  getDomainAddress,
 }
 
 let background = null;
@@ -347,42 +354,45 @@ function navigateBack () {
     }
     if (navigationStack.length > 0) {
       const navigation = navigationStack.pop();
-      return navigateTo(navigation.data.screenName, navigation.data.params);
+      return navigateTo(navigation.params.tabOptions.screenName, navigation.params);
     }
   }
   // go to home since we don't have any other page to go to.
   return niftyActions.goHome();
 }
 
-function navigateTo (screenName, params) {
-  const defaultParams = {
-    showDomainsSearch: true,
-  };
-
-  const defaultNavBarParams = {
-    showTitle: true,
+function navigateTo (screenName, params, resetNavigation = false) {
+  const defaultTabOptions = {
+    screenTitle: screenName,
     showBack: true,
+    showSearchbar: true,
+    screenName,
+    tabIndex: 0,
+    hideTitle: false,
   };
-
-  params = extend(defaultParams, params);
-  params.navBar = extend(defaultNavBarParams, params.navBar);
-
-  if (params.navBar.showBack === false) {
+  if (!params) {
+    params = {
+      tabOptions: defaultTabOptions,
+    };
+  }
+  if (params.tabOptions) {
+    params.tabOptions = extend(defaultTabOptions, params.tabOptions);
+  } else {
+    params.tabOptions = defaultTabOptions;
+  }
+  if (params.tabOptions.showBack === false || resetNavigation) {
     // we reset the navigation since we can't go back in the next page or any other after that
-    for (let index = 0; index < navigationStack.length; index++) {
+    for (let index = 0; index <= navigationStack.length; index++) {
       navigationStack.pop();
     }
   }
 
   const currentNavigation = {
     type: rifActions.NAVIGATE_TO,
-    data: {
-      screenName,
-      params,
-    },
+    params,
   }
-  const alreadyNavigatedTo = navigationStack.find(navigation => navigation.data.screenName === screenName);
-  if (!alreadyNavigatedTo) {
+  const alreadyNavigatedTo = navigationStack.find(navigation => navigation.params.tabOptions.screenName === screenName);
+  if (!alreadyNavigatedTo && !resetNavigation) {
     navigationStack.push(currentNavigation);
   }
   backNavigated = false;
@@ -493,6 +503,22 @@ function getDomain (domainName) {
           return reject(error);
         }
         return resolve(domain);
+      });
+    });
+  };
+}
+
+function getDomainAddress (domainName) {
+  return (dispatch) => {
+    dispatch(niftyActions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      dispatch(niftyActions.hideLoadingIndication());
+      background.rif.rns.register.getDomainAddress(domainName, (error, domainAddress) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(domainAddress);
       });
     });
   };
@@ -675,10 +701,12 @@ function createPayment (partner, tokenAddress, netAmount, callbackHandlers = new
       }
       if (callbackHandlers && callbackHandlers.successHandler) {
         handleSdkCallback(lumino.callbacks.COMPLETED_PAYMENT, dispatch, callbackHandlers.successHandler);
+        handleSdkCallback(lumino.callbacks.RECEIVED_PAYMENT, dispatch, callbackHandlers.successHandler);
       }
       if (callbackHandlers && callbackHandlers.errorHandler) {
         handleSdkCallback(lumino.callbacks.FAILED_CREATE_PAYMENT, dispatch, callbackHandlers.errorHandler);
         handleSdkCallback(lumino.callbacks.FAILED_PAYMENT, dispatch, callbackHandlers.errorHandler);
+        handleSdkCallback(lumino.callbacks.EXPIRED_PAYMENT, dispatch, callbackHandlers.errorHandler);
       }
       background.rif.lumino.createPayment(partner, tokenAddress, netAmount, (error) => {
         if (error) {
@@ -694,13 +722,17 @@ function createPayment (partner, tokenAddress, netAmount, callbackHandlers = new
 function getChannels () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      background.rif.lumino.getChannels((error, channels) => {
-        if (error) {
-          dispatch(niftyActions.displayWarning(error));
-          return reject(error);
-        }
-        return resolve(channels);
-      });
+      if (rifConfig.mocksEnabled) {
+        return resolve(mocks.channels);
+      } else {
+        background.rif.lumino.getChannels((error, channels) => {
+          if (error) {
+            dispatch(niftyActions.displayWarning(error));
+            return reject(error);
+          }
+          return resolve(channels);
+        });
+      }
     });
   };
 }
@@ -708,13 +740,17 @@ function getChannels () {
 function getTokens () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      background.rif.lumino.getTokens((error, tokens) => {
-        if (error) {
-          dispatch(niftyActions.displayWarning(error));
-          return reject(error);
-        }
-        return resolve(tokens);
-      });
+      if (rifConfig.mocksEnabled) {
+        return resolve(mocks.tokens);
+      } else {
+        background.rif.lumino.getTokens((error, tokens) => {
+          if (error) {
+            dispatch(niftyActions.displayWarning(error));
+            return reject(error);
+          }
+          return resolve(tokens);
+        });
+      }
     });
   };
 }
@@ -761,6 +797,63 @@ function cleanStore () {
         }
         return resolve();
       });
+    });
+  };
+}
+
+function showRifLandingPage () {
+  return {
+    type: rifActions.RIF_LANDING_PAGE,
+    params: {
+      tabOptions: {
+        showBack: true,
+        screenTitle: 'My Domains',
+      },
+    },
+  }
+}
+
+function setupDefaultLuminoCallbacks () {
+  return (dispatch) => {
+    return new Promise(resolve => {
+      handleSdkCallback(lumino.callbacks.SIGNING_FAIL, dispatch, (error) => {
+        console.debug('Error Signing', error);
+        dispatch(niftyActions.displayToast('Error Signing!', false));
+      });
+      handleSdkCallback(lumino.callbacks.REQUEST_CLIENT_ONBOARDING, dispatch, (result) => {
+        console.debug('Requesting onboarding', result);
+        dispatch(niftyActions.displayToast('Requesting onboard to Hub'));
+      });
+      handleSdkCallback(lumino.callbacks.CLIENT_ONBOARDING_SUCCESS, dispatch, (result) => {
+        console.debug('Onboarding success', result);
+        dispatch(niftyActions.displayToast('Onboarding completed successfully'));
+      });
+      handleSdkCallback(lumino.callbacks.RECEIVED_PAYMENT, dispatch, (result) => {
+        console.debug('Received Payment', result);
+        dispatch(niftyActions.displayToast('Received a payment'));
+      });
+      return resolve();
+    });
+  };
+}
+
+function createNetworkPayment (network, destination, amountInWei) {
+  // TODO: network is not being used for now because we can't switch the network just to make a payment, we should
+  // TODO: think about the ui and maybe refactor this, for now it will only pay on RBTC
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      dispatch(getSelectedAddress()).then(selectedAddress => {
+        const txData = {
+          from: selectedAddress,
+          to: destination,
+        };
+        global.ethQuery.sendTransaction(txData, (err, _data) => {
+          if (err) {
+            return dispatch(niftyActions.displayWarning(err.message))
+          }
+        });
+        resolve();
+      }).catch(error => reject(error));
     });
   };
 }

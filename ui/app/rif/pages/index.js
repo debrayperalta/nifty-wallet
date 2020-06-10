@@ -13,113 +13,128 @@ import LuminoTokenDetailPage from './lumino/tokenDetailPage/tokenDetailPage';
 import React from 'react';
 import SearchDomains from '../components/searchDomains';
 import rifActions from '../actions';
+import {tabDefinitions} from './tab-definitions';
+import Tabs from '../components/tabs';
 import ToastComponent from '../../../../old-ui/app/components/toast';
 import ErrorComponent from '../../../../old-ui/app/components/error';
+import LuminoHome from './lumino/index';
+import {pageNames} from './names';
 
-const pageNames = {
-  rns: {
-    domains: 'domains',
-    domainsDetail: 'domainsDetail',
-    domainRegister: 'domainRegister',
-    subdomains: 'subdomains',
-    exchange: 'exchange',
-    luminoChannels: 'lumino-channels',
-    pay: 'pay',
-    renew: 'renew',
-    sellOnMKP: 'sell-on-mkp',
-    transfer: 'transfer',
-    luminoTokensPage: 'luminoTokensPage',
-    luminoTokenDetailPage: 'luminoTokenDetailPage',
-  },
+function getSearchBarComponent (show) {
+  if (!show) {
+    return null;
+  }
+  return (<SearchDomains />);
 }
 
-function buildScreen (screenComponent, context, dispatch) {
-  let navBar = null;
-  let searchDomains = null;
-
-  if (context.params.navBar) {
-    if (!context.params.navBar.title && context.params.navBar.showTitle) {
-      context.params.navBar.title = context.screenName;
-    }
-    if (!context.params.navBar.backAction && context.params.navBar.showBack) {
-      context.params.navBar.backAction = () => dispatch(rifActions.navigateBack());
-    }
-    let backButton = null;
-    if (context.params.navBar.showBack || context.params.navBar.backAction) {
-      backButton = (
-        <i onClick={(event) => {
-          context.params.navBar.backAction();
-        }} className="fa fa-arrow-left fa-lg cursor-pointer" style={{
-          position: 'absolute',
-          left: '30px',
-        }}/>
-      );
-    }
-    let title = null;
-    if (context.params.navBar.showTitle || context.params.navBar.title) {
-      title = (<h2>{context.params.navBar.title}</h2>);
-    }
-    navBar = (
-      <div className="section-title flex-row flex-center">
-        {backButton}
-        {title}
-      </div>
-    );
+function getTabTitleComponent (title, hideTitle) {
+  if (!title || hideTitle) {
+    return null;
   }
-
-  if (context.params.showDomainsSearch) {
-    searchDomains = (<SearchDomains/>);
-  }
-
-  const screenBody = (
-    <div className="flex-column flex-justify-center flex-grow select-none">
-      {screenComponent}
-    </div>
-  );
-
   return (
-    <div className="flex-column flex-grow" style={{
-      maxWidth: '400px',
-    }}>
+    <h2 className="page-title">{title}</h2>
+  );
+}
+
+function buildTabs (screenName, tabOptions) {
+  const tabs = [];
+
+  tabDefinitions.forEach((tabDefinition, index) => {
+    let tabTitle = tabDefinition.defaultScreenTitle;
+    let tabComponent = getPageComponent(tabDefinition.defaultScreenName);
+    let showSearchbar = tabDefinition.showSearchbar;
+    const tabIndex = tabOptions.tabIndex;
+    if (screenName && tabDefinition.index === tabIndex) {
+      tabTitle = tabOptions.screenTitle;
+      tabComponent = getPageComponent(screenName);
+      showSearchbar = tabOptions.showSearchbar;
+    }
+    const tab = {
+      index,
+      title: tabDefinition.title,
+      component: (
+        <div>
+          {getSearchBarComponent(showSearchbar)}
+          {getTabTitleComponent(tabTitle, tabOptions.hideTitle)}
+          {tabComponent}
+        </div>
+      ),
+    };
+    tabs.push(tab);
+  });
+
+  return tabs;
+}
+
+function buildTabScreen (screenName, context, dispatch) {
+  const tabOptions = context.params.tabOptions;
+  const tabs = buildTabs(screenName, tabOptions, dispatch);
+  const onTabChange = (tab) => {
+    // we can use this to trigger on change tab actions
+    console.debug('Selected tab', tab);
+    const tabDefinition = tabDefinitions.find(definition => definition.index === tab.index);
+    dispatch(rifActions.navigateTo(tabDefinition.defaultScreenName, {
+      tabOptions: {
+        showSearchbar: tabDefinition.showSearchbar,
+        screenTitle: tabDefinition.defaultScreenTitle,
+        tabIndex: tabDefinition.index,
+      },
+    }, true));
+  }
+  return (
+    <div className="rif-app-container">
       <ToastComponent />
       <ErrorComponent />
-      {navBar}
-      {searchDomains}
-      {screenBody}
+      <Tabs tabs={tabs}
+            onChange={(tab) => onTabChange(tab)}
+            showBack={tabOptions.showBack}
+            backAction={() => dispatch(rifActions.navigateBack())}/>
     </div>
   );
+}
+
+function getLandingPage (context, dispatch) {
+  return buildTabScreen(null, context, dispatch);
 }
 
 function getPage (context, dispatch) {
-  switch (context.screenName) {
+  const tabOptions = context.params.tabOptions;
+  return buildTabScreen(tabOptions.screenName, context, dispatch);
+}
+
+function getPageComponent (screenName) {
+  switch (screenName) {
     case pageNames.rns.domains:
-      return buildScreen(<DomainsScreen/>, context, dispatch)
+      return (<DomainsScreen/>);
     case pageNames.rns.domainsDetail:
-      return buildScreen(<DomainsDetailScreen/>, context, dispatch)
+      return (<DomainsDetailScreen/>);
     case pageNames.rns.subdomains:
-      return buildScreen(<Subdomains/>, context, dispatch)
+      return (<Subdomains/>);
     case pageNames.rns.exchange:
-      return buildScreen(<Exchange/>, context, dispatch)
+      return (<Exchange/>);
     case pageNames.rns.luminoChannels:
-      return buildScreen(<LuminoChannels/>, context, dispatch)
+      return (<LuminoChannels/>);
     case pageNames.rns.pay:
-      return buildScreen(<Pay/>, context, dispatch)
+      return (<Pay/>);
     case pageNames.rns.renew:
-      return buildScreen(<Renew/>, context, dispatch)
+      return (<Renew/>);
     case pageNames.rns.sellOnMKP:
-      return buildScreen(<SellOnMKP/>, context, dispatch)
+      return (<SellOnMKP/>);
     case pageNames.rns.transfer:
-      return buildScreen(<Transfer/>, context, dispatch)
+      return (<Transfer/>);
     case pageNames.rns.domainRegister:
-      return buildScreen(<DomainRegisterScreen/>, context, dispatch)
+      return (<DomainRegisterScreen/>);
     case pageNames.rns.luminoTokensPage:
-      return buildScreen(<LuminoTokensPage/>, context, dispatch)
+      return (<LuminoTokensPage/>);
     case pageNames.rns.luminoTokenDetailPage:
-      return buildScreen(<LuminoTokenDetailPage/>, context, dispatch)
+      return (<LuminoTokenDetailPage/>);
+    case pageNames.lumino.home:
+      return (<LuminoHome />);
   }
 }
 
 export {
   getPage,
   pageNames,
+  getLandingPage,
 }

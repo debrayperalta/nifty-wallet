@@ -5,11 +5,15 @@ import actions from '../../../ui/app/actions'
 
 class ErrorComponent extends Component {
 	static propTypes = {
-		error: PropTypes.string,
+		error: PropTypes.any,
 		hideWarning: PropTypes.func,
 	}
 
 	render () {
+    let error = this.props.error;
+    if (typeof this.props.error === 'object') {
+      error = JSON.stringify(error);
+    }
 		return this.props.error ? (
 			<div style={{
 				textAlign: 'center',
@@ -42,7 +46,7 @@ class ErrorComponent extends Component {
 						style={{
 							wordBreak: 'break-word',
 						}}
-					>{this.props.error}</div>
+					>{error}</div>
 				</div>
 			</div>
 		) : null
@@ -51,7 +55,7 @@ class ErrorComponent extends Component {
 
 function mapStateToProps (state) {
   return {
-    error: state.appState.warning ? state.appState.warning.message : null,
+    error: state.appState.warning ? state.appState.warning : null,
   }
 }
 

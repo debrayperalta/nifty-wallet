@@ -1,197 +1,187 @@
 .button-container {
-  position: absolute;
-  bottom: 2em;
   text-align: center;
-  width: 100%;
-}
-
-.button-container>button {
-  font-family: 'Helvetica Neue', Helvetica, sans-serif;
-  text-transform: uppercase;
-  font-size: 1.2em;
-  border-radius: 0.3em;
-  background: #A8C5EE;
-  border: solid 0.1em #4a74b3;
-  color: black;
 }
 
 .domainRegisterInitiate {
-  padding: 1em;
+  font-family: var(--primary-font);
+  padding: 0 20px;
 }
 
-.domainRegisterInitiate>div>span {
-  margin-right: 0.4em;
-}
-
-.domainRegisterInitiate>div {
-  margin-top: 1em;
-}
-
-.domainRegisterAnimation {
-  display: flex;
-  flex-flow: column;
-  padding: 3em;
+.number-years-to-buy {
+  justify-content: center;
   align-items: center;
+  margin-bottom: 24px;
 }
 
-.domainRegisterAnimation>div {
-  color: #00a344;
-  text-transform: uppercase;
-  font-size: 1.2em;
-  font-weight: bold;
-  margin-top: 2em;
+.buying-name {
+  font-family: var(--primary-font);
+  color: var(--primary-color);
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 30px 0;
   text-align: center;
 }
 
-.checkmark {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  border-radius: 50%;
-  stroke: #fff;
-  stroke-width: 5;
-  stroke-miterlimit: 10;
-  animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
+.title-years {
+  font-family: var(--secondary-font);
+  color: var(--gray-text);
+  font-size: 16px;
+  font-weight: 300;
 }
 
-.checkmark__circle {
-  stroke-dasharray: 166;
-  stroke-dashoffset: 166;
-  stroke-width: 5;
-  stroke-miterlimit: 10;
-  stroke: #7ac142;
-  fill: none;
-  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+.qty-years {
+  margin: 0 15px;
+  color: var(--primary-color);
 }
 
-.checkmark__check {
-  transform-origin: 50% 50%;
-  stroke-dasharray: 48;
-  stroke-dashoffset: 48;
-  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
-}
-
-@keyframes stroke {
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes scale {
-  0%,
-  100% {
-    transform: none;
-  }
-  50% {
-    transform: scale3d(1.1, 1.1, 1);
-  }
-}
-
-@keyframes fill {
-  100% {
-    box-shadow: inset 0 0 0 100vh #7ac142;
-  }
-}
-
-.domainRegisterProgress>div {
-  display: flex;
+.qty-years .btn-minus,
+.qty-years .btn-plus {
+  height: 30px;
+  width: 30px;
+  display: inline-flex;
   align-items: center;
-  flex-flow: column;
+  justify-content: center;
 }
 
-.domainRegisterProgress>div>p {
-  text-transform: uppercase;
-  color: #00a344;
-  font-size: 0.7em;
-  font-weight: bold;
-  text-align: center;
-  padding: 0 3em 0 3em;
-}
-
-.domainRegisterProgress>div>progress[value] {
-  /* Reset the default appearance */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border: none;
-  width: 70%;
-  height: 2em;
-  margin-top: 1em;
-}
-
-.domainRegisterProgress>div>progress[value]::-webkit-progress-bar {
-  background-color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
-}
-
-.domainRegisterProgress>div>progress[value]::-webkit-progress-value {
-  background: #00a344;
-  border-radius: 2px;
-}
-
-.domainRegisterProgress>div>article {
-  border-radius: 50%;
-  background-size: 88%;
-  height: 7em;
-  padding-bottom: 31%;
+.qty-years .btn-plus svg {
   position: relative;
-  width: 7em;
-  border: solid 0.2em #00a344;
-  margin: 2em;
+  top: 3px;
 }
 
-.domainRegisterProgress>div>article:after {
-  background: #00a344;
-  border-radius: 50%;
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 5%;
-  height: 5%;
-  z-index: 10;
+.qty-years .qty-number {
+  font-family: var(--primary-font);
+  font-size: 20px;
+  font-weight: 700;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--primary-color);
 }
 
-.minutes-container, .seconds-container {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+.discount-msg {
+  font-family: var(--secondary-font);
+  color: var(--gray-text);
+  font-size: 9px;
+  font-weight: 400;
+  text-align: center;
+  line-height: 1.2;
 }
 
-.minutes {
-  background: #00a344;
-  height: 55%;
-  left: 49%;
-  position: absolute;
-  top: 4%;
-  transform-origin: 50% 100%;
-  width: 2%;
+.discount-msg span {
+  display: block;
+  color: var(--primary-color);
 }
 
-.seconds {
-  background: #00a344;
-  height: 55%;
-  left: 49.5%;
-  position: absolute;
-  top: 4%;
-  transform-origin: 50% 80%;
-  width: 0.5%;
-  z-index: 8;
+.domain-cost {
+  font-family: var(--primary-font);
+  color: var(--gray-text);
+  font-size: 16px;
+  font-weight: 300;
+  justify-content: center;
+  align-items: center;
 }
 
-@keyframes rotate {
-  100% {
-    transform: rotateZ(360deg);
-  }
+.cost-number {
+  color: var(--primary-color);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 15px;
+  flex-basis: 72px;
+  text-align: center;
 }
 
-.seconds-container {
-  animation: rotate 120s infinite linear;
+.cost-number small {
+  font-size: 12px;
 }
 
-.un-animated .seconds-container {
-  animation: none;
+.domain-register-disclaimer {
+  font-family: var(--secondary-font);
+  color: var(--gray-text);
+  font-size: 12px;
+  font-weight: 400;
+  text-align: center;
+  line-height: 1.3;
+  max-width: 260px;
+  margin: 20px auto;
+}
+
+.waiting-for-confirm {
+  font-family: var(--primary-font);
+  color: var(--gray-text);
+  font-weight: 400;
+}
+
+.waiting-for-confirm__title {
+  font-size: 16px;
+  margin-bottom: 20px;
+  font-weight: 300;
+}
+
+.waiting-for-register {
+  font-family: var(--primary-font);
+  color: var(--gray-text);
+  font-weight: 400;
+}
+
+.waiting-for-register__title {
+  font-size: 16px;
+  margin-bottom: 20px;
+  font-weight: 300;
+}
+
+.waiting-for-register__text {
+  max-width: 210px;
+  font-size: 12px;
+  margin: 18px auto 20px;
+  line-height: 1.3;
+}
+
+.ready-to-register .ready-to-register__msg {
+  max-width: 220px;
+  margin: 0 auto 20px;
+  border: 1px solid var(--primary-color);
+  border-radius: 20px;
+  padding: 15px;
+
+  font-family: var(--primary-font);
+  color: var(--primary-color);
+  font-size: 16px;
+  font-weight: 300;
+  text-align: center;
+}
+
+.ready-to-register__msg span {
+  display: block;
+  margin-top: 10px;
+}
+
+.ready-to-register .ready-to-register__text {
+  font-family: var(--primary-font);
+  color: var(--gray-text);
+  font-weight: 400;
+  font-size: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.domain-registered .domain-registered__title {
+  font-family: var(--primary-font);
+  color: var(--primary-color);
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.domain-registered .domain-registered__name {
+  font-family: var(--primary-font);
+  color: var(--primary-color);
+  font-weight: 300;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.domain-registered .domain-registered__text {
+  font-family: var(--primary-font);
+  color: var(--gray-text);
+  font-weight: 400;
+  font-size: 12px;
+  margin-bottom: 20px;
 }
