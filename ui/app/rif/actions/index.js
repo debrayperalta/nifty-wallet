@@ -47,6 +47,7 @@ const rifActions = {
   getChannels,
   getAvailableCallbacks,
   getTokensWithJoinedCheck,
+  getLuminoNetworks,
   listenCallback,
   createPayment,
   createDeposit,
@@ -79,10 +80,12 @@ function showModal (opts, modalName = 'generic-modal') {
     confirmLabel: 'Confirm',
     cancelLabel: 'Cancel',
     confirmButtonClass: null,
-    confirmCallback: () => {},
+    confirmCallback: () => {
+    },
     closeAfterConfirmCallback: true,
     cancelButtonClass: null,
-    cancelCallback: () => {},
+    cancelCallback: () => {
+    },
     closeAfterCancelCallback: true,
     validateConfirm: null,
     hideConfirm: false,
@@ -135,15 +138,15 @@ function getDomainDetails (domainName) {
   return (dispatch) => {
     dispatch(niftyActions.showLoadingIndication());
     return new Promise((resolve, reject) => {
-        background.rif.rns.resolver.getDomainDetails(domainName, (error, details) => {
-          console.debug('This are the details bringed', details);
-          dispatch(niftyActions.hideLoadingIndication());
-          if (error) {
-            dispatch(niftyActions.displayWarning(error));
-            return reject(error);
-          }
-          return resolve(details);
-        });
+      background.rif.rns.resolver.getDomainDetails(domainName, (error, details) => {
+        console.debug('This are the details bringed', details);
+        dispatch(niftyActions.hideLoadingIndication());
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(details);
+      });
     })
   }
 }
@@ -448,7 +451,7 @@ function goToConfirmPageForLastTransaction (afterApproval) {
             unapprovedTransactions: latestTransaction,
             afterApproval,
           }));
-      });
+        });
     });
   }
 }
@@ -732,9 +735,36 @@ function getTokensWithJoinedCheck () {
           resolve(tokensJoined);
         }).catch(err => {
           // If you have 0 channels opened, it will go here, so we need to resolve with only the tokens
-          console.debug("Couldn't get channels", err);
+          console.debug('Couldn\'t get channels', err);
           resolve(tokens);
         })
+      }).catch(err => {
+        reject(err);
+      })
+    });
+  };
+}
+
+function getLuminoNetworks () {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      dispatch(this.getTokens()).then(tokens => {
+        const networks = tokens.map(t => {
+          const network = {
+            name: t.name,
+            channels: t.channels.length,
+            nodes: 0,
+          }
+          if (network.channels) {
+            const nodesMap = {};
+            t.channels.forEach(c => {
+              nodesMap[c.from_address] = true
+            })
+            network.nodes = Object.keys(nodesMap).length;
+          }
+          return network;
+        })
+        return resolve(networks);
       }).catch(err => {
         reject(err);
       })
