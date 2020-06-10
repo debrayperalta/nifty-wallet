@@ -83,12 +83,17 @@ class ChainAddresses extends Component {
     this.setState({ insertedAddress: address });
   }
 
-  async addAddress (e) {
+  async addAddress () {
     const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
     this.props.waitForListener(transactionListenerId)
       .then(transactionReceipt => {
         this.props.showDomainsDetailPage({updateChains: true, ...this.props.domain});
       });
+    /**
+     * TODO Rodrigo
+     * Why this is not correctly redirecting to domain details page???
+     * It is confirming and adding the address, but not redirecting. Getting a blank page
+     */
     this.props.showTransactionConfirmPage({
       action: () => this.props.showDomainsDetailPage(this.props.domain),
     });

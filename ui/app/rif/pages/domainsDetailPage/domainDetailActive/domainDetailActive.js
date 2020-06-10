@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { CustomButton, ChainAddresses, Subdomains, LuminoNetworkChannels } from '../../../components';
-import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver';
-import AddNewSubdomain from './addNewSubdomain';
-import { GET_RESOLVERS, SVG_PLUS } from '../../../constants';
-import { SLIP_ADDRESSES } from '../../../constants/slipAddresses';
+import { ChainAddresses, Subdomains, LuminoNetworkChannels } from '../../../components';
+import { GET_RESOLVERS } from '../../../constants';
 import niftyActions from '../../../../actions';
-import {pageNames} from '../../index';
 import rifActions from '../../../actions';
 import DomainHeader from '../../../components/domain-header';
 import { rns } from '../../../../../../rif.config';

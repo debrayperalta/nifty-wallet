@@ -24,6 +24,11 @@ class AddNewSubdomain extends Component {
   }
 
   async addSubdomain () {
+    /**
+     * TODO Rodrigo
+     * When trying to create a new subdomain i'm getting an error that the owner needs to be setted, but this parameter is optional.
+     * Check why this is happening
+     */
     const transactionListenerId = await this.props.createSubdomain(
       this.props.domainName,
       this.state.newSubdomain.name.toLowerCase(),
