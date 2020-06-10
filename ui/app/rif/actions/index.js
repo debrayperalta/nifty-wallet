@@ -729,7 +729,11 @@ function getTokensWithJoinedCheck () {
           tokens.map(token => {
             const tokenJoined = token;
             tokenJoined.openedChannels = channels.filter(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
-            tokenJoined.joined = !!channels.find(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
+            if (channels.find(channel => channel.token_address === ethUtils.toChecksumAddress(token.address))) {
+              tokenJoined.joined = true;
+            } else {
+              tokenJoined.joined = false;
+            }
             const userBalance = sumValuesOfArray(tokenJoined.openedChannels, 'balance');
             tokenJoined.userBalance = userBalance;
             tokensJoined.push(tokenJoined);

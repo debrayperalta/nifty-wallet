@@ -5,7 +5,7 @@ export default class Token {
     this.address = address;
     this.networkChannels = networkChannels;
     this.userChannels = userChannels;
-    this.network_address = networkAddress;
+    this.networkAddress = networkAddress;
     this.joined = joined;
     this.userBalance = userBalance;
   }
