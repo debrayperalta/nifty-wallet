@@ -87,9 +87,9 @@ class LuminoNetworkChannels extends Component {
               }}
               className={
                 {
-                  button: '',
-                  icon: '',
-                  text: '',
+                  button: classes.customButton.button,
+                  icon: classes.customButton.icon,
+                  text: classes.customButton.text,
                 }
               }
             />

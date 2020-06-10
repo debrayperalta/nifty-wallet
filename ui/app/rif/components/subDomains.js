@@ -4,13 +4,16 @@ import PropTypes from 'prop-types';
 import rifActions from '../actions';
 import niftyActions from '../../actions';
 import {pageNames} from '../pages';
-import { GenericTable } from './index';
+import {CustomButton, GenericTable} from './index';
 import ItemWithActions from './item-with-actions';
+import {SVG_PLUS} from '../constants';
+import AddNewSubdomain from '../pages/domainsDetailPage/domainDetailActive/addNewSubdomain';
 
 class Subdomains extends Component {
 
   static propTypes = {
     domainInfo: PropTypes.object,
+    isOwner: PropTypes.bool,
     showThis: PropTypes.func,
     getSubdomains: PropTypes.func,
     subdomains: PropTypes.array,
@@ -29,6 +32,7 @@ class Subdomains extends Component {
     super(props);
     this.state = {
       subdomains: [],
+      addSubdomain: false,
     };
   }
 
@@ -56,8 +60,12 @@ class Subdomains extends Component {
     return [];
   }
 
+  showAddSubdomain = () => {
+    this.setState({addSubdomain: !this.state.addSubdomain})
+  }
+
   render () {
-    const {classes, paginationSize} = this.props;
+    const { isOwner, classes, paginationSize} = this.props;
     const data = this.getData();
     return (
       <div>
@@ -76,6 +84,25 @@ class Subdomains extends Component {
               paginationSize={paginationSize || 3}
               classes={classes}
             />
+            {isOwner &&
+            <div>
+              <CustomButton
+                svgIcon={SVG_PLUS}
+                text={'Add Subdomain'}
+                onClick={() => this.showAddSubdomain()}
+                className={
+                  {
+                    button: classes.customButton.button,
+                    icon: classes.customButton.icon,
+                    text: classes.customButton.text,
+                  }
+                }
+              />
+              {this.state.addSubdomain &&
+              <AddNewSubdomain />
+              }
+            </div>
+            }
           </div>
         }
         {

@@ -2,20 +2,29 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import rifActions from '../actions';
-import { GenericTable } from './index';
+import {CustomButton, GenericTable} from './index';
 import {getChainAddressByChainAddress} from '../utils/utils';
-import {DEFAULT_ICON, GET_RESOLVERS} from '../constants';
+import {DEFAULT_ICON, GET_RESOLVERS, SVG_PLUS} from '../constants';
 import ItemWithActions from './item-with-actions';
 import InputWithSubmit from './InputWithSubmit';
 import rifConfig from '../../../../rif.config';
+import AddNewChainAddressToResolver
+  from '../pages/domainsDetailPage/domainDetailActive/addNewTokenNetworkAddress/addNewChainAddressToResolver';
+import {SLIP_ADDRESSES} from '../constants/slipAddresses';
+import {pageNames} from '../pages';
 
 class ChainAddresses extends Component {
 
   static propTypes = {
+    domain: PropTypes.object.isRequired,
     domainName: PropTypes.string.isRequired,
+    setChainAddressForResolver: PropTypes.func.isRequired,
+    showDomainsDetailPage: PropTypes.func.isRequired,
     isOwner: PropTypes.bool.isRequired,
     selectedResolverAddress: PropTypes.string,
     getChainAddresses: PropTypes.func,
+    waitForListener: PropTypes.func,
+    showTransactionConfirmPage: PropTypes.func,
     paginationSize: PropTypes.number,
     classes: PropTypes.any,
   }
@@ -23,9 +32,14 @@ class ChainAddresses extends Component {
   constructor (props) {
     super(props);
     const resolvers = Object.assign([], GET_RESOLVERS());
+    const slipChainAddresses = Object.assign([], SLIP_ADDRESSES);
     this.state = {
       chainAddresses: [],
       resolvers: resolvers,
+      slipChainAddresses: slipChainAddresses,
+      selectedChainAddress: slipChainAddresses[0].chain,
+      insertedAddress: '',
+      addChainAddress: false,
     };
   }
 
@@ -61,22 +75,72 @@ class ChainAddresses extends Component {
     });
   }
 
+  updateChainAddress = (selectedOption) => {
+    this.setState({ selectedChainAddress: selectedOption });
+  }
+
+  updateAddress = (address) => {
+    this.setState({ insertedAddress: address });
+  }
+
+  async addAddress (e) {
+    const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
+    this.props.waitForListener(transactionListenerId)
+      .then(transactionReceipt => {
+        this.props.showDomainsDetailPage({updateChains: true, ...this.props.domain});
+      });
+    this.props.showTransactionConfirmPage({
+      action: () => this.props.showDomainsDetailPage(this.props.domain),
+    });
+  }
+
+  showAddChainAddress = () => {
+    this.setState({addChainAddress: !this.state.addChainAddress})
+  }
+
   render () {
-    const { paginationSize, classes } = this.props;
+    const { isOwner, selectedResolverAddress, paginationSize, classes } = this.props;
+    const { resolvers } = this.state;
     const data = this.convertChainAddressesToTableData();
     return (
-      <GenericTable
-        title={'Addresses'}
-        columns={[
-          {
-            Header: 'Content',
-            accessor: 'content',
-          },
-        ]}
-        data={data}
-        paginationSize={paginationSize || 3}
-        classes={classes}
-      />
+      <div>
+        <GenericTable
+          title={'Addresses'}
+          columns={[
+            {
+              Header: 'Content',
+              accessor: 'content',
+            },
+          ]}
+          data={data}
+          paginationSize={paginationSize || 3}
+          classes={classes}
+        />
+        {(isOwner && resolvers.find(resolver => resolver.address === selectedResolverAddress)) &&
+        <div>
+          <CustomButton
+            svgIcon={SVG_PLUS}
+            text={'Add Address'}
+            onClick={() => this.showAddChainAddress()}
+            className={
+              {
+                button: classes.customButton.button,
+                icon: classes.customButton.icon,
+                text: classes.customButton.text,
+              }
+            }
+          />
+          {this.state.addChainAddress &&
+          <AddNewChainAddressToResolver
+            updateChainAddress={this.updateChainAddress.bind(this)}
+            updateAddress={this.updateAddress.bind(this)}
+            slipChainAddresses={this.state.slipChainAddresses}
+            confirmCallback={this.addAddress.bind(this)}
+          />
+          }
+        </div>
+        }
+      </div>
     );
   }
 }
@@ -90,6 +154,15 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     getChainAddresses: (domainName) => dispatch(rifActions.getChainAddresses(domainName)),
+    setChainAddressForResolver: (domainName, chain, chainAddress) => dispatch(rifActions.setChainAddressForResolver(domainName, chain, chainAddress)),
+    showDomainsDetailPage: (props) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, {
+      tabOptions: {
+        screenTitle: 'Domain Details',
+      },
+      ...props,
+    })),
+    waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
+    showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
   }
 }
 module.exports = connect(mapStateToProps, mapDispatchToProps)(ChainAddresses);
