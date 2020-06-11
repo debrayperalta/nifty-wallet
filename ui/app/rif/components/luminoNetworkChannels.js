@@ -80,21 +80,6 @@ class LuminoNetworkChannels extends Component {
               paginationSize={paginationSize || 3}
               classes={classes}
             />
-            {(isOwner || false) &&
-            <CustomButton
-              svgIcon={SVG_PLUS}
-              text={'Add channel'}
-              onClick={() => {
-              }}
-              className={
-                {
-                  button: classes.customButton.button,
-                  icon: classes.customButton.icon,
-                  text: classes.customButton.text,
-                }
-              }
-            />
-            }
           </div>
       }
       {
@@ -104,6 +89,21 @@ class LuminoNetworkChannels extends Component {
           <span>No channels found</span>
         </div>
       }
+        {(isOwner || false) &&
+        <CustomButton
+          svgIcon={SVG_PLUS}
+          text={'Add channel'}
+          onClick={() => {
+          }}
+          className={
+            {
+              button: classes.customButton.button,
+              icon: classes.customButton.icon,
+              text: classes.customButton.text,
+            }
+          }
+        />
+        }
       </div>
     );
   }

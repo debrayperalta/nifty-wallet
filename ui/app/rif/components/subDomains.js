@@ -12,9 +12,9 @@ class Subdomains extends Component {
 
   static propTypes = {
     pageName: PropTypes.string.isRequired,
+    redirectParams: PropTypes.any.isRequired,
     domainInfo: PropTypes.object,
     isOwner: PropTypes.bool,
-    showThis: PropTypes.func,
     getSubdomains: PropTypes.func,
     subdomains: PropTypes.array,
     showPopup: PropTypes.func,
@@ -65,7 +65,7 @@ class Subdomains extends Component {
   }
 
   render () {
-    const { domainInfo, isOwner, pageName, classes, paginationSize} = this.props;
+    const { domainInfo, isOwner, pageName, redirectParams, classes, paginationSize} = this.props;
     const data = this.getData();
     return (
       <div>
@@ -84,29 +84,6 @@ class Subdomains extends Component {
               paginationSize={paginationSize || 3}
               classes={classes}
             />
-            {isOwner &&
-            <div>
-              <CustomButton
-                svgIcon={SVG_PLUS}
-                text={'Add Subdomain'}
-                onClick={() => this.showAddSubdomain()}
-                className={
-                  {
-                    button: classes.customButton.button,
-                    icon: classes.customButton.icon,
-                    text: classes.customButton.text,
-                  }
-                }
-              />
-              {this.state.addSubdomain &&
-              <AddNewSubdomain
-                ownerAddress={domainInfo.ownerAddress}
-                domainName={domainInfo.domainName}
-                pageName={pageName}
-              />
-              }
-            </div>
-            }
           </div>
         }
         {
@@ -115,6 +92,30 @@ class Subdomains extends Component {
             <span>Subdomains</span>
             <span>No subdomains found</span>
           </div>
+        }
+        {isOwner &&
+        <div>
+          <CustomButton
+            svgIcon={SVG_PLUS}
+            text={'Add Subdomain'}
+            onClick={() => this.showAddSubdomain()}
+            className={
+              {
+                button: classes.customButton.button,
+                icon: classes.customButton.icon,
+                text: classes.customButton.text,
+              }
+            }
+          />
+          {this.state.addSubdomain &&
+          <AddNewSubdomain
+            ownerAddress={domainInfo.ownerAddress}
+            domainName={domainInfo.domainName}
+            pageName={pageName}
+            redirectParams={redirectParams}
+          />
+          }
+        </div>
         }
       </div>
     );
@@ -130,8 +131,6 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     getSubdomains: (domainName) => dispatch(rifActions.getSubdomains(domainName)),
-    // showThis: (pageName, params) => dispatch(rifActions.navigateTo(pageNames.rns.subdomains, params)),
-    showThis: (pageName, params) => dispatch(rifActions.navigateTo(pageName, params)),
     showPopup: (title, opts) => {
       dispatch(rifActions.showModal({
         title,

@@ -133,18 +133,30 @@ class ChainAddresses extends Component {
     const data = this.convertChainAddressesToTableData();
     return (
       <div>
-        <GenericTable
-          title={'Addresses'}
-          columns={[
-            {
-              Header: 'Content',
-              accessor: 'content',
-            },
-          ]}
-          data={data}
-          paginationSize={paginationSize || 3}
-          classes={classes}
-        />
+        {
+          data.length > 0 &&
+          <div>
+            <GenericTable
+              title={'Addresses'}
+              columns={[
+                {
+                  Header: 'Content',
+                  accessor: 'content',
+                },
+              ]}
+              data={data}
+              paginationSize={paginationSize || 3}
+              classes={classes}
+            />
+          </div>
+        }
+        {
+          data.length === 0 &&
+          <div>
+            <span>Addresses</span>
+            <span>No addresses found</span>
+          </div>
+        }
         {(isOwner && resolvers.find(resolver => resolver.address === selectedResolverAddress)) &&
         <div>
           <CustomButton

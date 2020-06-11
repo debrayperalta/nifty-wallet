@@ -10,6 +10,7 @@ class AddNewSubdomain extends Component {
     domainName: PropTypes.string.isRequired,
     ownerAddress: PropTypes.string.isRequired,
     pageName: PropTypes.string.isRequired,
+    redirectParams: PropTypes.any.isRequired,
     createSubdomain: PropTypes.func,
     waitForListener: PropTypes.func,
     showToast: PropTypes.func,
@@ -45,7 +46,9 @@ class AddNewSubdomain extends Component {
           action: (payload) => {
             this.props.showThis(
               this.props.pageName,
-              {...this.props});
+              {
+                ...this.props.redirectParams,
+              });
             this.props.showToast('Waiting Confirmation');
           },
           payload: null,

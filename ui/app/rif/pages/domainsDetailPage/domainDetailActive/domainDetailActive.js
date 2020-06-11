@@ -214,6 +214,10 @@ class DomainsDetailActiveScreen extends Component {
             classes={styles.subdomains}
             paginationSize={3}
             pageName={pageNames.rns.domainsDetail}
+            redirectParams={{
+              domain: this.props.domain,
+              status: this.props.domain.status,
+            }}
           />
           <LuminoNetworkChannels
             isOwner={isOwner}
