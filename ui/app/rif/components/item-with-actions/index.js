@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { faPen, faTimes, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 /**
@@ -24,6 +24,7 @@ class ItemWithActions extends Component {
     actionClasses: PropTypes.string,
     enableRightChevron: PropTypes.bool,
     onRightChevronClick: PropTypes.func,
+    hiddenValue: PropTypes.any,
   }
 
   constructor (props) {
@@ -52,8 +53,8 @@ class ItemWithActions extends Component {
         onDeleteClick,
         enableRightChevron,
         onRightChevronClick,
-        contentClasses = "",
-        actionClasses = ""
+        contentClasses = '',
+        actionClasses = ''
       } = this.props;
       const {showEditChildren} = this.state;
       return (
