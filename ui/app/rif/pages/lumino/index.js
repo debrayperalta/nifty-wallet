@@ -35,12 +35,12 @@ class LuminoHome extends Component {
         {networks.withChannels.map(n => <LuminoNetworkItem key={n.symbol} userChannels={n.userChannels}
                                                            symbol={n.symbol} nodes={n.nodes}
                                                            channels={n.channels}
-                                                           onClick={() => console.warn(n)}/>,
+                                                           onRightChevronClick={() => console.warn(n)}/>,
         )}
         <div>Lumino networks available</div>
         {networks.withoutChannels.map(n => <LuminoNetworkItem key={n.symbol} symbol={n.symbol} nodes={n.nodes}
                                                               channels={n.channels}
-                                                              onClick={() => console.warn(n)}/>,
+                                                              onRightChevronClick={() => console.warn(n)}/>,
         )}
       </div>
     );

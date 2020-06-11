@@ -9,14 +9,14 @@ class LuminoNetworkItem extends Component {
     symbol: PropTypes.string.isRequired,
     nodes: PropTypes.number.isRequired,
     channels: PropTypes.number.isRequired,
-    onClick: PropTypes.func.isRequired,
+    onRightChevronClick: PropTypes.func,
     className: PropTypes.object,
     userChannels: PropTypes.number,
   }
 
   render = () => {
-    const {icon, userChannels, symbol, nodes, channels, onClick, className = {}} = this.props;
-    return (<div onClick={onClick}>
+    const {icon, userChannels, symbol, nodes, channels, onRightChevronClick, className = {}} = this.props;
+    return (<div>
       {icon && <div>
         <FontAwesomeIcon icon={icon} className={className.icon}/>
       </div>
@@ -40,7 +40,7 @@ class LuminoNetworkItem extends Component {
         </div>
       </div>
       }
-      <div>
+      <div onClick={onRightChevronClick}>
         <img height={15} width={15} src="images/rif/chevronRight.svg"/>
       </div>
     </div>);
