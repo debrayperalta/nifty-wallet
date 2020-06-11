@@ -303,12 +303,6 @@ class Pay extends Component {
           <div className="form-segment">
             <button className="btn-primary btn-pay" disabled={!this.readyToPay()} onClick={() => this.sendLuminoPayment()}>Pay</button>
           </div>
-          <div className="form-segment">
-            <OpenChannel tokenAddress={this.state.selectedToken.address}
-                         tokenNetworkAddress={this.state.selectedToken.network_address}
-                         tokenName={this.state.selectedToken.name}
-                         tokenSymbol={this.state.selectedToken.symbol}/>
-          </div>
         </div>
       );
     } else {
