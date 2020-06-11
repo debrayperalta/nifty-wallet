@@ -47,11 +47,11 @@ html {
 .account-detail-section::-webkit-scrollbar {
     width: 0;
 }
- 
+
 .account-detail-section::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 }
- 
+
 .account-detail-section::-webkit-scrollbar-thumb {
   background-color: darkgrey;
   outline: 1px solid slategrey;
@@ -137,19 +137,11 @@ button, input[type="submit"] {
 
 button[disabled], input[type="submit"][disabled] {
   cursor: not-allowed;
-  background: rgba(197, 197, 197, 1);
-  box-shadow: 0px 3px 6px rgba(197, 197, 197, 0.36);
+  background: #D8D8D8;
 }
 
 button.spaced {
   margin: 2px;
-}
-
-button:not([disabled]):hover, input[type="submit"]:not([disabled]):hover {
-  transform: scale(1.1);
-}
-button:not([disabled]):active, input[type="submit"]:not([disabled]):active {
-  transform: scale(0.95);
 }
 
 .grow-on-hover:hover {
@@ -464,9 +456,9 @@ p.buy-option {
 }
 
 .section-title {
-  border-top: 1px solid #e2e2e2;
   height: 80px;
-  font-family: 'Nunito Semibold';
+  background: var(--primary-color);
+  font-family: var(--primary-font);
 }
 
 .trash:after {

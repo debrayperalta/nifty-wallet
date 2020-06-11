@@ -28,7 +28,7 @@ class Menu extends Component {
       },
       {
         label: 'Pay',
-        action: () => this.props.navigateTo(pageNames.rns.pay, 'Pay'),
+        action: () => this.props.navigateTo(pageNames.rns.pay, null, {domainInfo: this.props.domainInfo}),
       },
       {
         label: 'Sell it on MKP',
@@ -122,10 +122,8 @@ function mapDispatchToProps (dispatch) {
     navigateTo: (screenName, title, params) => {
       dispatch(rifActions.navigateTo(screenName, {
         ...params,
-        showDomainsSearch: true,
-        navBar: {
-          title,
-          backAction: () => dispatch(rifActions.navigateBack()),
+        tabOptions: {
+          screenTitle: title,
         },
       }));
       dispatch(rifActions.hideMenu());

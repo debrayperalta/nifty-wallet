@@ -1,10 +1,11 @@
-import React, {Component} from 'react'
-import {connect} from 'react-redux'
-import PropTypes from 'prop-types'
-import rifActions from '../../../actions'
-import niftyActions from '../../../../actions'
-import {registrationTimeouts} from '../../../constants'
-import {pageNames} from '../../index'
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
+import rifActions from '../../../actions';
+import niftyActions from '../../../../actions';
+import {registrationTimeouts} from '../../../constants';
+import {pageNames} from '../../index';
+import extend from 'xtend';
 
 class DomainRegisterScreen extends Component {
 
@@ -30,12 +31,19 @@ class DomainRegisterScreen extends Component {
     isDomainAvailable: PropTypes.func,
     showToast: PropTypes.func,
     showDomainList: PropTypes.func,
-    navBar: PropTypes.object,
+    tabOptions: PropTypes.object,
     showLoading: PropTypes.func,
   }
 
-  initialize () {
-    const {domain, currentStep} = this.props;
+  componentDidMount () {
+    this.props.showLoading();
+    this.initialize().then(() => {
+      this.props.showLoading(false);
+    });
+  }
+
+  async initialize () {
+    const {domain, domainName, currentStep} = this.props;
     if (domain && !currentStep) {
       if (domain.registration) {
         if (domain.registration.readyToRegister) {
@@ -51,30 +59,24 @@ class DomainRegisterScreen extends Component {
       }
     } else if (!currentStep) {
       // otherwise is available and ready for register
-      const available = this.props.isDomainAvailable(this.props.domainName);
+      const available = this.props.isDomainAvailable(domainName);
       if (!available) {
         // is not available for registration so we redirect to domain list with a warning
         this.props.showToast('Domain not available, can not be registered!', false);
         this.props.showDomainList();
+      } else {
+        await this.calculateAndFillCost(domainName, 1);
       }
     }
   }
 
-  showWaitingForRegister () {
-    this.props.showThis({
-      ...this.props,
-      currentStep: 'waitingForRegister',
-      navBar: {
-        showBack: false,
-        title: this.props.navBar.title,
-      },
-    });
-  }
-
-  componentDidMount () {
-    this.props.showLoading();
-    this.initialize();
-    this.props.showLoading(false);
+  async calculateAndFillCost (domainName, yearsToRegister) {
+    const costInWei = await this.props.getCost(domainName, yearsToRegister);
+    const costInRif = costInWei / 1e18;
+    this.props.showThis(extend(this.props, {
+      yearsToRegister,
+      costInRif,
+    }));
   }
 
   async getUpdatedDomain () {
@@ -87,20 +89,39 @@ class DomainRegisterScreen extends Component {
     await this.props.updateDomains(domain);
   }
 
-  showRegistration () {
-    this.props.getCost(this.props.domainName, 1)
-      .then(costInWei => {
-        const costInRif = costInWei / 1e18;
-        this.props.showThis({
-          ...this.props,
-          currentStep: 'setupRegister',
-          yearsToRegister: 1,
-          costInRif: costInRif,
-        });
-      });
+  showWaitingForRegister () {
+    this.props.showThis(extend(this.props, {
+      currentStep: 'waitingForRegister',
+      tabOptions: {
+        showBack: false,
+        hideTitle: true,
+      },
+    }));
   }
 
-  async initiateRegistration () {
+  showWaitingForConfirmation () {
+    this.props.showThis({
+      ...this.props,
+      currentStep: 'waitingForConfirmation',
+      tabOptions: {
+        showBack: false,
+        hideTitle: true,
+      },
+    });
+  }
+
+  showReadyToRegister () {
+    this.props.showThis({
+      ...this.props,
+      currentStep: 'readyToRegister',
+      tabOptions: {
+        showBack: false,
+        hideTitle: true,
+      },
+    });
+  }
+
+  async requestDomain () {
     const result = await this.props.requestRegistration(this.props.domainName, this.props.yearsToRegister);
     this.props.waitForListener(result.transactionListenerId)
       .then(transactionReceipt => {
@@ -128,8 +149,8 @@ class DomainRegisterScreen extends Component {
         this.props.viewDomainDetails({
           domain: domain,
           status: domain.details.status,
-          navBar: {
-            title: 'Domain Detail',
+          tabOptions: {
+            screenTitle: 'Domain Detail',
             showBack: false,
           },
         });
@@ -151,17 +172,6 @@ class DomainRegisterScreen extends Component {
     });
   }
 
-  showWaitingForConfirmation () {
-    this.props.showThis({
-      ...this.props,
-      currentStep: 'waitingForConfirmation',
-      navBar: {
-        showBack: false,
-        title: this.props.navBar.title,
-      },
-    });
-  }
-
   async changeYearsToRegister (yearsToRegister) {
     if (yearsToRegister && yearsToRegister > 0) {
       const costInWei = await this.props.getCost(this.props.domainName, yearsToRegister);
@@ -175,97 +185,74 @@ class DomainRegisterScreen extends Component {
     }
   }
 
+  getTitle (currentStep) {
+    if (currentStep !== 'registered') {
+      return (<h3 className="buying-name">Buying {this.props.domainName}</h3>);
+    }
+    return null;
+  }
+
   getBody (currentStep) {
     const partials = {
-      available: (
-        <div className="domainRegisterAnimation">
-          <svg
-            className="checkmark"
-            xmlns="http://www.w3.org/2000/svg"
-            width="96"
-            height="96"
-            viewBox="0 0 52 52">
-            <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
-            <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-          </svg>
-          <div>
-            Domain Available
-          </div>
-        </div>
-      ),
       setupRegister: (
         <div className="domainRegisterInitiate">
-          <div>
-            You are going to register <span className="bold">{this.props.domainName}</span>
+          <div className="d-flex number-years-to-buy">
+            <span className="title-years">Number of years:</span>
+            <div className="qty-years">
+              <span className="hand-over btn-minus" onClick={() => this.changeYearsToRegister(this.props.yearsToRegister - 1)}>
+                <svg width="8" height="2" viewBox="0 0 8 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 1L8 0.999999" stroke="#602A95"/>
+                </svg>
+              </span>
+              <span className="qty-number">{this.props.yearsToRegister}</span>
+              <span className="hand-over btn-plus" onClick={() => this.changeYearsToRegister(this.props.yearsToRegister + 1)}>
+                <svg width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8.48 5.168H5.216V8.608H4.056V5.168H0.808V4.088H4.056V0.672H5.216V4.088H8.48V5.168Z" fill="#602A95"/>
+                </svg>
+              </span>
+            </div>
+            <small className="discount-msg">
+              <span>50% discount per year</span> from the third year
+            </small>
           </div>
-          <div>
-            <span>Number of years:</span>
-            <span className="hand-over" onClick={() => this.changeYearsToRegister(this.props.yearsToRegister - 1)}>
-              <i className="fa fa-minus"/>
-            </span>
-            <span>{this.props.yearsToRegister}</span>
-            <span className="hand-over" onClick={() => this.changeYearsToRegister(this.props.yearsToRegister + 1)}>
-              <i className="fa fa-plus"/>
-            </span>
+          <div className="d-flex domain-cost">
+            <span>Cost</span><span className="cost-number">{this.props.costInRif} <small>RIF</small></span>
           </div>
-          <div>
-            <span>Cost in RIF:</span><span>{this.props.costInRif}</span><span>RIF</span>
+          <div className="domain-register-disclaimer">
+            You will be asked to confirm the first of two transactions required (request & register)
+            to buy your domain.
           </div>
         </div>
       ),
       waitingForRegister: (
-        <div className="domainRegisterProgress">
-          <div>
-            <article className="clock">
-              <div className="minutes-container">
-                <div className="minutes"/>
-              </div>
-              <div className="seconds-container">
-                <div className="seconds"/>
-              </div>
-            </article>
-            <p>
-              Waiting for confirmation. You need to wait while we secure your domain, then you need to confirm the registration at the final step
-            </p>
-          </div>
+        <div className="waiting-for-register text-center">
+          <h4 className="waiting-for-register__title">Confirming transaction</h4>
+          <div className="app-loader"/>
+          <p className="waiting-for-register__text">Wait until the domain is requested then click Register to buy the domain.</p>
         </div>
       ),
       readyToRegister: (
-        <div className="domainRegisterProgress domainRegisterAnimation">
-          <svg
-            className="checkmark"
-            xmlns="http://www.w3.org/2000/svg"
-            width="96"
-            height="96"
-            viewBox="0 0 52 52">
-            <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
-            <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-          </svg>
-          <div>
-            We are ready!
+        <div className="ready-to-register">
+          <div className="ready-to-register__msg">
+            <svg width="38" height="23" viewBox="0 0 38 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1.09302 10.5L12.9674 21L37.2326 1" stroke="#602A95" strokeWidth="2"/>
+            </svg>
+            <span>Your domain has been requested</span>
           </div>
+          <p className="ready-to-register__text">Click Register to buy the domain.</p>
         </div>
       ),
       waitingForConfirmation: (
-        <div className="domainRegisterAnimation">
-          <div>Waiting for confirmation...</div>
+        <div className="waiting-for-confirm text-center">
+          <h4 className="waiting-for-confirm__title">Confirming transaction</h4>
+          <div className="app-loader"/>
         </div>
       ),
       registered: (
-        <div className="domainRegisterAnimation">
-          <svg
-            className="checkmark"
-            xmlns="http://www.w3.org/2000/svg"
-            width="96"
-            height="96"
-            viewBox="0 0 52 52">
-            <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
-            <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-          </svg>
-          <div>
-            <div>Congratulations</div>
-            <div>The domain is yours</div>
-          </div>
+        <div className="domain-registered text-center">
+          <h4 className="domain-registered__title">Congrats!</h4>
+          <p  className="domain-registered__name">{this.props.domainName} is yours</p>
+          <p className="domain-registered__text">Check it in the explorer</p>
         </div>
       ),
     };
@@ -284,37 +271,27 @@ class DomainRegisterScreen extends Component {
     return partials[currentStep];
   }
 
-  showReadyToRegister () {
-    this.props.showThis({
-      ...this.props,
-      currentStep: 'readyToRegister',
-      navBar: {
-        showBack: false,
-        title: this.props.navBar.title,
-      },
-    });
-  }
-
   getButtons (currentStep) {
     const partials = {
-      available: (
-        <div className="button-container">
-          <button onClick={() => this.showRegistration()}>Register Domain</button>
-        </div>
-      ),
       setupRegister: (
         <div className="button-container">
-          <button onClick={() => this.initiateRegistration()}>Initiate Registration</button>
+          <button className="btn-primary btn-register" onClick={() => this.requestDomain()}>Request Domain</button>
+        </div>
+      ),
+      waitingForRegister: (
+        <div className="button-container">
+          <button className="btn-primary btn-register" disabled={true}>Register</button>
         </div>
       ),
       readyToRegister: (
         <div className="button-container">
-          <button onClick={() => this.completeRegistration()}>Register</button>
+          <button className="btn-primary btn-register" onClick={() => this.completeRegistration()}>Register</button>
         </div>
       ),
       registered: (
         <div className="button-container">
-          <button onClick={() => this.viewDomainDetails()}>View Domain Details</button>
+          <button className="btn-primary-outlined"  onClick={() => this.props.showDomainList()}>My Domains</button>
+          <button className="btn-primary-outlined"  onClick={() => this.viewDomainDetails()}>List in Marketplace</button>
         </div>
       ),
     };
@@ -322,15 +299,15 @@ class DomainRegisterScreen extends Component {
   }
 
   render () {
-    const registerBody = this.getBody(this.props.currentStep ? this.props.currentStep : 'available');
-    const registerButtons = this.getButtons(this.props.currentStep ? this.props.currentStep : 'available');
+    const currentStep = this.props.currentStep ? this.props.currentStep : 'setupRegister';
+    const title = this.getTitle(currentStep);
+    const body = this.getBody(currentStep);
+    const buttons = this.getButtons(currentStep);
     return (
-      <div className={'body'}>
-        <div id="headerName" className={'domain-name'}>
-          <div>{this.props.domainName}</div>
-        </div>
-        {registerBody}
-        {registerButtons}
+      <div className="body">
+        {title}
+        {body}
+        {buttons}
       </div>
     );
   }
@@ -347,8 +324,8 @@ const mapDispatchToProps = dispatch => {
   return {
     dispatch: dispatch,
     showThis: (data) => dispatch(rifActions.navigateTo(pageNames.rns.domainRegister, {
-      navBar: {
-        title: 'Domain Register',
+      tabOptions: {
+        screenTitle: 'Domain Register',
       },
       ...data,
     })),
@@ -359,8 +336,8 @@ const mapDispatchToProps = dispatch => {
     completeRegistration: (domainName) => dispatch(rifActions.finishRegistration(domainName)),
     canCompleteRegistration: (commitment) => dispatch(rifActions.canFinishRegistration(commitment)),
     viewDomainDetails: (params) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, {
-      navBar: {
-        title: 'Domain Details',
+      tabOptions: {
+        screenTitle: 'Domain Details',
       },
       ...params,
     })),
@@ -369,7 +346,11 @@ const mapDispatchToProps = dispatch => {
     updateDomains: (domain) => dispatch(rifActions.updateDomains(domain)),
     showToast: (text, success) => dispatch(niftyActions.displayToast(text, success)),
     isDomainAvailable: (domainName) => dispatch(rifActions.checkDomainAvailable(domainName)),
-    showDomainList: () => dispatch(rifActions.navigateTo(pageNames.rns.domains)),
+    showDomainList: () => dispatch(rifActions.navigateTo(pageNames.rns.domains, {
+      tabOptions: {
+        showBack: false,
+      },
+    })),
     showLoading: (loading = true, message) => loading ? dispatch(niftyActions.showLoadingIndication(message)) : dispatch(niftyActions.hideLoadingIndication()),
   }
 }

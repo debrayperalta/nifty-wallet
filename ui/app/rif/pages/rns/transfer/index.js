@@ -6,7 +6,7 @@ class Transfer extends Component {
   static propTypes = {}
 
   render () {
-    return (<div>Transfer</div>);
+    return (<div className="body">Transfer</div>);
   }
 }
 function mapStateToProps (state) {

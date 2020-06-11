@@ -35,7 +35,7 @@ const Import = require('./accounts/import')
 const ForgetDeviceScreen = require('./components/connect-hardware/forget-screen')
 import ConnectHardwareForm from './components/connect-hardware/index'
 const InfoScreen = require('./info')
-import { getPage } from '../../ui/app/rif/pages'
+import { getPage, getLandingPage } from '../../ui/app/rif/pages'
 import { showModal } from '../../ui/app/rif/components/index'
 const AppBar = require('./components/app-bar/app-bar.component')
 const Loading = require('./components/loading')
@@ -364,6 +364,8 @@ App.prototype.renderPrimary = function () {
     case 'rif':
       log.debug('rendering rif screen')
       return getPage(props.currentView, props.dispatch);
+    case 'rif.landingPage':
+      return getLandingPage(props.currentView, props.dispatch)
 
     default:
       log.debug('rendering default, account detail screen')

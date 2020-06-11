@@ -1,0 +1,41 @@
+export const mocks = {
+  tokens: [{
+    'channels': [],
+    'address': '0x0b3e32d1d2cabeabeacc686a449aaf8351ffb065',
+    'name': 'PesoToken',
+    'network_address': '0x230e2854b94c010501d6aced2d900018c07dc7db',
+    'symbol': 'UYU',
+  }, {
+    'channels': [],
+    'address': '0x7e4a63cd446571c165817f075142c039cf69069c',
+    'name': 'InfuyToken',
+    'network_address': '0x41a34c1b6035e89fadecb445dbafe5804bc13a8e',
+    'symbol': 'IT',
+  }, {
+    'channels': [],
+    'address': '0x460218fcd497991b380f38b77c61334ad442e7f6',
+    'name': 'TestToken',
+    'network_address': '0xa6340e1de581c817ff9a15fc2fac398e198850a3',
+    'symbol': 'TT',
+  }],
+  channels: {
+    '2-0x7e4A63Cd446571c165817f075142c039Cf69069c': {
+      'channel_identifier': 1,
+      'settle_timeout': 500,
+      'token_network_identifier': '0xbe17703153a321e9b9867fd90f194bdd605cc243',
+      'total_deposit': '1000000000000000000',
+      'state': 'opened',
+      'token_address': '0xe1b8ec5381fca746e7fe6d60ceb898fedb44462a',
+      'reveal_timeout': 50,
+      'partner_address': '0xd7387C9b5a2860bFb6e8E8F36c8983B0469C6d18',
+      'balance': '1000000000000000000',
+      'token_symbol': 'LUM',
+      'token_name': 'LuminoToken',
+      'sdk_status': 'CHANNEL_OPENED',
+      'offChainBalance': '100000000000000000',
+      'receivedTokens': '0',
+      'sentTokens': '900000000000000000',
+      'votes': {'open': {}, 'close': {}},
+    },
+  },
+};

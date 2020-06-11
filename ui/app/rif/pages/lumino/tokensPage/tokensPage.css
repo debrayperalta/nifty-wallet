@@ -1,0 +1,79 @@
+.token-chiplet {
+  width: 90%;
+  float: left;
+  border-bottom: 0.05em solid #cdcdcd;
+  margin-left: 5%;
+  margin-top: 0.25em;
+  padding: 0.5em;
+}
+.token-logo {
+  width: 20%;
+}
+.token-logo-icon {
+  font-size: 2em;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.token-logo-png {
+  width: 3em;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.token-symbol {
+  width: 20%;
+  text-transform: uppercase;
+  font: 1.5em bold;
+  cursor: pointer;
+}
+.token-info {
+  width: 60%;
+}
+.token-info-channels {
+  width: 60%;
+  color: white;
+  text-align: center;
+  white-space: nowrap;
+  padding: 0.15em;
+  border-radius: 4em;
+  font-size: 0.85em;
+  background-color: #009edf;
+  position: relative;
+}
+.token-info-channels-icon {
+  width: 62.5%;
+  font-size: 1.25em;
+  color: white;
+  background-color: #009edf;
+  border-radius: 4em;
+  position: absolute;
+}
+.token-info-channels-qty {
+  width: 45%;
+  background-color: #79caeb;
+  color: 	#49859f;
+  border-radius: 4em;
+}
+.token-info-status {
+  width: 60%;
+  color: white;
+  text-align: center;
+  white-space: nowrap;
+  padding: 0.15em;
+  margin-top: 0.1em;
+  border-radius: 4em;
+  font-size: 0.85em;
+}
+.token-info-status-joined {
+  background-color: #2aa147;
+}
+.token-info-status-unjoined {
+  background-color: #ef3e36;
+}
+.align-left {
+  float: left;
+}
+.align-right {
+  float: right;
+}

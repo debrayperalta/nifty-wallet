@@ -20,9 +20,26 @@
   overflow: scroll;
   height: 26.5em;
   overflow-x: hidden;
-  font-family: Nunito Regular;
+  font-family: var(--primary-font);
 }
 .delete-button {
   background: #FF001F;
   color: white;
+}
+
+.form-segment {
+  display: flex;
+  margin: 20px 1em;
+  justify-content: center;
+}
+
+.form-segment>button {
+  margin: 0.2em;
+}
+
+.form-segment > span {
+  color: var(--gray-text);
+  font-size: 14px;
+  font-weight: 400;
+  margin-right: 10px;
 }

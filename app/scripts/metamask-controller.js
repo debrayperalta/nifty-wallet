@@ -289,9 +289,7 @@ module.exports = class MetamaskController extends EventEmitter {
     // RIF
     this.rifController = new RifController({
       initState: initState.RifController,
-      preferencesController: this.preferencesController,
-      networkController: this.networkController,
-      transactionController: this.txController,
+      metamaskController: this,
     });
 
     this.store.updateStructure({
