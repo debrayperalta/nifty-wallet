@@ -1,3 +1,5 @@
+import utils from 'web3-utils';
+
 /**
  * Returns the domain name cleared ready to use, with the .rsk suffix and to lowercase.
  * @param domainName the domain name to clear.
@@ -8,6 +10,16 @@ function cleanDomainName (domainName) {
   return (toLowerCaseDomainName && toLowerCaseDomainName.indexOf('.rsk') === -1) ? (toLowerCaseDomainName + '.rsk') : toLowerCaseDomainName;
 }
 
+/**
+ * Returns the passed balance in wei in Eth format
+ * @param balanceInWei The string of the balance
+ * @returns the balance expressed in Eth
+ */
+function getBalanceInEth (balanceInWei) {
+  return utils.fromWei(balanceInWei);
+}
+
 export {
   cleanDomainName,
+  getBalanceInEth,
 }
