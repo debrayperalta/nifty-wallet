@@ -23,6 +23,7 @@ class ChainAddresses extends Component {
     isOwner: PropTypes.bool.isRequired,
     selectedResolverAddress: PropTypes.string,
     getChainAddresses: PropTypes.func,
+    newChainAddresses: PropTypes.array,
     waitForListener: PropTypes.func,
     showTransactionConfirmPage: PropTypes.func,
     paginationSize: PropTypes.number,
@@ -50,6 +51,8 @@ class ChainAddresses extends Component {
   componentDidUpdate (prevProps, prevState) {
     if (prevProps.domainName !== this.props.domainName) {
       this.loadChainAddresses();
+    } else if (prevProps.newChainAddresses !== this.props.newChainAddresses && this.props.newChainAddresses !== []) {
+      this.setState({chainAddresses: this.props.newChainAddresses});
     }
   }
 
@@ -86,16 +89,33 @@ class ChainAddresses extends Component {
   async addAddress () {
     const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
     this.props.waitForListener(transactionListenerId)
-      .then(transactionReceipt => {
-        this.props.showDomainsDetailPage({updateChains: true, ...this.props.domain});
+      .then(async (transactionReceipt) => {
+        console.debug('======================================================================== ANTES DEL IF');
+        if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {
+          console.debug('======================================================================== ADENTRO DEL IF');
+          const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
+          console.debug('======================================================================== DESPUES DEL AWAIT');
+          this.props.showDomainsDetailPage({
+            domain: this.props.domain,
+            status: this.props.domain.status,
+            newChainAddresses: chainAddresses,
+          });
+        }
+        console.debug('======================================================================== DESPUES DEL IF');
+        /*
+        this.props.showDomainsDetailPage({
+          domain: this.props.domain,
+          status: this.props.domain.status,
+        });
+         */
       });
-    /**
-     * TODO Rodrigo
-     * Why this is not correctly redirecting to domain details page???
-     * It is confirming and adding the address, but not redirecting. Getting a blank page
-     */
     this.props.showTransactionConfirmPage({
-      action: () => this.props.showDomainsDetailPage(this.props.domain),
+      action: () => {
+        this.props.showDomainsDetailPage({
+        domain: this.props.domain,
+        status: this.props.domain.status,
+        })
+      },
     });
   }
 
@@ -161,10 +181,11 @@ function mapDispatchToProps (dispatch) {
     getChainAddresses: (domainName) => dispatch(rifActions.getChainAddresses(domainName)),
     setChainAddressForResolver: (domainName, chain, chainAddress) => dispatch(rifActions.setChainAddressForResolver(domainName, chain, chainAddress)),
     showDomainsDetailPage: (props) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, {
-      tabOptions: {
-        screenTitle: 'Domain Details',
-      },
       ...props,
+      navBar: {
+        title: 'Domain Detail',
+        showBack: true,
+      },
     })),
     waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),

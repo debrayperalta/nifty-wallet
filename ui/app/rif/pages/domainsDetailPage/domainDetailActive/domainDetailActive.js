@@ -111,7 +111,7 @@ class DomainsDetailActiveScreen extends Component {
 		isRifStorage: PropTypes.bool,
     displayToast: PropTypes.func.isRequired,
     disableResolvers: PropTypes.bool,
-    updateChains: PropTypes.bool,
+    newChainAddresses: PropTypes.array,
     getDomain: PropTypes.func,
     showToast: PropTypes.func,
 	}
@@ -122,7 +122,6 @@ class DomainsDetailActiveScreen extends Component {
 		this.state = {
       disableCombo: !enableComboResolvers,
 			resolvers: resolvers,
-      updateChains: true,
 		};
 	}
   /*
@@ -171,7 +170,7 @@ class DomainsDetailActiveScreen extends Component {
   }
 
 	render () {
-    const { domain, domainName, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress } = this.props;
+    const { domain, domainName, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress, newChainAddresses } = this.props;
     const domainInfo = {
       domainName,
       expirationDate,
@@ -199,6 +198,7 @@ class DomainsDetailActiveScreen extends Component {
               paginationSize={3}
               classes={styles.chainAddresses}
               isOwner={isOwner}
+              newChainAddresses={newChainAddresses}
             />
           </div>
           }
@@ -222,7 +222,7 @@ class DomainsDetailActiveScreen extends Component {
 function mapStateToProps (state) {
 	const params = state.appState.currentView.params;
 	const domain = params.domain;
-	const details = domain.details;
+	const details = domain.details || params.details;
   return {
 		dispatch: state.dispatch,
 		status: details.status,
@@ -236,7 +236,7 @@ function mapStateToProps (state) {
 		isLuminoNode: details.isLuminoNode,
 		isRifStorage: details.isRifStorage,
     selectedResolverAddress: params.selectedResolverAddress ? params.selectedResolverAddress : details.selectedResolverAddress,
-    updateChains: details.updateChains,
+    newChainAddresses: details.newChainAddresses || [],
     disableResolvers: details.disableResolvers,
 		domain: domain,
 	}
