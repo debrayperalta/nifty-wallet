@@ -1,5 +1,5 @@
 import {Lumino} from '@rsksmart/lumino-light-client-sdk';
-import {lumino} from '../../../../../rif.config';
+import {lumino, rns} from '../../../../../rif.config';
 import {LuminoSigningHandler} from './signing-handler';
 import {AbstractManager} from '../abstract-manager';
 import {bindOperation, isRskNetwork} from '../utils/general';
@@ -37,6 +37,7 @@ export class LuminoManager extends AbstractManager {
         rskEndpoint: this.network.rskEndpoint,
         hubEndpoint: lumino.hub.endpoint,
         address: ethUtils.toChecksumAddress(this.address),
+        registryAddress: rns.contracts.rns,
       };
       const signingHandler = {
         sign: (tx) => this.signingHandler.sign(tx),
@@ -57,7 +58,6 @@ export class LuminoManager extends AbstractManager {
       const state = this.store.getState();
         if (state.apiKey && !cleanApiKey) {
           await this.operations.setApiKey(state.apiKey);
-        await this.operations.onboarding();
         } else {
           await this.operations.onboarding();
           state.apiKey = await this.operations.getApiKey();

@@ -133,6 +133,7 @@ export default class RifController {
   cleanStore () {
     this.rnsManager.store.putState({});
     this.luminoManager.store.putState({});
+    return Promise.resolve();
   }
 
   /**

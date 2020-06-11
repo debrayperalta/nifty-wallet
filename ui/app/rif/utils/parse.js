@@ -12,7 +12,7 @@ function isValidRNSDomain (value) {
   if (!value) {
     return false;
   }
-  return value.match('.*\\.rsk');
+  return !!value.match('.*\\.rsk');
 }
 
 export {

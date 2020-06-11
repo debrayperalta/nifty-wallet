@@ -48,8 +48,16 @@ const commonPlatforms = [
 // browser reload
 
 gulp.task('dev:reload', function () {
+  const args = process.argv.slice(2);
+  let port = args.find(arg => arg.indexOf('--port=') !== -1);
+  if (port) {
+    port = port.split('=')[1];
+  } else {
+    port = 35729;
+  }
+  console.log('Using port ' + port);
   livereload.listen({
-    port: 35729,
+    port,
   })
 })
 
