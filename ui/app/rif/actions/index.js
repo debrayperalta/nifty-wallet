@@ -745,24 +745,37 @@ function getTokensWithJoinedCheck () {
   };
 }
 
-function getLuminoNetworks () {
+function getLuminoNetworks (userAddress) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       dispatch(this.getTokens()).then(tokens => {
-        const networks = tokens.map(t => {
+        const networks = {
+          withChannels: [],
+          withoutChannels: [],
+        }
+        tokens.forEach(t => {
           const network = {
             symbol: t.symbol,
             channels: t.channels.length,
             nodes: 0,
+            userChannels: 0,
           }
           if (network.channels) {
             const nodesMap = {};
+            // We check for the unique nodes in the channels
             t.channels.forEach(c => {
-              nodesMap[c.from_address] = true
+              const {from_address: from, to_address: to} = c;
+              nodesMap[from] = true
+              // If the user is one of the participants, this is one of their channels
+              if (from.toLowerCase() === userAddress || to.toLowerCase() === userAddress) {
+                network.userChannels += 1
+              }
             })
             network.nodes = Object.keys(nodesMap).length;
           }
-          return network;
+          // Here we put it in the has channel or not key
+          if (network.userChannels) return networks.withChannels.push(network);
+          return networks.withoutChannels.push(network)
         })
         return resolve(networks);
       }).catch(err => {

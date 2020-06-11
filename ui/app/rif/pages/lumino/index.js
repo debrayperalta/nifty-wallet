@@ -8,28 +8,39 @@ class LuminoHome extends Component {
 
   static propTypes = {
     getLuminoNetworks: PropTypes.func,
+    currentAddress: PropTypes.string,
   }
 
   constructor (props) {
     super(props);
     this.state = {
-      networks: [],
+      networks: {
+        withChannels: [],
+        withoutChannels: [],
+      },
     }
   }
 
   async componentDidMount () {
-    const {getLuminoNetworks} = this.props;
-    const result = await getLuminoNetworks();
-    if (result && result.length) this.setState({networks: result});
+    const {getLuminoNetworks, currentAddress} = this.props;
+    const networks = await getLuminoNetworks(currentAddress);
+    if (networks && networks.withChannels.length || networks.withoutChannels.length) this.setState({networks});
   }
 
   render () {
     const {networks} = this.state;
     return (
       <div className="body">
+        <div>My Lumino networks available</div>
+        {networks.withChannels.map(n => <LuminoNetworkItem key={n.symbol} userChannels={n.userChannels}
+                                                           symbol={n.symbol} nodes={n.nodes}
+                                                           channels={n.channels}
+                                                           onClick={() => console.warn(n)}/>,
+        )}
         <div>Lumino networks available</div>
-        {networks.map(n => <LuminoNetworkItem key={n.symbol} symbol={n.symbol} nodes={n.nodes} channels={n.channels}
-                                              onClick={() => console.warn(n)}/>,
+        {networks.withoutChannels.map(n => <LuminoNetworkItem key={n.symbol} symbol={n.symbol} nodes={n.nodes}
+                                                              channels={n.channels}
+                                                              onClick={() => console.warn(n)}/>,
         )}
       </div>
     );
@@ -39,12 +50,14 @@ class LuminoHome extends Component {
 function mapStateToProps (state) {
   // params is the params value or object passed to rifActions.navigateTo('pageName', params)
   const params = state.appState.currentView.params;
-  return {}
+  return {
+    currentAddress: state.metamask.selectedAddress.toLowerCase(),
+  }
 }
 
 function mapDispatchToProps (dispatch) {
   return {
-    getLuminoNetworks: () => dispatch(rifActions.getLuminoNetworks()),
+    getLuminoNetworks: (userAddress) => dispatch(rifActions.getLuminoNetworks(userAddress)),
   }
 }
 
