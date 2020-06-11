@@ -751,7 +751,7 @@ function getLuminoNetworks () {
       dispatch(this.getTokens()).then(tokens => {
         const networks = tokens.map(t => {
           const network = {
-            name: t.name,
+            symbol: t.symbol,
             channels: t.channels.length,
             nodes: 0,
           }

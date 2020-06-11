@@ -28,7 +28,7 @@ class LuminoHome extends Component {
     return (
       <div className="body">
         <div>Lumino networks available</div>
-        {networks.map(n => <LuminoNetworkItem key={n.name} name={n.name} nodes={n.nodes} channels={n.channels}
+        {networks.map(n => <LuminoNetworkItem key={n.symbol} symbol={n.symbol} nodes={n.nodes} channels={n.channels}
                                               onClick={() => console.warn(n)}/>,
         )}
       </div>

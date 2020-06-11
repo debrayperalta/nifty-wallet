@@ -6,7 +6,7 @@ class LuminoNetworkItem extends Component {
 
   static propTypes = {
     icon: PropTypes.object,
-    name: PropTypes.string.isRequired,
+    symbol: PropTypes.string.isRequired,
     nodes: PropTypes.number.isRequired,
     channels: PropTypes.number.isRequired,
     onClick: PropTypes.func.isRequired,
@@ -14,14 +14,14 @@ class LuminoNetworkItem extends Component {
   }
 
   render = () => {
-    const {icon, name, nodes, channels, onClick, className = {}} = this.props;
+    const {icon, symbol, nodes, channels, onClick, className = {}} = this.props;
     return (<div onClick={onClick}>
       {icon && <div>
         <FontAwesomeIcon icon={icon} className={className.icon}/>
       </div>
       }
       <div>
-        <span>{name}</span>
+        <span>{symbol}</span>
       </div>
       <div>
         <img height={15} width={15} src="images/rif/node.svg"/>
