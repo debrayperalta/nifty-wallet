@@ -70,11 +70,13 @@ class SearchDomains extends Component {
 
   render () {
     return (
-      <input
-        placeholder="Search for domains"
-        className={'search-bar'}
-        onKeyDown={(event) => this.handleKeyDown(event)}
-      />
+      <div className="search-bar-container">
+        <input
+          placeholder="Search for domains"
+          className={'search-bar'}
+          onKeyDown={(event) => this.handleKeyDown(event)}
+        />
+      </div>
     )
   }
 }

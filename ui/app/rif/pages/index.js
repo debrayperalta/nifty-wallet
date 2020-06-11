@@ -53,7 +53,7 @@ function buildTabs (screenName, tabOptions) {
       index,
       title: tabDefinition.title,
       component: (
-        <div>
+        <div className="rif-tab-content__inside">
           {getSearchBarComponent(showSearchbar)}
           {getTabTitleComponent(tabTitle, tabOptions.hideTitle)}
           {tabComponent}
