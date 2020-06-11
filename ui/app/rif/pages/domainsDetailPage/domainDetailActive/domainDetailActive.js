@@ -189,6 +189,12 @@ class DomainsDetailActiveScreen extends Component {
                       showLuminoNodeIcon={isLuminoNode}
                       showRifStorageIcon={isRifStorage}/>
         <div id="domainDetailBody" className={''}>
+          <Subdomains
+            isOwner={isOwner}
+            domainInfo={domainInfo}
+            classes={styles.subdomains}
+            paginationSize={3}
+          />
           {resolvers &&
           <div id="chainAddressesBody" className={''}>
             <ChainAddresses
@@ -202,12 +208,6 @@ class DomainsDetailActiveScreen extends Component {
             />
           </div>
           }
-          <Subdomains
-            isOwner={isOwner}
-            domainInfo={domainInfo}
-            classes={styles.subdomains}
-            paginationSize={3}
-          />
           <LuminoNetworkChannels
             isOwner={isOwner}
             paginationSize={3}

@@ -65,7 +65,7 @@ class Subdomains extends Component {
   }
 
   render () {
-    const { isOwner, classes, paginationSize} = this.props;
+    const { domainInfo, isOwner, classes, paginationSize} = this.props;
     const data = this.getData();
     return (
       <div>
@@ -99,7 +99,10 @@ class Subdomains extends Component {
                 }
               />
               {this.state.addSubdomain &&
-              <AddNewSubdomain />
+              <AddNewSubdomain
+                ownerAddress={domainInfo.ownerAddress}
+                domainName={domainInfo.domainName}
+              />
               }
             </div>
             }
