@@ -90,24 +90,14 @@ class ChainAddresses extends Component {
     const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
     this.props.waitForListener(transactionListenerId)
       .then(async (transactionReceipt) => {
-        console.debug('======================================================================== ANTES DEL IF');
         if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {
-          console.debug('======================================================================== ADENTRO DEL IF');
           const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
-          console.debug('======================================================================== DESPUES DEL AWAIT');
           this.props.showDomainsDetailPage({
             domain: this.props.domain,
             status: this.props.domain.status,
             newChainAddresses: chainAddresses,
           });
         }
-        console.debug('======================================================================== DESPUES DEL IF');
-        /*
-        this.props.showDomainsDetailPage({
-          domain: this.props.domain,
-          status: this.props.domain.status,
-        });
-         */
       });
     this.props.showTransactionConfirmPage({
       action: () => {
