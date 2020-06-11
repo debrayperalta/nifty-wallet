@@ -19,7 +19,10 @@ export class LuminoManager extends AbstractManager {
       apiKey: null,
     });
     this.lumino = Lumino;
-    this.operations = new LuminoOperations(this.lumino);
+    this.operations = new LuminoOperations({
+      lumino: this.lumino,
+      address: this.address,
+    });
     this.callbacks = new LuminoCallbacks(this.lumino);
     this.keyringController = props.keyringController;
     this.signingHandler = new LuminoSigningHandler({
@@ -80,6 +83,9 @@ export class LuminoManager extends AbstractManager {
     super.onAddressChanged(address);
     if (this.signingHandler) {
       this.signingHandler.address = address;
+    }
+    if (this.operations) {
+      this.operations.address = address;
     }
     this.initializeLumino(true);
   }

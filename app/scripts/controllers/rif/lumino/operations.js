@@ -4,8 +4,9 @@ import {isValidRNSDomain} from '../../../../../ui/app/rif/utils/parse';
 
 export class LuminoOperations {
 
-  constructor (lumino) {
-    this.lumino = lumino;
+  constructor (props) {
+    this.lumino = props.lumino;
+    this.address = props.address;
   }
 
   onboarding () {
@@ -66,11 +67,10 @@ export class LuminoOperations {
     return Promise.resolve();
   }
 
-  createDeposit (partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, netAmount) {
+  createDeposit (partner, tokenAddress, tokenNetworkAddress, channelIdentifier, netAmount) {
     const errors = checkRequiredParameters({
       partner,
       tokenAddress,
-      address,
       tokenNetworkAddress,
       channelIdentifier,
       netAmount,
@@ -82,6 +82,7 @@ export class LuminoOperations {
     if (!isValidRNSDomain(partner)) {
       partner = toChecksumAddress(partner);
     }
+    const address = this.address;
     const params = {
       ...checksumAddresses({tokenAddress, address, tokenNetworkAddress}),
       amount,
