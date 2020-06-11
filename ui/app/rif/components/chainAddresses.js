@@ -51,7 +51,7 @@ class ChainAddresses extends Component {
   componentDidUpdate (prevProps, prevState) {
     if (prevProps.domainName !== this.props.domainName) {
       this.loadChainAddresses();
-    } else if (prevProps.newChainAddresses !== this.props.newChainAddresses && this.props.newChainAddresses !== []) {
+    } else if (prevProps.newChainAddresses !== this.props.newChainAddresses && this.props.newChainAddresses.length > 0) {
       this.setState({chainAddresses: this.props.newChainAddresses});
     }
   }
@@ -71,11 +71,17 @@ class ChainAddresses extends Component {
     return this.state.chainAddresses.map((chainAddress) => {
       const address = getChainAddressByChainAddress(chainAddress.chain);
       const icon = address.icon ? address.icon : DEFAULT_ICON;
-      const item = <ItemWithActions contentClasses={classes.content} actionClasses={classes.contentActions} enableEdit={isOwner} enableDelete={isOwner} text={chainAddress.address} leftIcon={icon}><InputWithSubmit/></ItemWithActions>
+      const item = <ItemWithActions contentClasses={classes.content} actionClasses={classes.contentActions} enableEdit={isOwner} enableDelete={isOwner} text={chainAddress.address} leftIcon={icon}>
+        <InputWithSubmit hiddenValue={chainAddress.chain} submit={this.onChangeSubmit} />
+      </ItemWithActions>
       return {
         content: item,
       };
     });
+  }
+
+  onChangeSubmit = (address, selectedChainAddress) => {
+    this.addAddress(address, selectedChainAddress);
   }
 
   updateChainAddress = (selectedOption) => {
@@ -86,8 +92,10 @@ class ChainAddresses extends Component {
     this.setState({ insertedAddress: address });
   }
 
-  async addAddress () {
-    const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
+  async addAddress (address = null, chainAddress = null) {
+    const insertedAddress = address || this.state.insertedAddress;
+    const selectedChainAddress = chainAddress || this.state.selectedChainAddress;
+    const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, selectedChainAddress, insertedAddress);
     this.props.waitForListener(transactionListenerId)
       .then(async (transactionReceipt) => {
         if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {

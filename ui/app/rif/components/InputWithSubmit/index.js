@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 class InputWithSubmit extends Component {
 
   static propTypes = {
+    hiddenValue: PropTypes.any,
     submit: PropTypes.func,
   }
 
@@ -21,14 +22,19 @@ class InputWithSubmit extends Component {
     e.preventDefault();
     const {submit} = this.props;
     const {value} = this.state;
-    submit(value);
+    if (this.props.hiddenValue) {
+      submit(value, this.props.hiddenValue);
+    } else {
+      submit(value);
+    }
+
   }
 
   render = () => {
     const {value} = this.state;
     return <div>
       <input onChange={this.onChange} value={value} />
-      <button onSubmit={this.onSubmit}>Submit</button>
+      <button onClick={this.onSubmit}>Submit</button>
     </div>;
   }
 }

@@ -182,6 +182,8 @@ export default class RnsResolver extends RnsJsDelegate {
    */
   setChainAddressForResolver (domainName, chain, chainAddress) {
     return new Promise((resolve, reject) => {
+      // TODO Rodrigo
+      // If chainAddress is "" set the chainAddress to null (It's like deleting)
       const transactionListener = this.send(this.multiChainresolverContractInstance, 'setChainAddr', [namehash.hash(domainName), chain, chainAddress])
       transactionListener.transactionConfirmed()
         .then(transactionReceipt => {
