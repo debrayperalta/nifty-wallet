@@ -1,0 +1,125 @@
+.token-description {
+  width: 90%;
+  float: left;
+  border-bottom: 0.05em solid #cdcdcd;
+  margin-top: 0.25em;
+  margin-left: 5%;
+  padding: 0.5em;
+}
+.token-name-desc{
+  width: 40%;
+}
+.token-name-desc-symbol {
+  width: 100%;
+  text-transform: uppercase;
+  font: 1.5em bold;
+}
+.token-name-desc-name {
+  width: 100%;
+  font-size: 1.2em;
+}
+.token-deposit {
+  width: 40%;
+}
+.token-deposit-text {
+  width: 100%;
+  text-align: right;
+}
+.token-general-info {
+  width: 100%;
+  margin-top: 1em;
+}
+.token-general-info-chiplet {
+  width: 30%;
+  float: left;
+  margin-left: 2.5%;
+}
+.token-general-info-channels {
+  width: 100%;
+  color: white;
+  text-align: center;
+  white-space: nowrap;
+  padding: 0.15em;
+  border-radius: 4em;
+  font-size: 0.85em;
+  background-color: #009edf;
+  position: relative;
+}
+.token-general-info-status {
+  width: 100%;
+  color: white;
+  text-align: center;
+  white-space: nowrap;
+  padding: 0.15em;
+  margin-top: 0.1em;
+  border-radius: 4em;
+  font-size: 0.85em;
+}
+.token-general-info-chiplet-channel-new {
+  width: 100%;
+  text-align: center;
+  border: 0.125em solid #7cc77b;
+  border-radius: 3em;
+  background-color: #bbd89e;
+  color: #50644c;
+  cursor: pointer;
+}
+.channels-info {
+  width: 90%;
+  float: left;
+  margin-top: 0.25em;
+  padding: 0.5em;
+}
+.channels-info-chiplet {
+  width: 100%;
+  float: left;
+  border-bottom: 0.05em solid #cdcdcd;
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+  padding: 0.5em;
+}
+.channels-info-chiplet-text {
+  width: 70%;
+  float: left;
+}
+.channels-info-chiplet-status {
+  width: 30%;
+  float: right;
+}
+.channels-info-chiplet-text-domain {
+  font: 1.25em bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.channels-info-chiplet-text-balance {
+  padding: 0.25em;
+}
+.channels-info-chiplet-text-balance span {
+  font-weight: bold;
+}
+.join-network-button {
+  width: 100%;
+  margin-left: 5%;
+  background-color: #00a538;
+  color: white;
+  text-align: center;
+  border-radius: 0.5em;
+  cursor: pointer;
+  font: 1.5em bold;
+  padding: 0.25em;
+  margin-top: 25%;
+}
+.leave-network-button {
+  width: 95%;
+  margin-left: 5%;
+  background-color: #ff0119;
+  display: flow-root;
+  color: white;
+  text-align: center;
+  border-radius: 0.5em;
+  cursor: pointer;
+  font: 1.5em bold;
+  padding: 0.25em;
+  margin-top: 10%;
+}
