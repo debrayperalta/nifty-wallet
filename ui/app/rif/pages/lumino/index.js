@@ -29,9 +29,13 @@ class LuminoHome extends Component {
     if (networks && networks.withChannels.length || networks.withoutChannels.length) this.setState({networks});
   }
 
+  navigateToNetworkDetail = ({symbol, networkAddress}) => {
+    const {navigateTo} = this.props;
+    return navigateTo(symbol, networkAddress)
+  }
+
   render () {
     const {networks} = this.state;
-    const {navigateTo} = this.props;
     // TODO: Replace .map with instances of the <GenericTable /> from other branches
     return (
       <div className="body">
@@ -39,12 +43,12 @@ class LuminoHome extends Component {
         {networks.withChannels.map(n => <LuminoNetworkItem key={n.symbol} userChannels={n.userChannels}
                                                            symbol={n.symbol} nodes={n.nodes}
                                                            channels={n.channels}
-                                                           onRightChevronClick={() => navigateTo(n.symbol)}/>,
+                                                           onRightChevronClick={() => this.navigateToNetworkDetail(n)}/>,
         )}
         <div>Lumino networks available</div>
         {networks.withoutChannels.map(n => <LuminoNetworkItem key={n.symbol} symbol={n.symbol} nodes={n.nodes}
                                                               channels={n.channels}
-                                                              onRightChevronClick={() => navigateTo(n.symbol)}/>,
+                                                              onRightChevronClick={() => this.navigateToNetworkDetail(n)}/>,
         )}
       </div>
     );
@@ -62,11 +66,13 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     getLuminoNetworks: (userAddress) => dispatch(rifActions.getLuminoNetworks(userAddress)),
-    navigateTo: (networkSymbol) => {
+    navigateTo: (networkSymbol, networkAddress) => {
       dispatch(rifActions.navigateTo(pageNames.lumino.networkDetails, {
         networkSymbol,
+        networkAddress,
         tabOptions: {
           tabIndex: 1,
+          showBack: true,
         },
       }));
     },
