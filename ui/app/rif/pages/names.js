@@ -14,6 +14,7 @@ const pageNames = {
   },
   lumino: {
     home: 'luminoHome',
+    networkDetails: 'networkDetails',
   },
 }
 
