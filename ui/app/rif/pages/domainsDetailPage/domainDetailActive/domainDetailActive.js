@@ -113,6 +113,7 @@ class DomainsDetailActiveScreen extends Component {
     displayToast: PropTypes.func.isRequired,
     disableResolvers: PropTypes.bool,
     newChainAddresses: PropTypes.array,
+    newSubdomains: PropTypes.array,
     getDomain: PropTypes.func,
     showToast: PropTypes.func,
 	}
@@ -171,7 +172,7 @@ class DomainsDetailActiveScreen extends Component {
   }
 
 	render () {
-    const { domain, domainName, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress, newChainAddresses } = this.props;
+    const { domain, domainName, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress, newChainAddresses, newSubdomains } = this.props;
     const domainInfo = {
       domainName,
       expirationDate,
@@ -213,11 +214,12 @@ class DomainsDetailActiveScreen extends Component {
             domainInfo={domainInfo}
             classes={styles.subdomains}
             paginationSize={3}
-            pageName={pageNames.rns.domainsDetail}
+            newSubdomains={newSubdomains}
             redirectParams={{
               domain: this.props.domain,
               status: this.props.domain.status,
             }}
+            pageName={pageNames.rns.domainsDetail}
           />
           <LuminoNetworkChannels
             isOwner={isOwner}
@@ -249,6 +251,7 @@ function mapStateToProps (state) {
 		isRifStorage: details.isRifStorage,
     selectedResolverAddress: params.selectedResolverAddress ? params.selectedResolverAddress : details.selectedResolverAddress,
     newChainAddresses: details.newChainAddresses || [],
+    newSubdomains: details.newSubdomains || [],
     disableResolvers: details.disableResolvers,
 		domain: domain,
 	}

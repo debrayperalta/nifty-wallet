@@ -12,6 +12,7 @@ class AddNewSubdomain extends Component {
     pageName: PropTypes.string.isRequired,
     redirectParams: PropTypes.any.isRequired,
     createSubdomain: PropTypes.func,
+    getSubdomains: PropTypes.func,
     waitForListener: PropTypes.func,
     showToast: PropTypes.func,
     showPopup: PropTypes.func,
@@ -36,7 +37,16 @@ class AddNewSubdomain extends Component {
       this.state.newSubdomain.owner,
       this.props.ownerAddress);
     this.props.waitForListener(transactionListenerId).then(transactionReceipt => {
-      this.showCreationSuccess();
+      this.props.getSubdomains(this.props.domainName)
+        .then(subdomains => {
+          this.props.showThis(
+            this.props.pageName,
+            {
+              ...this.props.redirectParams,
+              newSubdomains: subdomains,
+            });
+          this.props.showToast('Subdomain added');
+        });
     });
     this.props.showPopup('Confirmation', {
       text: 'Please confirm the operation in the next screen to create the subdomain.',
@@ -92,6 +102,7 @@ function mapDispatchToProps (dispatch) {
       }));
     },
     createSubdomain: (domainName, subdomain, ownerAddress, parentOwnerAddress) => dispatch(rifActions.createSubdomain(domainName, subdomain, ownerAddress, parentOwnerAddress)),
+    getSubdomains: (domainName) => dispatch(rifActions.getSubdomains(domainName)),
     waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),

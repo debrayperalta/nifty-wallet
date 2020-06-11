@@ -24,6 +24,7 @@ class Subdomains extends Component {
     showTransactionConfirmPage: PropTypes.func,
     isSubdomainAvailable: PropTypes.func,
     deleteSubdomain: PropTypes.func,
+    newSubdomains: PropTypes.array,
     paginationSize: PropTypes.number,
     classes: PropTypes.any,
   }
@@ -38,6 +39,12 @@ class Subdomains extends Component {
 
   componentDidMount () {
     this.loadSubdomains();
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    if (prevProps.newSubdomains !== this.props.newSubdomains && this.props.newSubdomains.length > 0) {
+      this.setState({subdomains: this.props.newSubdomains});
+    }
   }
 
   loadSubdomains () {
