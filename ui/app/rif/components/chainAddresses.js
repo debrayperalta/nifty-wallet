@@ -19,7 +19,9 @@ class ChainAddresses extends Component {
     domain: PropTypes.object.isRequired,
     domainName: PropTypes.string.isRequired,
     setChainAddressForResolver: PropTypes.func.isRequired,
-    showDomainsDetailPage: PropTypes.func.isRequired,
+    pageName: PropTypes.string.isRequired,
+    showThis: PropTypes.func.isRequired,
+    redirectParams: PropTypes.any.isRequired,
     isOwner: PropTypes.bool.isRequired,
     selectedResolverAddress: PropTypes.string,
     getChainAddresses: PropTypes.func,
@@ -44,7 +46,7 @@ class ChainAddresses extends Component {
     };
   }
 
-  componentDidMount () {
+  componentDidMount () {;
     this.loadChainAddresses();
   }
 
@@ -104,19 +106,19 @@ class ChainAddresses extends Component {
       .then(async (transactionReceipt) => {
         if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {
           const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
-          this.props.showDomainsDetailPage({
-            domain: this.props.domain,
-            status: this.props.domain.status,
-            newChainAddresses: chainAddresses,
+          this.props.showThis(
+            this.props.pageName,
+            {
+              ...this.props.redirectParams,
+              newChainAddresses: chainAddresses,
           });
         }
       });
     this.props.showTransactionConfirmPage({
       action: () => {
-        this.props.showDomainsDetailPage({
-        domain: this.props.domain,
-        status: this.props.domain.status,
-        })
+        this.props.showThis(
+          this.props.pageName,
+          this.props.redirectParams)
       },
     });
   }
@@ -126,7 +128,7 @@ class ChainAddresses extends Component {
   }
 
   render () {
-    const { isOwner, selectedResolverAddress, paginationSize, classes } = this.props;
+    const { isOwner, selectedResolverAddress, pageName, paginationSize, classes } = this.props;
     const { resolvers } = this.state;
     const data = this.convertChainAddressesToTableData();
     return (
@@ -163,6 +165,7 @@ class ChainAddresses extends Component {
             updateAddress={this.updateAddress.bind(this)}
             slipChainAddresses={this.state.slipChainAddresses}
             confirmCallback={this.addAddress.bind(this)}
+            pageName={pageName}
           />
           }
         </div>
@@ -182,13 +185,7 @@ function mapDispatchToProps (dispatch) {
   return {
     getChainAddresses: (domainName) => dispatch(rifActions.getChainAddresses(domainName)),
     setChainAddressForResolver: (domainName, chain, chainAddress) => dispatch(rifActions.setChainAddressForResolver(domainName, chain, chainAddress)),
-    showDomainsDetailPage: (props) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, {
-      ...props,
-      navBar: {
-        title: 'Domain Detail',
-        showBack: true,
-      },
-    })),
+    showThis: (pageName, props) => dispatch(rifActions.navigateTo(pageName, props)),
     waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
   }

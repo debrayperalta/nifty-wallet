@@ -10,6 +10,7 @@ import { SVG_PLUS } from '../constants';
 class LuminoNetworkChannels extends Component {
 
   static propTypes = {
+    pageName: PropTypes.string.isRequired,
     isOwner: PropTypes.bool,
     paginationSize: PropTypes.number,
     getChannelsGroupedByNetwork: PropTypes.func,

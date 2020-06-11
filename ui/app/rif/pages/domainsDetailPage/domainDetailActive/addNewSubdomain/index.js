@@ -9,6 +9,7 @@ class AddNewSubdomain extends Component {
   static propTypes = {
     domainName: PropTypes.string.isRequired,
     ownerAddress: PropTypes.string.isRequired,
+    pageName: PropTypes.string.isRequired,
     createSubdomain: PropTypes.func,
     waitForListener: PropTypes.func,
     showToast: PropTypes.func,
@@ -42,9 +43,9 @@ class AddNewSubdomain extends Component {
       confirmCallback: async () => {
         this.props.showTransactionConfirmPage({
           action: (payload) => {
-            this.props.showThis({
-              ...this.props,
-            });
+            this.props.showThis(
+              this.props.pageName,
+              {...this.props});
             this.props.showToast('Waiting Confirmation');
           },
           payload: null,
@@ -80,7 +81,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.subdomains, params)),
+    showThis: (pageName, params) => dispatch(rifActions.navigateTo(pageName, params)),
     showPopup: (title, opts) => {
       dispatch(rifActions.showModal({
         title,

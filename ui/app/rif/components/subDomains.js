@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import rifActions from '../actions';
 import niftyActions from '../../actions';
-import {pageNames} from '../pages';
 import {CustomButton, GenericTable} from './index';
 import ItemWithActions from './item-with-actions';
 import {SVG_PLUS} from '../constants';
@@ -12,6 +11,7 @@ import AddNewSubdomain from '../pages/domainsDetailPage/domainDetailActive/addNe
 class Subdomains extends Component {
 
   static propTypes = {
+    pageName: PropTypes.string.isRequired,
     domainInfo: PropTypes.object,
     isOwner: PropTypes.bool,
     showThis: PropTypes.func,
@@ -65,7 +65,7 @@ class Subdomains extends Component {
   }
 
   render () {
-    const { domainInfo, isOwner, classes, paginationSize} = this.props;
+    const { domainInfo, isOwner, pageName, classes, paginationSize} = this.props;
     const data = this.getData();
     return (
       <div>
@@ -102,6 +102,7 @@ class Subdomains extends Component {
               <AddNewSubdomain
                 ownerAddress={domainInfo.ownerAddress}
                 domainName={domainInfo.domainName}
+                pageName={pageName}
               />
               }
             </div>
@@ -129,7 +130,8 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     getSubdomains: (domainName) => dispatch(rifActions.getSubdomains(domainName)),
-    showThis: (params) => dispatch(rifActions.navigateTo(pageNames.rns.subdomains, params)),
+    // showThis: (pageName, params) => dispatch(rifActions.navigateTo(pageNames.rns.subdomains, params)),
+    showThis: (pageName, params) => dispatch(rifActions.navigateTo(pageName, params)),
     showPopup: (title, opts) => {
       dispatch(rifActions.showModal({
         title,

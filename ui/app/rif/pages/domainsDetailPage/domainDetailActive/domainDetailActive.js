@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { ChainAddresses, Subdomains, LuminoNetworkChannels } from '../../../components';
+import {pageNames} from '../../names';
 import { GET_RESOLVERS } from '../../../constants';
 import niftyActions from '../../../../actions';
 import rifActions from '../../../actions';
@@ -189,12 +190,6 @@ class DomainsDetailActiveScreen extends Component {
                       showLuminoNodeIcon={isLuminoNode}
                       showRifStorageIcon={isRifStorage}/>
         <div id="domainDetailBody" className={''}>
-          <Subdomains
-            isOwner={isOwner}
-            domainInfo={domainInfo}
-            classes={styles.subdomains}
-            paginationSize={3}
-          />
           {resolvers &&
           <div id="chainAddressesBody" className={''}>
             <ChainAddresses
@@ -205,13 +200,26 @@ class DomainsDetailActiveScreen extends Component {
               classes={styles.chainAddresses}
               isOwner={isOwner}
               newChainAddresses={newChainAddresses}
+              redirectParams={{domain: this.props.domain,
+                status: this.props.domain.status,
+                newChainAddresses: newChainAddresses,
+              }}
+              pageName={pageNames.rns.domainsDetail}
             />
           </div>
           }
+          <Subdomains
+            isOwner={isOwner}
+            domainInfo={domainInfo}
+            classes={styles.subdomains}
+            paginationSize={3}
+            pageName={pageNames.rns.domainsDetail}
+          />
           <LuminoNetworkChannels
             isOwner={isOwner}
             paginationSize={3}
             classes={styles.LuminoNetworkChannels}
+            pageName={pageNames.rns.domainsDetail}
           />
         </div>
       </div>
