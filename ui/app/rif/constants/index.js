@@ -14,6 +14,10 @@ export function GET_RESOLVERS () {
 }
 const PATH_TO_RIF_IMAGES = '/images/rif/';
 
+const JOINED_TEXT = 'JOINED';
+
+const UNJOINED_TEXT = 'NOT JOINED';
+
 export {
   DEFAULT_ICON,
   domainIconProps,
@@ -21,4 +25,6 @@ export {
   rifStorageIconProps,
   tokenIcons,
   PATH_TO_RIF_IMAGES,
+  JOINED_TEXT,
+  UNJOINED_TEXT,
 }

@@ -19,7 +19,15 @@ function getBalanceInEth (balanceInWei) {
   return utils.fromWei(balanceInWei);
 }
 
+function isValidRNSDomain (value) {
+  if (!value) {
+    return false;
+  }
+  return !!value.match('.*\\.rsk');
+}
+
 export {
   cleanDomainName,
   getBalanceInEth,
+  isValidRNSDomain,
 }

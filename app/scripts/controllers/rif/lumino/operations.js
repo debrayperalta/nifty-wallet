@@ -1,5 +1,6 @@
-import {toWei} from 'web3-utils';
+import {toChecksumAddress, toWei} from 'web3-utils';
 import {checkRequiredParameters, checksumAddresses} from '../utils/general';
+import {isValidRNSDomain} from '../../../../../ui/app/rif/utils/parse';
 
 export class LuminoOperations {
 
@@ -78,9 +79,13 @@ export class LuminoOperations {
       return Promise.reject(errors);
     }
     const amount = toWei(netAmount);
+    if (!isValidRNSDomain(partner)) {
+      partner = toChecksumAddress(partner);
+    }
     const params = {
-      ...checksumAddresses({partner, tokenAddress, address, tokenNetworkAddress}),
+      ...checksumAddresses({tokenAddress, address, tokenNetworkAddress}),
       amount,
+      partner,
       channelId: channelIdentifier,
     };
     console.debug(`Requested deposit of ${amount} on token ${tokenAddress} on channel ${channelIdentifier} with partner ${partner}`);
@@ -98,8 +103,12 @@ export class LuminoOperations {
       return Promise.reject(errors);
     }
     const amount = toWei(netAmount);
+    if (!isValidRNSDomain(partner)) {
+      partner = toChecksumAddress(partner);
+    }
     const body = {
-      ...checksumAddresses({partner, token_address: tokenAddress}),
+      ...checksumAddresses({token_address: tokenAddress}),
+      partner,
       amount,
     };
     console.debug(`Sending payment of ${amount} on token ${tokenAddress} to ${partner}`);

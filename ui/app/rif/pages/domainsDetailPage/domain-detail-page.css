@@ -1,21 +1,28 @@
+.domain-info-container {
+  padding: 0 28px;
+}
+
 .domain-detail-body {
   width: 90%;
   font-size: 1rem;
 }
+
 .domain-name {
-    font-size: 1.5rem;
-    font-weight: bold;
-    width: 100%;
-    height: 3.125rem;
-    padding: 0.625rem;
-    background-color: #A8C5EE;
+  font-family: var(--primary-font);
+  color: var(--primary-color);
+  font-weight: 400;
+  font-size: 24px;
+  margin-bottom: 16px;
 }
+
 .domain-name span {
   margin-right: 1rem;
 }
+
 .domain-icon {
   margin-left: 0.5rem;
 }
+
 .domain-description {
   font-weight: bold;
   float: left;
@@ -172,4 +179,38 @@
 .resolver-chainaddress-description-chain-address span {
   font-size: 1rem;
   margin-right: 0.2rem;
+}
+
+.payments-title {
+  font-family: var(--primary-font);
+  color: var(--gray-text);
+  font-weight: 300;
+  font-size: 16px;
+  margin-bottom: 18px;
+}
+
+.payment-mode-dropdown {
+  max-width: 170px;
+  margin: 0 auto 30px;
+}
+
+
+.payment-mode-dropdown .mode-dropdown-item {
+  font-family: var(--primary-font);
+  color: var(--gray-text);
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.payment-mode-dropdown .mode-dropdown-item + div {
+  display: block !important;
+  height: auto;
+}
+
+.payment-legend {
+  color: var(--primary-color);
+  font-size: 8px;
+  display: block;
+  line-height: 1.2;
 }

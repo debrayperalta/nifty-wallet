@@ -3,6 +3,7 @@ import extend from 'xtend';
 import {lumino} from '../../../../app/scripts/controllers/rif/constants';
 import {CallbackHandlers} from './callback-handlers';
 import ethUtils from 'ethereumjs-util';
+import { sumValuesOfArray } from '../utils/utils';
 import rifConfig from '../../../../rif.config';
 import {mocks} from './mocks';
 
@@ -40,6 +41,7 @@ const rifActions = {
   getDomains,
   getDomain,
   updateDomains,
+  getDomainByAddress,
   // Lumino
   onboarding,
   openChannel,
@@ -56,6 +58,8 @@ const rifActions = {
   cleanStore,
   showRifLandingPage,
   setupDefaultLuminoCallbacks,
+  createNetworkPayment,
+  getDomainAddress,
 }
 
 let background = null;
@@ -147,6 +151,25 @@ function getDomainDetails (domainName) {
           return reject(error);
         }
         return resolve(details);
+      });
+    })
+  }
+}
+
+/*
+  TODO: rorolopetegui
+   This action isn't used for now, but it resolves an address using reverse lookup
+ */
+function getDomainByAddress(address) {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.rns.resolver.getAddressDomain(address, (error, domain) => {
+        console.debug('this is the domain bringed', domain);
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(domain);
       });
     })
   }
@@ -489,6 +512,22 @@ function getDomain (domainName) {
   };
 }
 
+function getDomainAddress (domainName) {
+  return (dispatch) => {
+    dispatch(niftyActions.showLoadingIndication())
+    return new Promise((resolve, reject) => {
+      dispatch(niftyActions.hideLoadingIndication());
+      background.rif.rns.register.getDomainAddress(domainName, (error, domainAddress) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(domainAddress);
+      });
+    });
+  };
+}
+
 function getDomains () {
   return (dispatch) => {
     dispatch(niftyActions.showLoadingIndication())
@@ -739,8 +778,14 @@ function getTokensWithJoinedCheck () {
           const channels = Object.keys(channelObject).map(channelKey => channelObject[channelKey]);
           tokens.map(token => {
             const tokenJoined = token;
-            tokenJoined.joined = !!channels.find(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
-            tokenJoined.openedChannels = channels.filter(channel => channel.token_address === ethUtils.toChecksumAddress(token.address));
+            tokenJoined.openedChannels = channels.filter(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address));
+            if (channels.find(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address))) {
+              tokenJoined.joined = true;
+            } else {
+              tokenJoined.joined = false;
+            }
+            const userBalance = sumValuesOfArray(tokenJoined.openedChannels, 'balance');
+            tokenJoined.userBalance = userBalance;
             tokensJoined.push(tokenJoined);
           });
           resolve(tokensJoined);
@@ -880,6 +925,27 @@ function setupDefaultLuminoCallbacks () {
         dispatch(niftyActions.displayToast('Received a payment'));
       });
       return resolve();
+    });
+  };
+}
+
+function createNetworkPayment (network, destination, amountInWei) {
+  // TODO: network is not being used for now because we can't switch the network just to make a payment, we should
+  // TODO: think about the ui and maybe refactor this, for now it will only pay on RBTC
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      dispatch(getSelectedAddress()).then(selectedAddress => {
+        const txData = {
+          from: selectedAddress,
+          to: destination,
+        };
+        global.ethQuery.sendTransaction(txData, (err, _data) => {
+          if (err) {
+            return dispatch(niftyActions.displayWarning(err.message))
+          }
+        });
+        resolve();
+      }).catch(error => reject(error));
     });
   };
 }
