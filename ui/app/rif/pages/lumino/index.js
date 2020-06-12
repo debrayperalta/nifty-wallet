@@ -29,9 +29,9 @@ class LuminoHome extends Component {
     if (networks && networks.withChannels.length || networks.withoutChannels.length) this.setState({networks});
   }
 
-  navigateToNetworkDetail = ({symbol, networkAddress}) => {
+  navigateToNetworkDetail = (network) => {
     const {navigateTo} = this.props;
-    return navigateTo(symbol, networkAddress)
+    return navigateTo(network.symbol, network.networkAddress)
   }
 
   render () {
@@ -73,6 +73,7 @@ function mapDispatchToProps (dispatch) {
         tabOptions: {
           tabIndex: 1,
           showBack: true,
+          showSearchbar: false,
         },
       }));
     },

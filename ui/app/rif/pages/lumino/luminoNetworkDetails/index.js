@@ -15,7 +15,7 @@ class LuminoNetworkDetails extends Component {
   constructor (props) {
     super(props);
     this.state = {
-      loading: false,
+      loading: true,
       networkData: {
         channels: 0,
         nodes: 0,
@@ -28,24 +28,34 @@ class LuminoNetworkDetails extends Component {
   async componentDidMount () {
     const {getUserChannels} = this.props;
     const userChannels = await getUserChannels();
-    if (userChannels && userChannels.length) return this.setState({userChannels})
+    if (userChannels && userChannels.length) return this.setState({userChannels, loading: false})
     // TODO: Run again a function to resolve addresses to RNS domains
+    return this.setState({loading: false})
   }
 
   render () {
     const {networkSymbol} = this.props;
-    const {userChannels} = this.state;
+    const {userChannels, loading} = this.state;
     return (
       <div className="body">
         <div>{networkSymbol} Network</div>
         <button>Leave</button>
-        <div>
+        {loading && <div>Loading data</div>}
+        {!loading && <div>
+          {userChannels.length && <div>My channels in the {networkSymbol} Network </div>}
+          {!userChannels.length && <div>
+            <div>
+              No channels yet
+            </div>
+            <div>Add a channel to join the {networkSymbol} network</div>
+          </div>
+          }
           {userChannels.map(c => <LuminoChannelItem key={c.channel_identifier} partnerAddress={c.partner_address}
                                                     balance={c.balance}
                                                     state={c.state} tokenSymbol={networkSymbol}
                                                     onRightChevronClick={() => console.warn(c)}/>)}
         </div>
-
+        }
       </div>
     );
   }

@@ -3,7 +3,7 @@ import extend from 'xtend';
 import {lumino} from '../../../../app/scripts/controllers/rif/constants';
 import {CallbackHandlers} from './callback-handlers';
 import ethUtils from 'ethereumjs-util';
-import { sumValuesOfArray } from '../utils/utils';
+import {sumValuesOfArray} from '../utils/utils';
 import rifConfig from '../../../../rif.config';
 import {mocks} from './mocks';
 
@@ -160,7 +160,7 @@ function getDomainDetails (domainName) {
   TODO: rorolopetegui
    This action isn't used for now, but it resolves an address using reverse lookup
  */
-function getDomainByAddress(address) {
+function getDomainByAddress (address) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       background.rif.rns.resolver.getAddressDomain(address, (error, domain) => {
@@ -862,7 +862,7 @@ function getUserChannelsInNetwork (tokenNetworkAddress) {
         partner_address: '0xd7387C9b5a2860bFb6e8E8F36c8983B0469C6d18',
       },
     ]
-    return dispatch(resolve(mockData));
+    return resolve(mockData);
     // dispatch(getChannels().then(({error, channels}) => {
     //   if (error) {
     //     dispatch(niftyActions.displayWarning(error));
