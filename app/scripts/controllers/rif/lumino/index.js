@@ -101,6 +101,8 @@ export class LuminoManager extends AbstractManager {
       onboarding: bindOperation(this.operations.onboarding, this.operations),
       openChannel: bindOperation(this.operations.openChannel, this.operations),
       closeChannel: bindOperation(this.operations.closeChannel, this.operations),
+      subscribeToCloseChannel: bindOperation(this.operations.subscribeToCloseChannel, this.operations),
+      deleteChannelFromSDK: bindOperation(this.operations.deleteChannelFromSdk, this.operations),
       createDeposit: bindOperation(this.operations.createDeposit, this.operations),
       createPayment: bindOperation(this.operations.createPayment, this.operations),
       getChannels: bindOperation(this.operations.getChannels, this.operations),
