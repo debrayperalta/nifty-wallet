@@ -1,4 +1,4 @@
-import {toChecksumAddress, toWei} from 'web3-utils';
+import web3Utils from 'web3-utils';
 import {checkRequiredParameters, checksumAddresses} from '../utils/general';
 import {isValidRNSDomain} from '../../../../../ui/app/rif/utils/parse';
 
@@ -6,7 +6,11 @@ export class LuminoOperations {
 
   constructor (props) {
     this.lumino = props.lumino;
-    this.address = props.address;
+    this.address = web3Utils.toChecksumAddress(props.address);
+  }
+
+  updateAddress (newAddress) {
+    this.address = web3Utils.toChecksumAddress(newAddress);
   }
 
   onboarding () {
@@ -78,9 +82,9 @@ export class LuminoOperations {
     if (errors.length > 0) {
       return Promise.reject(errors);
     }
-    const amount = toWei(netAmount);
+    const amount = web3Utils.toWei(netAmount);
     if (!isValidRNSDomain(partner)) {
-      partner = toChecksumAddress(partner);
+      partner = web3Utils.toChecksumAddress(partner);
     }
     const address = this.address;
     const params = {
@@ -103,9 +107,9 @@ export class LuminoOperations {
     if (errors.length > 0) {
       return Promise.reject(errors);
     }
-    const amount = toWei(netAmount);
+    const amount = web3Utils.toWei(netAmount);
     if (!isValidRNSDomain(partner)) {
-      partner = toChecksumAddress(partner);
+      partner = web3Utils.toChecksumAddress(partner);
     }
     const body = {
       ...checksumAddresses({token_address: tokenAddress}),
@@ -119,5 +123,21 @@ export class LuminoOperations {
 
   getChannels () {
     return Promise.resolve(this.lumino.get().actions.getChannels());
+  }
+
+  async notifierInitialization (url) {
+    if (url) {
+      await this.lumino.get().actions.notifierRegistration(url);
+      await this.lumino.get().actions.subscribeToOpenChannel(url);
+    }
+  }
+
+  async notifiersInitialization (urls) {
+    if (urls && urls.length > 0) {
+      for (const url of urls) {
+        await this.lumino.get().actions.notifierRegistration(url);
+        await this.lumino.get().actions.subscribeToOpenChannel(url);
+      }
+    }
   }
 }
