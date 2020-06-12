@@ -116,6 +116,7 @@ class DomainsDetailActiveScreen extends Component {
     newSubdomains: PropTypes.array,
     getDomain: PropTypes.func,
     showToast: PropTypes.func,
+    showConfigPage: PropTypes.func,
 	}
 	constructor (props) {
 		super(props);
@@ -126,37 +127,7 @@ class DomainsDetailActiveScreen extends Component {
 			resolvers: resolvers,
 		};
 	}
-  /*
-	async onChangeComboResolvers (e) {
-    for (const resolverItem of e.target.children) {
-      if (resolverItem.value === e.target.value) {
-        const address = resolverItem.getAttribute('data-address');
-        const transactionListenerId = await this.props.setNewResolver(this.props.domainName, address);
-        this.props.waitForListener(transactionListenerId)
-          .then(transactionReceipt => {
-            this.props.showDomainsDetailPage({
-              domain: this.props.domain,
-              status: this.props.domain.details.status,
-              disableResolvers: false,
-              selectedResolverAddress: address,
-            });
-          });
-        this.props.showTransactionConfirmPage({
-          action: () => {
-            this.props.showDomainsDetailPage({
-              domain: this.props.domain,
-              status: this.props.domain.details.status,
-              disableResolvers: true,
-              selectedResolverAddress: address,
-            });
-            this.props.showToast('Waiting Confirmation');
-          },
-        });
-        return;
-      }
-    }
-  }
-*/
+
   componentDidUpdate (prevProps, prevState) {
     if (this.props.disableResolvers !== this.state.disableCombo) {
       this.setState({ disableCombo: this.props.disableResolvers });
@@ -185,11 +156,26 @@ class DomainsDetailActiveScreen extends Component {
     };
 		const { resolvers } = this.state;
 		return (
-      <div className='domain-detail'>
+      <div className="domain-detail">
         <DomainHeader domainName={domainName}
                       showOwnerIcon={isOwner}
                       showLuminoNodeIcon={isLuminoNode}
-                      showRifStorageIcon={isRifStorage}/>
+                      showRifStorageIcon={isRifStorage}>
+          <svg width="19" height="23" viewBox="0 0 19 23" fill="none" xmlns="http://www.w3.org/2000/svg"
+            onClick={() => this.props.showConfigPage({
+              domain: domain,
+              domainName: domainName,
+              selectedResolverAddress: selectedResolverAddress,
+            })}
+          >
+            <line x1="16" y1="4.37114e-08" x2="16" y2="23" stroke="#602A95" strokeWidth="2"/>
+            <line x1="9" y1="4.37114e-08" x2="9" y2="23" stroke="#602A95" strokeWidth="2"/>
+            <line x1="3" y1="4.37114e-08" x2="3" y2="23" stroke="#602A95" strokeWidth="2"/>
+            <ellipse cx="9" cy="17" rx="3" ry="3" transform="rotate(90 9 17)" fill="#602A95"/>
+            <ellipse cx="16" cy="5" rx="3" ry="3" transform="rotate(90 16 5)" fill="#602A95"/>
+            <ellipse cx="3" cy="8" rx="3" ry="3" transform="rotate(90 3 8)" fill="#602A95"/>
+          </svg>
+        </DomainHeader>
         <div id="domainDetailBody" className={''}>
           {resolvers &&
           <div id="chainAddressesBody" className={''}>
@@ -267,6 +253,7 @@ const mapDispatchToProps = dispatch => {
     displayToast: (message) => dispatch(niftyActions.displayToast(message)),
     getDomain: (domainName) => dispatch(rifActions.getDomain(domainName)),
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
+    showConfigPage: (props) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetailConfiguration, props)),
 	}
 }
 

@@ -25,7 +25,15 @@ export default class Pagination extends Component {
   };
 
   componentWillReceiveProps (nextProps) {
-    this.changePage(nextProps.page + 1);
+    if (nextProps.pages !== this.props.pages) {
+      const visiblePages = this.getVisiblePages(this.props.page, nextProps.pages);
+      this.setState({
+        visiblePages: this.filterPages(visiblePages, this.props.pages),
+      });
+    }
+    if (nextProps.page !== this.props.page) {
+      this.changePage(nextProps.page + 1);
+    }
   }
 
   filterPages = (visiblePages, totalPages) => {
@@ -71,7 +79,6 @@ export default class Pagination extends Component {
       canNextPage,
       className,
     } = this.props;
-    const { visiblePages } = this.state;
     const activePage = this.props.page + 1;
     const classNames = className || {};
     return (
@@ -80,7 +87,7 @@ export default class Pagination extends Component {
           {'<'}
         </button>{' '}
         <div className={classNames.indexes}>
-          {visiblePages.map((page, index, array) => {
+          {this.state.visiblePages.map((page, index, array) => {
             return (
               <PageButtonComponent
                 key={page}
