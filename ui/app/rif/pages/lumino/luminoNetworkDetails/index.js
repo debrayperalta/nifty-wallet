@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux'
 import rifActions from '../../../actions';
 import LuminoChannelItem from '../../../components/luminoChannelItem';
+import OpenChannel from '../../../components/lumino/open-channel';
 
 class LuminoNetworkDetails extends Component {
 
@@ -10,6 +11,8 @@ class LuminoNetworkDetails extends Component {
     networkSymbol: PropTypes.string,
     networkAddress: PropTypes.string,
     getUserChannels: PropTypes.func,
+    networkTokenAddress: PropTypes.string,
+    networkName: PropTypes.string,
   }
 
   constructor (props) {
@@ -34,7 +37,8 @@ class LuminoNetworkDetails extends Component {
   }
 
   render () {
-    const {networkSymbol} = this.props;
+    const {networkSymbol, networkName, networkAddress, networkTokenAddress} = this.props;
+    debugger;
     const {userChannels, loading} = this.state;
     return (
       <div className="body">
@@ -56,6 +60,11 @@ class LuminoNetworkDetails extends Component {
                                                     onRightChevronClick={() => console.warn(c)}/>)}
         </div>
         }
+        <OpenChannel
+          tokenAddress={networkTokenAddress}
+          tokenNetworkAddress={networkAddress}
+          tokenName={networkName}
+          tokenSymbol={networkSymbol}/>
       </div>
     );
   }
@@ -68,6 +77,8 @@ function mapStateToProps (state) {
     currentAddress: state.metamask.selectedAddress.toLowerCase(),
     networkSymbol: params.networkSymbol,
     networkAddress: params.networkAddress,
+    networkTokenAddress: params.networkTokenAddress,
+    networkName: params.networkName,
   }
 }
 

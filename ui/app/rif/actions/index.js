@@ -584,24 +584,20 @@ function onboarding (callbackHandlers = new CallbackHandlers()) {
 }
 
 function handleSdkCallback (callbackName, dispatch, handler = null) {
+  const handlerFunction = async (result) => {
+    if (handler) {
+      await handler(result);
+    }
+  };
   listenToSdkCallback(callbackName, dispatch)
-    .then(result => {
-      if (handler) {
-        handler(result)
-      }
-    })
-    .catch(error => {
-      if (handler) {
-        handler(error);
-      }
-    });
+    .then(result => handlerFunction(result))
+    .catch(error => handlerFunction(error));
 }
 
-function listenToSdkCallback (callbackName, dispatch) {
+function listenToSdkCallback (callbackName) {
   return new Promise((resolve, reject) => {
     background.rif.lumino.listenCallback(callbackName, (error, result) => {
       if (error) {
-        dispatch(niftyActions.displayWarning(error));
         return reject(error);
       }
       return resolve(result);
@@ -610,8 +606,8 @@ function listenToSdkCallback (callbackName, dispatch) {
 }
 
 function listenCallback (callbackName) {
-  return (dispatch) => {
-    return listenToSdkCallback(callbackName, dispatch);
+  return () => {
+    return listenToSdkCallback(callbackName);
   };
 }
 
@@ -675,7 +671,7 @@ function closeChannel (partner, tokenAddress, address, tokenNetworkAddress, chan
   };
 }
 
-function createDeposit (partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, netAmount, callbackHandlers = new CallbackHandlers()) {
+function createDeposit (partner, tokenAddress, tokenNetworkAddress, channelIdentifier, netAmount, callbackHandlers = new CallbackHandlers()) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       if (callbackHandlers && callbackHandlers.requestHandler) {
@@ -687,7 +683,7 @@ function createDeposit (partner, tokenAddress, address, tokenNetworkAddress, cha
       if (callbackHandlers && callbackHandlers.errorHandler) {
         handleSdkCallback(lumino.callbacks.FAILED_DEPOSIT_CHANNEL, dispatch, callbackHandlers.errorHandler);
       }
-      background.rif.lumino.createDeposit(partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, netAmount, (error) => {
+      background.rif.lumino.createDeposit(partner, tokenAddress, tokenNetworkAddress, channelIdentifier, netAmount, (error) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
@@ -813,6 +809,8 @@ function getLuminoNetworks (userAddress) {
         tokens.forEach(t => {
           const network = {
             symbol: t.symbol,
+            networkTokenAddress: t.address,
+            name: t.name,
             networkAddress: t.network_address,
             channels: t.channels.length,
             nodes: 0,
