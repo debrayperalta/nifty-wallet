@@ -350,6 +350,7 @@ function showMenu (data) {
 }
 
 function navigateBack () {
+  debugger;
   if (navigationStack && navigationStack.length > 0) {
     // we cleanup the last navigation since it was to the current page
     if (!backNavigated) {
@@ -396,7 +397,7 @@ function navigateTo (screenName, params, resetNavigation = false) {
     params,
   }
   const alreadyNavigatedTo = navigationStack.find(navigation => navigation.params.tabOptions.screenName === screenName);
-  if (!alreadyNavigatedTo && !resetNavigation) {
+  if (!alreadyNavigatedTo) {
     navigationStack.push(currentNavigation);
   }
   backNavigated = false;
