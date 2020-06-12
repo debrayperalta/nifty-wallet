@@ -7,6 +7,9 @@ module.exports = {
       endpoint: '',
     },
   },
+  notifier: {
+    availableNodes: [],
+  },
   rns: {
     contracts: {
       rns: '',

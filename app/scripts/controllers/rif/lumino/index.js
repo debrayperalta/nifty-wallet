@@ -1,5 +1,5 @@
 import {Lumino} from '@rsksmart/lumino-light-client-sdk';
-import {lumino, rns} from '../../../../../rif.config';
+import {lumino, rns, notifier} from '../../../../../rif.config';
 import {LuminoSigningHandler} from './signing-handler';
 import {AbstractManager} from '../abstract-manager';
 import {bindOperation, isRskNetwork} from '../utils/general';
@@ -42,6 +42,7 @@ export class LuminoManager extends AbstractManager {
         address: ethUtils.toChecksumAddress(this.address),
         registryAddress: rns.contracts.rns,
       };
+      await this.signingHandler.initialize();
       const signingHandler = {
         sign: (tx) => this.signingHandler.sign(tx),
         offChainSign: (byteMessage) => this.signingHandler.offChainSign(byteMessage),
@@ -66,8 +67,13 @@ export class LuminoManager extends AbstractManager {
           state.apiKey = await this.operations.getApiKey();
           this.store.putState(state);
         }
+      await this.afterInitialization();
     }
   };
+
+  async afterInitialization () {
+    await this.operations.notifiersInitialization(notifier.availableNodes);
+  }
 
   onUnlock () {
     super.onUnlock();
@@ -82,10 +88,10 @@ export class LuminoManager extends AbstractManager {
   onAddressChanged (address) {
     super.onAddressChanged(address);
     if (this.signingHandler) {
-      this.signingHandler.address = address;
+      this.signingHandler.updateAddress(address);
     }
     if (this.operations) {
-      this.operations.address = address;
+      this.operations.updateAddress(address);
     }
     this.initializeLumino(true);
   }

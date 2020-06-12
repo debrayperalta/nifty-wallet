@@ -50,7 +50,8 @@ class OpenChannel extends Component {
     return (
       <div>
         <div className="form-segment">
-          <input className="domain-address-input" type="text" placeholder="Enter address / domain" onChange={(event) => this.changeDestination(event)}/>
+          <input className="domain-address-input" type="text" placeholder="Enter address / domain"
+                 onChange={(event) => this.changeDestination(event)}/>
           <span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="3.5" y="3.5" width="9" height="9" stroke="#979797"/>
@@ -66,10 +67,12 @@ class OpenChannel extends Component {
                  type="text"
                  placeholder={this.props.tokenSymbol + ' Amount'}
                  onKeyDown={event => this.validateAmount(event)}
-                 onChange={event => this.changeAmount(event)} />
+                 onChange={event => this.changeAmount(event)}/>
         </div>
         <div className="form-segment">
-          <button className="btn-primary" disabled={!this.readyToOpenChannel()} onClick={() => this.openChannelRequest()}>Add</button>
+          <button className="btn-primary" disabled={!this.readyToOpenChannel()}
+                  onClick={() => this.openChannelRequest()}>Add
+          </button>
         </div>
       </div>
     );
@@ -85,8 +88,8 @@ class OpenChannel extends Component {
       console.debug('OPEN CHANNEL REQUESTED', result);
       this.props.showToast('Requesting Open Channel');
     };
-    callbackHandlers.successHandler = async (result) => {
-      console.debug('CHANNEL OPENED', result);
+    callbackHandlers.successHandler = async (response) => {
+      console.debug('CHANNEL OPENED', response);
       this.props.showToast('Channel Opened Successfully!');
       if (this.state.amount) {
         const depositCallbackHandlers = new CallbackHandlers();
@@ -107,8 +110,8 @@ class OpenChannel extends Component {
             this.props.showToast('Unknown Error Trying to Deposit');
           }
         };
-        // TODO: we need to change this to get the channel identifier from the channel result.
-        const channelIdentifier = '1';
+
+        const channelIdentifier = response.channel_identifier;
 
         // we need to deposit
         this.props.showToast(`Trying to deposit ${this.state.amount} ${this.props.tokenName} on channel ${channelIdentifier}`);
