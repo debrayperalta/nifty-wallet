@@ -811,7 +811,6 @@ function getLuminoNetworks (userAddress) {
           withoutChannels: [],
         }
         tokens.forEach(t => {
-          console.warn(t);
           const network = {
             symbol: t.symbol,
             networkAddress: t.network_address,
