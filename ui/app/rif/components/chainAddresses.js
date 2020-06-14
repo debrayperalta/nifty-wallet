@@ -11,12 +11,10 @@ import rifConfig from '../../../../rif.config';
 import AddNewChainAddressToResolver
   from '../pages/domainsDetailPage/domainDetailActive/addNewTokenNetworkAddress/addNewChainAddressToResolver';
 import {SLIP_ADDRESSES} from '../constants/slipAddresses';
-import {pageNames} from '../pages';
 
 class ChainAddresses extends Component {
 
   static propTypes = {
-    domain: PropTypes.object.isRequired,
     domainName: PropTypes.string.isRequired,
     setChainAddressForResolver: PropTypes.func.isRequired,
     pageName: PropTypes.string.isRequired,

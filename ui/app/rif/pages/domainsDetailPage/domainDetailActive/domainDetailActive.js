@@ -7,7 +7,6 @@ import { GET_RESOLVERS } from '../../../constants';
 import niftyActions from '../../../../actions';
 import rifActions from '../../../actions';
 import DomainHeader from '../../../components/domain-header';
-import { rns } from '../../../../../../rif.config';
 
 // TODO @fmelo
 // Here you can set the classnames for the entire page
@@ -121,26 +120,10 @@ class DomainsDetailActiveScreen extends Component {
 	constructor (props) {
 		super(props);
     const resolvers = Object.assign([], GET_RESOLVERS());
-    const enableComboResolvers = this.props.isOwner && !(props.disableResolvers || false);
 		this.state = {
-      disableCombo: !enableComboResolvers,
 			resolvers: resolvers,
 		};
 	}
-
-  componentDidUpdate (prevProps, prevState) {
-    if (this.props.disableResolvers !== this.state.disableCombo) {
-      this.setState({ disableCombo: this.props.disableResolvers });
-    }
-  }
-
-  getDefaultSelectedValue (resolvers, selectedResolverAddress) {
-    const selectedResolver = resolvers.find(resolver => resolver.address === selectedResolverAddress);
-    if (selectedResolver) {
-      return selectedResolver.name;
-    }
-    return rns.contracts.publicResolver;
-  }
 
 	render () {
     const { domain, domainName, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress, newChainAddresses, newSubdomains } = this.props;
@@ -153,6 +136,7 @@ class DomainsDetailActiveScreen extends Component {
       isLuminoNode,
       isRifStorage,
       content,
+      selectedResolverAddress,
     };
 		const { resolvers } = this.state;
 		return (
@@ -180,7 +164,6 @@ class DomainsDetailActiveScreen extends Component {
           {resolvers &&
           <div id="chainAddressesBody" className={''}>
             <ChainAddresses
-              domain={domain}
               domainName={domainName}
               selectedResolverAddress={selectedResolverAddress}
               paginationSize={3}

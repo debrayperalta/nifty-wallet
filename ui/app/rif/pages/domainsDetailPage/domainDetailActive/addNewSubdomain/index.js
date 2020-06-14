@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import rifActions from '../../../../actions';
 import niftyActions from '../../../../../actions';
-import {pageNames} from '../../../../pages/index';
 
 class AddNewSubdomain extends Component {
   static propTypes = {
