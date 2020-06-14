@@ -174,7 +174,6 @@ class Subdomains extends Component {
 }
 function mapStateToProps (state) {
   const params = state.appState.currentView.params;
-  console.debug('========================================================================', params);
   return {
     ...params,
     isOwner: state.metamask.selectedAddress.toLowerCase() === params.subdomain.ownerAddress.toLowerCase(),
