@@ -11,12 +11,10 @@ import rifConfig from '../../../../rif.config';
 import AddNewChainAddressToResolver
   from '../pages/domainsDetailPage/domainDetailActive/addNewTokenNetworkAddress/addNewChainAddressToResolver';
 import {SLIP_ADDRESSES} from '../constants/slipAddresses';
-import {pageNames} from '../pages';
 
 class ChainAddresses extends Component {
 
   static propTypes = {
-    domain: PropTypes.object.isRequired,
     domainName: PropTypes.string.isRequired,
     setChainAddressForResolver: PropTypes.func.isRequired,
     pageName: PropTypes.string.isRequired,
@@ -46,7 +44,7 @@ class ChainAddresses extends Component {
     };
   }
 
-  componentDidMount () {;
+  componentDidMount () {
     this.loadChainAddresses();
   }
 
@@ -59,7 +57,7 @@ class ChainAddresses extends Component {
   }
 
   async loadChainAddresses () {
-    if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {
+    if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress && resolver.isMultiChain)) {
       const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
       this.setState({chainAddresses: chainAddresses});
     } else if (rifConfig.mocksEnabled) {
@@ -157,7 +155,7 @@ class ChainAddresses extends Component {
             <span>No addresses found</span>
           </div>
         }
-        {(isOwner && resolvers.find(resolver => resolver.address === selectedResolverAddress)) &&
+        {(isOwner && resolvers.find(resolver => resolver.address === selectedResolverAddress && resolver.isMultiChain)) &&
         <div>
           <CustomButton
             svgIcon={SVG_PLUS}

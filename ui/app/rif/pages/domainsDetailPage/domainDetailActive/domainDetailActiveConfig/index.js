@@ -7,12 +7,6 @@ import niftyActions from '../../../../../actions';
 import rifActions from '../../../../actions';
 import {pageNames} from '../../../names';
 
-// TODO @fmelo
-// Here you can set the classnames for the entire page
-const styles = {
-
-}
-
 class DomainsDetailConfigurationScreen extends Component {
   static propTypes = {
     domain: PropTypes.object.isRequired,
@@ -82,13 +76,13 @@ class DomainsDetailConfigurationScreen extends Component {
     const { selectedResolverAddress } = this.props;
     const { disableSelect } = this.state;
     return (
-      <div className={''}>
+      <div>
         <span>Resolver</span>
         <p>The Resolver is a Smart Contract responsible for the process of translating names into addresses. You can select a public resolver or a custom resolver.</p>
-        <div id="selectResolver" className={'custom-select'}>
+        <div id="selectResolver">
           <select id="comboResolvers"
                   defaultValue={this.getDefaultSelectedValue(this.state.resolvers, selectedResolverAddress)}
-                  className="select-css" onChange={this.onChangeComboResolvers.bind(this)}
+                  onChange={this.onChangeComboResolvers.bind(this)}
                   disabled={disableSelect}
           >
             <option disabled value={rns.contracts.publicResolver} hidden> Select Resolver </option>

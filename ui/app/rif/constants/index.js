@@ -7,10 +7,18 @@ export const registrationTimeouts = {
 }
 
 export function GET_RESOLVERS () {
-  return ([{
-    name: 'Multi-Chain',
-    address: rifConfig.rns.contracts.multiChainResolver,
-  }]);
+  return ([
+    {
+      name: 'Multi-Chain',
+      address: rifConfig.rns.contracts.multiChainResolver,
+      isMultiChain: true,
+    },
+    {
+      name: 'Public Resolver',
+      address: rifConfig.rns.contracts.publicResolver,
+      isMultiChain: false,
+    },
+  ]);
 }
 const PATH_TO_RIF_IMAGES = '/images/rif/';
 
