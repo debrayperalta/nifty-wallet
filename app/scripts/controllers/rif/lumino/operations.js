@@ -1,6 +1,7 @@
 import web3Utils from 'web3-utils';
 import {checkRequiredParameters, checksumAddresses} from '../utils/general';
 import {isValidRNSDomain} from '../../../../../ui/app/rif/utils/parse';
+import {notifier} from '../../../../../rif.config';
 
 export class LuminoOperations {
 
@@ -51,11 +52,10 @@ export class LuminoOperations {
     return Promise.resolve();
   }
 
-  closeChannel (partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier) {
+  closeChannel (partner, tokenAddress, tokenNetworkAddress, channelIdentifier) {
     const errors = checkRequiredParameters({
       partner,
       tokenAddress,
-      address,
       tokenNetworkAddress,
       channelIdentifier,
     });
@@ -63,11 +63,24 @@ export class LuminoOperations {
       return Promise.reject(errors);
     }
     const params = {
-      ...checksumAddresses({partner, tokenAddress, address, tokenNetworkAddress}),
+      ...checksumAddresses({partner, tokenAddress, tokenNetworkAddress}),
+      address: this.address,
       channelIdentifier,
     };
     console.debug('Requesting to close channel', params);
-    this.lumino.get().actions.closeChannel(params);
+    this.lumino.get().actions.closeChannel(params)
+    return Promise.resolve();
+  }
+
+  deleteChannelFromSdk (channelIdentifier, tokenAddress) {
+    const errors = checkRequiredParameters({
+      channelIdentifier,
+      tokenAddress,
+    });
+    if (errors.length > 0) {
+      return Promise.reject(errors);
+    }
+    this.lumino.get().actions.deleteChannelFromSDK(channelIdentifier, tokenAddress);
     return Promise.resolve();
   }
 
@@ -125,6 +138,35 @@ export class LuminoOperations {
     return Promise.resolve(this.lumino.get().actions.getChannels());
   }
 
+  subscribeToCloseChannel (channelId, tokenAddress) {
+    this.subscribeToCloseChannelForNotifiers(notifier.availableNodes, channelId, tokenAddress);
+    return Promise.resolve();
+  }
+
+  async subscribeToCloseChannelForNotifiers (urls, channelId, tokenAddress) {
+    if (urls && urls.length > 0 && channelId && tokenAddress) {
+      for (const url of urls) {
+        await this.subscribeToCloseChannelForNotifier(url, channelId, tokenAddress);
+      }
+    }
+  }
+
+  async subscribeToCloseChannelForNotifier (url, channelId, tokenAddress) {
+    const errors = checkRequiredParameters({
+      url,
+      channelId,
+      tokenAddress,
+    });
+    if (errors.length > 0) {
+      return Promise.reject(errors);
+    }
+    if (url && tokenAddress) {
+      tokenAddress = web3Utils.toChecksumAddress(tokenAddress);
+      await this.lumino.get().actions.subscribeToUserClosesChannelOnToken(url, tokenAddress);
+      await this.lumino.get().actions.subscribeToPartnerClosesSpecificChannel(url, channelId, tokenAddress);
+    }
+  }
+
   async notifierInitialization (url) {
     if (url) {
       await this.lumino.get().actions.notifierRegistration(url);
@@ -135,8 +177,7 @@ export class LuminoOperations {
   async notifiersInitialization (urls) {
     if (urls && urls.length > 0) {
       for (const url of urls) {
-        await this.lumino.get().actions.notifierRegistration(url);
-        await this.lumino.get().actions.subscribeToOpenChannel(url);
+        await this.notifierInitialization(url);
       }
     }
   }

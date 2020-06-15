@@ -13,7 +13,6 @@ import ethUtils from 'ethereumjs-util';
 import {isValidRNSDomain} from '../../../utils/parse';
 import web3Utils from 'web3-utils';
 import {validateDecimalAmount} from '../../../utils/validations';
-import OpenChannel from '../../../components/lumino/open-channel';
 
 class ModeOption extends Select.Option {
   render () {
