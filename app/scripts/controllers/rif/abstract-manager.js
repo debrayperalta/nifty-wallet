@@ -7,6 +7,7 @@ import ObservableStore from 'obs-store';
 export class AbstractManager {
   constructor (props, initStoreState) {
     this.web3 = props.web3;
+    this.configurationProvider = props.configurationProvider;
     this.transactionController = props.transactionController;
     this.preferencesController = props.preferencesController;
     this.networkController = props.networkController;

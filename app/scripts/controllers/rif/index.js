@@ -3,6 +3,7 @@ import Web3 from 'web3'
 import ComposableObservableStore from './../../lib/ComposableObservableStore'
 import {LuminoManager} from './lumino';
 import {bindOperation} from './utils/general';
+import {RifConfigurationProvider} from './config';
 
 /**
  * RIF Controller
@@ -26,8 +27,14 @@ export default class RifController {
 
     const initState = props.initState || {};
 
+    this.configurationProvider = new RifConfigurationProvider({
+      initState: initState.RifConfigurationProvider,
+      networkController: this.metamaskController.networkController,
+    });
+
     this.rnsManager = new RnsManager({
       initState: initState.RnsManager,
+      configurationProvider: this.configurationProvider,
       preferencesController: this.metamaskController.preferencesController,
       networkController: this.metamaskController.networkController,
       transactionController: this.metamaskController.txController,
@@ -36,6 +43,7 @@ export default class RifController {
 
     this.luminoManager = new LuminoManager({
       initState: initState.LuminoManager,
+      configurationProvider: this.configurationProvider,
       web3: this.web3,
       keyringController: this.metamaskController.keyringController,
       preferencesController: this.metamaskController.preferencesController,
@@ -46,6 +54,7 @@ export default class RifController {
     this.store = new ComposableObservableStore(props.initState, {
       RnsManager: this.rnsManager.store,
       LuminoManager: this.luminoManager.store,
+      RifConfigurationProvider: this.configurationProvider.store,
     });
 
     this.metamaskController.preferencesController.store.subscribe(updatedPreferences => this.preferencesUpdated(updatedPreferences));
@@ -105,6 +114,7 @@ export default class RifController {
    * Event executed when the user unlocks the wallet
    */
   unlocked () {
+    this.configurationProvider.onUnlock();
     this.rnsManager.onUnlock();
     this.luminoManager.onUnlock();
   }
@@ -114,6 +124,7 @@ export default class RifController {
    * @param network the new network state
    */
   onNetworkChanged (network) {
+    this.configurationProvider.onNetworkChanged(network);
     this.rnsManager.onNetworkChanged(network);
     this.luminoManager.onNetworkChanged(network);
   }
@@ -131,6 +142,7 @@ export default class RifController {
    * Cleans the store completely, this can be used by the developer to reset rif state.
    */
   cleanStore () {
+    this.configurationProvider.store.putState({});
     this.rnsManager.store.putState({});
     this.luminoManager.store.putState({});
     return Promise.resolve();
@@ -143,6 +155,7 @@ export default class RifController {
    */
   exposeApi () {
     return {
+      configuration: this.configurationProvider.bindApi(),
       rns: this.rnsManager.bindApi(),
       lumino: this.luminoManager.bindApi(),
       cleanStore: bindOperation(this.cleanStore, this),
