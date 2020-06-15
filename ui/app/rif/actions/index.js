@@ -350,7 +350,6 @@ function showMenu (data) {
 }
 
 function navigateBack () {
-  debugger;
   if (navigationStack && navigationStack.length > 0) {
     // we cleanup the last navigation since it was to the current page
     if (!backNavigated) {
@@ -584,24 +583,20 @@ function onboarding (callbackHandlers = new CallbackHandlers()) {
 }
 
 function handleSdkCallback (callbackName, dispatch, handler = null) {
+  const handlerFunction = async (result) => {
+    if (handler) {
+      await handler(result);
+    }
+  };
   listenToSdkCallback(callbackName, dispatch)
-    .then(result => {
-      if (handler) {
-        handler(result)
-      }
-    })
-    .catch(error => {
-      if (handler) {
-        handler(error);
-      }
-    });
+    .then(result => handlerFunction(result))
+    .catch(error => handlerFunction(error));
 }
 
-function listenToSdkCallback (callbackName, dispatch) {
+function listenToSdkCallback (callbackName) {
   return new Promise((resolve, reject) => {
     background.rif.lumino.listenCallback(callbackName, (error, result) => {
       if (error) {
-        dispatch(niftyActions.displayWarning(error));
         return reject(error);
       }
       return resolve(result);
@@ -610,8 +605,8 @@ function listenToSdkCallback (callbackName, dispatch) {
 }
 
 function listenCallback (callbackName) {
-  return (dispatch) => {
-    return listenToSdkCallback(callbackName, dispatch);
+  return () => {
+    return listenToSdkCallback(callbackName);
   };
 }
 
@@ -675,7 +670,7 @@ function closeChannel (partner, tokenAddress, address, tokenNetworkAddress, chan
   };
 }
 
-function createDeposit (partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, netAmount, callbackHandlers = new CallbackHandlers()) {
+function createDeposit (partner, tokenAddress, tokenNetworkAddress, channelIdentifier, netAmount, callbackHandlers = new CallbackHandlers()) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       if (callbackHandlers && callbackHandlers.requestHandler) {
@@ -687,7 +682,7 @@ function createDeposit (partner, tokenAddress, address, tokenNetworkAddress, cha
       if (callbackHandlers && callbackHandlers.errorHandler) {
         handleSdkCallback(lumino.callbacks.FAILED_DEPOSIT_CHANNEL, dispatch, callbackHandlers.errorHandler);
       }
-      background.rif.lumino.createDeposit(partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, netAmount, (error) => {
+      background.rif.lumino.createDeposit(partner, tokenAddress, tokenNetworkAddress, channelIdentifier, netAmount, (error) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
@@ -724,29 +719,19 @@ function createPayment (partner, tokenAddress, netAmount, callbackHandlers = new
   };
 }
 
-function getSDKChannels () {
-  background.rif.lumino.getChannels((error, channels) => {
-    if (error) {
-      return {error};
-    }
-    return {channels};
-  });
-}
-
 function getChannels () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       if (rifConfig.mocksEnabled) {
         return resolve(mocks.channels);
       } else {
-        getSDKChannels().then(({error, channels}) => {
+        background.rif.lumino.getChannels((error, channels) => {
           if (error) {
             dispatch(niftyActions.displayWarning(error));
             return reject(error)
           }
           return resolve(channels);
         });
-
       }
     });
   };
@@ -805,15 +790,42 @@ function getTokensWithJoinedCheck () {
 function getLuminoNetworks (userAddress) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
+      // TODO: Delete this mock config when we do not need it anymore;
+      if (rifConfig.mocksEnabled) {
+        const networkMock1 = {
+          symbol: 'MRIF',
+          networkTokenAddress: '0x1234',
+          name: 'Mock RIF',
+          networkAddress: '0x12345',
+          channels: 20,
+          nodes: 5,
+          userChannels: 0,
+        }
+        const networkMock2 = {
+          symbol: 'MDoC',
+          networkTokenAddress: '0x12234',
+          name: 'Mock DoC',
+          networkAddress: '0x122345',
+          channels: 20,
+          nodes: 5,
+          userChannels: 2,
+        }
+        const networksMock = {
+          withChannels: [networkMock2],
+          withoutChannels: [networkMock1],
+        }
+        resolve(networksMock);
+      }
       dispatch(this.getTokens()).then(tokens => {
         const networks = {
           withChannels: [],
           withoutChannels: [],
         }
         tokens.forEach(t => {
-          console.warn(t);
           const network = {
             symbol: t.symbol,
+            networkTokenAddress: t.address,
+            name: t.name,
             networkAddress: t.network_address,
             channels: t.channels.length,
             nodes: 0,
@@ -844,40 +856,49 @@ function getLuminoNetworks (userAddress) {
   };
 }
 
-function getUserChannelsInNetwork (tokenNetworkAddress) {
+function getUserChannelsInNetwork (tokenAddress) {
   // TODO: Replace the implementation with a direct fetch of the SDK
   return (dispatch) => new Promise((resolve, reject) => {
+      if (rifConfig.mocksEnabled) {
+        if (tokenAddress !== '0x12234') {
+          return resolve([]);
+        }
+        const mockData = [
+          {
+            balance: '100000000000',
+            partner_address: '0x460218fcd497991b380f38b77c61334ad442e7f6',
+            channel_identifier: 1,
+            state: 'Open',
+          },
+          {
+            balance: '1000000000000000000000000',
+            channel_identifier: 2,
+            state: 'Open',
+            token_network_identifier: '0x41a34C1B6035E89FAdecb445dbAFe5804BC13a8E',
+            partner_address: '0xd7387C9b5a2860bFb6e8E8F36c8983B0469C6d18',
+          },
+        ]
+        return resolve(mockData);
+      }
 
-    const mockData = [
-      {
-        balance: '100000000000',
-        partner_address: '0x460218fcd497991b380f38b77c61334ad442e7f6',
-        channel_identifier: 1,
-        state: 'Open',
-      },
-      {
-        balance: '10000000000000000',
-        channel_identifier: 2,
-        state: 'Open',
-        token_network_identifier: '0x41a34C1B6035E89FAdecb445dbAFe5804BC13a8E',
-        partner_address: '0xd7387C9b5a2860bFb6e8E8F36c8983B0469C6d18',
-      },
-    ]
-    return resolve(mockData);
-    // dispatch(getChannels().then(({error, channels}) => {
-    //   if (error) {
-    //     dispatch(niftyActions.displayWarning(error));
-    //     return reject(error);
-    //   }
-    //   if (channels) {
-    //     // We get only the values, since these are the ones we care about
-    //     const channelsArr = Object.values(channels).filter(ch => ch.token_network_identifier === tokenNetworkAddress);
-    //     return resolve(channelsArr);
-    //   }
-    //   return resolve([])
-    // }))
-  })
+      background.rif.lumino.getChannels((error, channels) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        if (channels) {
+          // We get only the values, since these are the ones we care about
+          const channelsArr = Object.values(channels).filter(ch => ch.token_address.toLowerCase() === tokenAddress);
+          return resolve(channelsArr);
+        }
+        return resolve([])
+      });
 
+    }
+
+    ,
+  )
+    ;
 }
 
 function cleanStore () {
@@ -951,4 +972,4 @@ function createNetworkPayment (network, destination, amountInWei) {
   };
 }
 
-module.exports = rifActions
+module.exports = rifActions;
