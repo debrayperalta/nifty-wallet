@@ -26,7 +26,12 @@ function isValidRNSDomain (value) {
   return !!value.match('.*\\.rsk');
 }
 
+function parseLuminoError (error) {
+  return error && error.response && error.response.data && error.response.data.errors && error.response.data.errors ? error.response.data.errors : null;
+}
+
 export {
+  parseLuminoError,
   cleanDomainName,
   getBalanceInEth,
   isValidRNSDomain,
