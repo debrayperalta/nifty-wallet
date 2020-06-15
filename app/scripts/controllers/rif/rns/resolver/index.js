@@ -201,6 +201,29 @@ export default class RnsResolver extends RnsJsDelegate {
       resolve(transactionListener.id);
     });
   }
+  /* TODO Rodrigo
+  This is the hashing for the subdomain so we can set the address correctly, need to re-do this for the getChainAddresses too
+  setChainAddressForResolver (domainName, chain, chainAddress) {
+  return new Promise((resolve, reject) => {
+    const toBeSettedChainAddress = chainAddress || rns.zeroAddress;
+    console.debug('Im here');
+    const node = rskNameHash('lebron.rsk');
+    console.debug('Im here2');
+    const label = web3Utils.sha3('subdomain');
+    console.debug('Im here3');
+    const subnode = web3Utils.soliditySha3(node, label);
+    console.debug('Im her4');
+    const transactionListener = this.send(this.multiChainresolverContractInstance, 'setChainAddr', [subnode, chain, toBeSettedChainAddress])
+    transactionListener.transactionConfirmed()
+      .then(transactionReceipt => {
+        console.debug('setChainAddressForResolver success', transactionReceipt);
+      }).catch(transactionReceiptOrError => {
+        console.debug('Error when trying to set chain address for resolver', transactionReceiptOrError);
+      });
+    resolve(transactionListener.id);
+  });
+}
+   */
 
   /**
   * Returns a status for the days remaining of a domain

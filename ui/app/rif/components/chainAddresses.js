@@ -17,10 +17,11 @@ class ChainAddresses extends Component {
   static propTypes = {
     domainName: PropTypes.string.isRequired,
     setChainAddressForResolver: PropTypes.func.isRequired,
-    pageName: PropTypes.string.isRequired,
+    redirectPage: PropTypes.string.isRequired,
     showThis: PropTypes.func.isRequired,
     redirectParams: PropTypes.any.isRequired,
     isOwner: PropTypes.bool.isRequired,
+    subdomainName: PropTypes.string,
     selectedResolverAddress: PropTypes.string,
     getChainAddresses: PropTypes.func,
     newChainAddresses: PropTypes.array,
@@ -44,7 +45,7 @@ class ChainAddresses extends Component {
     };
   }
 
-  componentDidMount () {;
+  componentDidMount () {
     this.loadChainAddresses();
   }
 
@@ -57,8 +58,9 @@ class ChainAddresses extends Component {
   }
 
   async loadChainAddresses () {
+    console.debug('=================================================================this.props.redirectParams', this.props.redirectParams);
     if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {
-      const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
+      const chainAddresses = await this.props.getChainAddresses(this.props.subdomainName || this.props.domainName);
       this.setState({chainAddresses: chainAddresses});
     } else if (rifConfig.mocksEnabled) {
       const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
@@ -99,13 +101,13 @@ class ChainAddresses extends Component {
   async addAddress (address = null, chainAddress = null) {
     const insertedAddress = address || this.state.insertedAddress;
     const selectedChainAddress = chainAddress || this.state.selectedChainAddress;
-    const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, selectedChainAddress, insertedAddress);
+    const transactionListenerId = await this.props.setChainAddressForResolver(this.props.subdomainName || this.props.domainName, selectedChainAddress, insertedAddress);
     this.props.waitForListener(transactionListenerId)
       .then(async (transactionReceipt) => {
         if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {
-          const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
+          const chainAddresses = await this.props.getChainAddresses(this.props.subdomainName || this.props.domainName);
           this.props.showThis(
-            this.props.pageName,
+            this.props.redirectPage,
             {
               ...this.props.redirectParams,
               newChainAddresses: chainAddresses,
@@ -115,7 +117,7 @@ class ChainAddresses extends Component {
     this.props.showTransactionConfirmPage({
       action: () => {
         this.props.showThis(
-          this.props.pageName,
+          this.props.redirectPage,
           this.props.redirectParams)
       },
     });
@@ -126,7 +128,7 @@ class ChainAddresses extends Component {
   }
 
   render () {
-    const { isOwner, selectedResolverAddress, pageName, paginationSize, classes } = this.props;
+    const { isOwner, selectedResolverAddress, redirectPage, paginationSize, classes } = this.props;
     const { resolvers } = this.state;
     const data = this.convertChainAddressesToTableData();
     return (
@@ -175,7 +177,7 @@ class ChainAddresses extends Component {
             updateAddress={this.updateAddress.bind(this)}
             slipChainAddresses={this.state.slipChainAddresses}
             confirmCallback={this.addAddress.bind(this)}
-            pageName={pageName}
+            pageName={redirectPage}
           />
           }
         </div>
@@ -188,6 +190,9 @@ function mapStateToProps (state) {
   const params = state.appState.currentView.params;
   return {
     ...params,
+    redirectParams: {
+      ...params,
+    },
   }
 }
 

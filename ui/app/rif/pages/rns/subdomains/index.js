@@ -149,6 +149,7 @@ class Subdomains extends Component {
         <div id="chainAddressesBody">
           <ChainAddresses
             domainName={domainName}
+            subdomainName={displayName}
             selectedResolverAddress={selectedResolverAddress}
             paginationSize={3}
             classes={styles.chainAddresses}
@@ -158,7 +159,7 @@ class Subdomains extends Component {
               ...this.props,
               newChainAddresses: newChainAddresses,
             }}
-            pageName={pageNames.rns.subdomains}
+            redirectPage={pageNames.rns.subdomains}
           />
         </div>
         }

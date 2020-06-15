@@ -174,7 +174,7 @@ class DomainsDetailActiveScreen extends Component {
                 status: this.props.domain.status,
                 newChainAddresses: newChainAddresses,
               }}
-              pageName={pageNames.rns.domainsDetail}
+              redirectPage={pageNames.rns.domainsDetail}
             />
           </div>
           }
