@@ -62,6 +62,8 @@ const rifActions = {
   createNetworkPayment,
   getDomainAddress,
   subscribeToCloseChannel,
+  getConfiguration,
+  setConfiguration,
 }
 
 let background = null;
@@ -887,5 +889,34 @@ function subscribeToCloseChannel (channelId, tokenAddress) {
     });
   };
 }
+
+function getConfiguration () {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.configuration.getConfiguration((error, configuration) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(configuration);
+      });
+    });
+  };
+}
+
+function setConfiguration (configuration) {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.configuration.setConfiguration(configuration, (error) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve();
+      });
+    });
+  };
+}
+
 
 module.exports = rifActions

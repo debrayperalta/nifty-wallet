@@ -22,7 +22,7 @@ export class RifConfigurationProvider {
     const actualState = this.store.getState();
     if (!actualState.rifConfiguration) {
       actualState.rifConfiguration = this.getInitialConfigStructure(chainId);
-      this.store.setState(actualState);
+      this.store.putState(actualState);
       return true;
     } else {
       const configuration = actualState.rifConfiguration;
@@ -62,7 +62,7 @@ export class RifConfigurationProvider {
    */
   getInitialConfigStructure (chainId) {
     switch (chainId) {
-      case 30: // RSK Mainnet
+      case '30': // RSK Mainnet
         return {
           lumino: {
             hub: {
@@ -87,7 +87,7 @@ export class RifConfigurationProvider {
           },
           mocksEnabled: false,
         };
-      case 31: // RSK Testnet
+      case '31': // RSK Testnet
         return {
           lumino: {
             hub: {
@@ -112,7 +112,7 @@ export class RifConfigurationProvider {
           },
           mocksEnabled: false,
         };
-      case 33: // RSK Regtest
+      case '33': // RSK Regtest
         return {
           lumino: {
             hub: {
@@ -169,8 +169,8 @@ export class RifConfigurationProvider {
   setConfigurationObject (configuration) {
     const actualState = this.store.getState();
     if (this.validateConfiguration(configuration)) {
-      actualState.rifconfiguration = configuration;
-      this.store.setState(actualState);
+      actualState.rifConfiguration = configuration;
+      this.store.putState(actualState);
     } else {
       throw new Error('Invalid configuration provided');
     }

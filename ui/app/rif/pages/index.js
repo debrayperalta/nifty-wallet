@@ -19,6 +19,7 @@ import ToastComponent from '../../../../old-ui/app/components/toast';
 import ErrorComponent from '../../../../old-ui/app/components/error';
 import LuminoHome from './lumino/index';
 import {pageNames} from './names';
+import RifConfiguration from './configuration';
 
 function getSearchBarComponent (show) {
   if (!show) {
@@ -67,6 +68,12 @@ function buildTabs (screenName, tabOptions) {
 }
 
 function buildTabScreen (screenName, context, dispatch) {
+  if (screenName === pageNames.configuration) {
+    return (<div>
+              <ToastComponent />
+              <RifConfiguration />
+            </div>);
+  }
   const tabOptions = context.params.tabOptions;
   const tabs = buildTabs(screenName, tabOptions, dispatch);
   const onTabChange = (tab) => {

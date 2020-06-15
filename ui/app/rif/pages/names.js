@@ -16,6 +16,7 @@ const pageNames = {
   lumino: {
     home: 'luminoHome',
   },
+  configuration: 'rifConfiguration',
 }
 
 export {

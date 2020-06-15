@@ -3,7 +3,7 @@ import Web3 from 'web3'
 import ComposableObservableStore from './../../lib/ComposableObservableStore'
 import {LuminoManager} from './lumino';
 import {bindOperation} from './utils/general';
-import {RifConfigurationProvider} from './config';
+import {RifConfigurationProvider} from './configuration';
 
 /**
  * RIF Controller

@@ -1,8 +1,11 @@
+import {pageNames} from '../../ui/app/rif/pages';
+
 const Component = require('react').Component
 const h = require('react-hyperscript')
 const connect = require('react-redux').connect
 import PropTypes from 'prop-types'
 const actions = require('../../ui/app/actions')
+const rifActions = require('../../ui/app/rif/actions');
 const LoadingIndicator = require('./components/loading')
 const Web3 = require('web3')
 const infuraCurrencies = require('./infura-conversion.json').objects.sort((a, b) => {
@@ -41,6 +44,7 @@ class ConfigScreen extends Component {
     revealSeedConfirmation: PropTypes.func,
     resetAccount: PropTypes.func,
     setCurrentCurrency: PropTypes.func,
+    openRifConfiguration: PropTypes.func,
   }
 
   constructor (props) {
@@ -244,6 +248,18 @@ class ConfigScreen extends Component {
                 },
               }, 'Change password'),
             ]),
+            h('div', [
+              h('p.config-title', `RIF Configuration`),
+              h('p.config-description', `This is for rif configuration only.`),
+              h('button.btn-spread', {
+                style: {
+                  alignSelf: 'center',
+                },
+                onClick (event) {
+                  props.openRifConfiguration();
+                },
+              }, 'Manage Configuration'),
+            ]),
           ]),
         ]),
       ])
@@ -370,6 +386,12 @@ const mapDispatchToProps = dispatch => {
     confirmChangePassword: () => dispatch(actions.confirmChangePassword()),
     resetAccount: () => dispatch(actions.resetAccount()),
     revealSeedConfirmation: () => dispatch(actions.revealSeedConfirmation()),
+    openRifConfiguration: () => dispatch(rifActions.navigateTo(pageNames.configuration, {
+      tabOptions: {
+        showBack: false,
+        showTitle: false,
+      },
+    })),
   }
 }
 
