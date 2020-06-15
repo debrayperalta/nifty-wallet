@@ -60,10 +60,10 @@ class ChainAddresses extends Component {
   async loadChainAddresses () {
     console.debug('=================================================================this.props.redirectParams', this.props.redirectParams);
     if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {
-      const chainAddresses = await this.props.getChainAddresses(this.props.subdomainName || this.props.domainName);
+      const chainAddresses = await this.props.getChainAddresses(this.props.domainName, this.props.subdomainName);
       this.setState({chainAddresses: chainAddresses});
     } else if (rifConfig.mocksEnabled) {
-      const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
+      const chainAddresses = await this.props.getChainAddresses(this.props.domainName, this.props.subdomainName);
       this.setState({chainAddresses: chainAddresses});
     }
   }
@@ -101,11 +101,11 @@ class ChainAddresses extends Component {
   async addAddress (address = null, chainAddress = null) {
     const insertedAddress = address || this.state.insertedAddress;
     const selectedChainAddress = chainAddress || this.state.selectedChainAddress;
-    const transactionListenerId = await this.props.setChainAddressForResolver(this.props.subdomainName || this.props.domainName, selectedChainAddress, insertedAddress);
+    const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, selectedChainAddress, insertedAddress, this.props.subdomainName);
     this.props.waitForListener(transactionListenerId)
       .then(async (transactionReceipt) => {
         if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {
-          const chainAddresses = await this.props.getChainAddresses(this.props.subdomainName || this.props.domainName);
+          const chainAddresses = await this.props.getChainAddresses(this.props.domainName, this.props.subdomainName);
           this.props.showThis(
             this.props.redirectPage,
             {
@@ -198,8 +198,8 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    getChainAddresses: (domainName) => dispatch(rifActions.getChainAddresses(domainName)),
-    setChainAddressForResolver: (domainName, chain, chainAddress) => dispatch(rifActions.setChainAddressForResolver(domainName, chain, chainAddress)),
+    getChainAddresses: (domainName, subdomain) => dispatch(rifActions.getChainAddresses(domainName, subdomain)),
+    setChainAddressForResolver: (domainName, chain, chainAddress, subdomain) => dispatch(rifActions.setChainAddressForResolver(domainName, chain, chainAddress, subdomain)),
     showThis: (pageName, props) => dispatch(rifActions.navigateTo(pageName, props)),
     waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),

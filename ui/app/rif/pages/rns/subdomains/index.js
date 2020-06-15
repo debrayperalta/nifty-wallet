@@ -149,7 +149,7 @@ class Subdomains extends Component {
         <div id="chainAddressesBody">
           <ChainAddresses
             domainName={domainName}
-            subdomainName={displayName}
+            subdomainName={subdomain.name}
             selectedResolverAddress={selectedResolverAddress}
             paginationSize={3}
             classes={styles.chainAddresses}
