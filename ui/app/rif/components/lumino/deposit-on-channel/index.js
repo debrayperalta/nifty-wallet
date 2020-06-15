@@ -42,7 +42,7 @@ class DepositOnChannel extends Component {
     return (
       <div>
         <div className="form-segment">
-          <input className="amount-input"
+          <input className="amount-input amount-input--deposit-channel"
                  type="text"
                  placeholder={this.props.tokenSymbol + ' Amount'}
                  onKeyDown={event => this.validateAmount(event)}
