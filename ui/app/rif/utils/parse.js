@@ -16,7 +16,7 @@ function cleanDomainName (domainName) {
  * @returns the balance expressed in Eth
  */
 function getBalanceInEth (balanceInWei) {
-  return utils.fromWei(balanceInWei);
+  return utils.fromWei(String(balanceInWei));
 }
 
 function isValidRNSDomain (value) {
