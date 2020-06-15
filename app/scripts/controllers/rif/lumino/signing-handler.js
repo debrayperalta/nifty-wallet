@@ -1,13 +1,25 @@
 import ethUtils from 'ethereumjs-util';
 import Transaction from 'ethereumjs-tx';
+import web3Utils from 'web3-utils';
+import {Wallet} from 'ethers';
 /**
  * Custom signing handler for lumino client using our sign controller.
  */
 export class LuminoSigningHandler {
   constructor (props) {
-    this.address = props.address;
+    this.address = web3Utils.toChecksumAddress(props.address);
     this.keyringController = props.keyringController;
     this.transactionController = props.transactionController;
+  }
+
+  async initialize () {
+    const privateKey = await this.keyringController.exportAccount(this.address);
+    this.wallet = new Wallet(privateKey);
+  }
+
+  async updateAddress (newAddress) {
+    this.address = web3Utils.toChecksumAddress(newAddress);
+    await this.initialize();
   }
 
   async sign (rawTx) {
@@ -22,19 +34,6 @@ export class LuminoSigningHandler {
   }
 
   async offChainSign (plainOrByteMessage) {
-    let message;
-    try {
-      message = ethUtils.toBuffer(plainOrByteMessage);
-    } catch (error) {
-      console.debug(error);
-      message = plainOrByteMessage;
-    }
-    const messageHash = ethUtils.hashPersonalMessage(message);
-    const offChainSign = await this.keyringController.signMessage({
-      from: this.address,
-      data: messageHash,
-    });
-    console.debug('Lumino Signed Message', offChainSign);
-    return offChainSign;
+    return await this.wallet.signMessage(plainOrByteMessage);
   }
 }

@@ -1,5 +1,5 @@
 import {Lumino} from '@rsksmart/lumino-light-client-sdk';
-import {lumino} from '../../../../../rif.config';
+import {lumino, rns, notifier} from '../../../../../rif.config';
 import {LuminoSigningHandler} from './signing-handler';
 import {AbstractManager} from '../abstract-manager';
 import {bindOperation, isRskNetwork} from '../utils/general';
@@ -19,7 +19,10 @@ export class LuminoManager extends AbstractManager {
       apiKey: null,
     });
     this.lumino = Lumino;
-    this.operations = new LuminoOperations(this.lumino);
+    this.operations = new LuminoOperations({
+      lumino: this.lumino,
+      address: this.address,
+    });
     this.callbacks = new LuminoCallbacks(this.lumino);
     this.keyringController = props.keyringController;
     this.signingHandler = new LuminoSigningHandler({
@@ -37,7 +40,9 @@ export class LuminoManager extends AbstractManager {
         rskEndpoint: this.network.rskEndpoint,
         hubEndpoint: lumino.hub.endpoint,
         address: ethUtils.toChecksumAddress(this.address),
+        registryAddress: rns.contracts.rns,
       };
+      await this.signingHandler.initialize();
       const signingHandler = {
         sign: (tx) => this.signingHandler.sign(tx),
         offChainSign: (byteMessage) => this.signingHandler.offChainSign(byteMessage),
@@ -55,16 +60,20 @@ export class LuminoManager extends AbstractManager {
       }
       await this.lumino.init(signingHandler, storageHandler, configParams);
       const state = this.store.getState();
-      if (state.apiKey && !cleanApiKey) {
-        await this.operations.setApiKey(state.apiKey);
-        await this.operations.onboarding();
-      } else {
-        await this.operations.onboarding();
-        state.apiKey = await this.operations.getApiKey();
-        this.store.putState(state);
-      }
+        if (state.apiKey && !cleanApiKey) {
+          await this.operations.setApiKey(state.apiKey);
+        } else {
+          await this.operations.onboarding();
+          state.apiKey = await this.operations.getApiKey();
+          this.store.putState(state);
+        }
+      await this.afterInitialization();
     }
   };
+
+  async afterInitialization () {
+    await this.operations.notifiersInitialization(notifier.availableNodes);
+  }
 
   onUnlock () {
     super.onUnlock();
@@ -79,7 +88,10 @@ export class LuminoManager extends AbstractManager {
   onAddressChanged (address) {
     super.onAddressChanged(address);
     if (this.signingHandler) {
-      this.signingHandler.address = address;
+      this.signingHandler.updateAddress(address);
+    }
+    if (this.operations) {
+      this.operations.updateAddress(address);
     }
     this.initializeLumino(true);
   }
@@ -89,6 +101,8 @@ export class LuminoManager extends AbstractManager {
       onboarding: bindOperation(this.operations.onboarding, this.operations),
       openChannel: bindOperation(this.operations.openChannel, this.operations),
       closeChannel: bindOperation(this.operations.closeChannel, this.operations),
+      subscribeToCloseChannel: bindOperation(this.operations.subscribeToCloseChannel, this.operations),
+      deleteChannelFromSDK: bindOperation(this.operations.deleteChannelFromSdk, this.operations),
       createDeposit: bindOperation(this.operations.createDeposit, this.operations),
       createPayment: bindOperation(this.operations.createPayment, this.operations),
       getChannels: bindOperation(this.operations.getChannels, this.operations),

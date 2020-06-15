@@ -1,0 +1,13 @@
+.channel-chiplet {
+  width: 100%;
+  text-align: center;
+  border-radius: 3em;
+}
+.channel-chiplet-open {
+  background-color: #2aa147;
+  color: white;
+}
+.channel-chiplet-close {
+  background-color: #ff0119;
+  color: white;
+}

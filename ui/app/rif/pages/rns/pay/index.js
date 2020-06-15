@@ -9,6 +9,10 @@ import Select from 'react-select';
 import rifActions from '../../../actions';
 import niftyActions from '../../../../../../ui/app/actions';
 import {connect} from 'react-redux';
+import ethUtils from 'ethereumjs-util';
+import {isValidRNSDomain} from '../../../utils/parse';
+import web3Utils from 'web3-utils';
+import {validateDecimalAmount} from '../../../utils/validations';
 
 class ModeOption extends Select.Option {
   render () {
@@ -84,6 +88,7 @@ class Pay extends Component {
     getTokens: PropTypes.func,
     showPopup: PropTypes.func,
     showToast: PropTypes.func,
+    getDomainAddress: PropTypes.func,
   }
 
   constructor (props) {
@@ -114,7 +119,8 @@ class Pay extends Component {
 
   getAllowedNetworks () {
     return SLIP_ADDRESSES.filter(network => {
-      return network.symbol === 'ETH' || network.symbol === 'RBTC';
+      // return network.symbol === 'ETH' || network.symbol === 'RBTC';
+      return network.symbol === 'RBTC';
     });
   }
 
@@ -150,28 +156,8 @@ class Pay extends Component {
   }
 
   validateAmount (event) {
-    const keyCode = event.keyCode;
-    const key = event.key;
     const decimalSeparator = this.props.decimalSeparator ? this.props.decimalSeparator : this.defaultDecimalSeparator;
-    const isValidNumber = key === decimalSeparator ||
-      (keyCode >= 96 && keyCode <= 105) || // numpad numbers
-      (keyCode >= 48 && keyCode <= 59) || // keyboard numbers
-      keyCode === 8; // backspace
-    if (!isValidNumber) {
-      // if it's not a valid number we block
-      event.preventDefault();
-      event.stopPropagation();
-      return false;
-    }
-    if (key === decimalSeparator) {
-      const currentAmount = this.state.amount ? this.state.amount : '';
-      // if we have already a decimal separator we block
-      if (currentAmount.indexOf(decimalSeparator) !== -1) {
-        event.preventDefault();
-        event.stopPropagation();
-        return false;
-      }
-    }
+    return validateDecimalAmount(event, this.state.amount, decimalSeparator);
   }
 
   changeAmount (event) {
@@ -194,7 +180,20 @@ class Pay extends Component {
       confirmLabel: 'Pay',
       confirmCallback: async () => {
         if (this.state.selectedNetwork && this.state.destination && this.state.amount) {
-          this.props.sendNetworkPayment(this.state.selectedNetwork, this.state.destination, this.state.amount);
+          if (this.state.amount <= 0) {
+            this.props.showToast('Amount has to be greater than 0.', false);
+          }
+          if (!ethUtils.isValidChecksumAddress(this.state.destination) && !isValidRNSDomain(this.state.destination)) {
+            this.props.showToast('Destination has to be a valid checksum address.', false);
+          }
+          if (this.state.amount > 0 && (ethUtils.isValidChecksumAddress(this.state.destination) || isValidRNSDomain(this.state.destination))) {
+            let destination = this.state.destination;
+            if (isValidRNSDomain(destination)) {
+              destination = await this.props.getDomainAddress(destination);
+            }
+            const amountInWei = web3Utils.toWei(this.state.amount);
+            this.props.sendNetworkPayment(this.state.selectedNetwork, destination, amountInWei);
+          }
         } else {
           this.props.showToast('You need to select a network and put the partner and amount first.', false);
         }
@@ -260,14 +259,14 @@ class Pay extends Component {
         <span>To:</span>
         <input className="domain-address-input" type="text" placeholder="Enter address / domain" onChange={(event) => this.changeDestination(event)}/>
         <span>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="3.5" y="3.5" width="9" height="9" stroke="#979797"/>
-              <path d="M1 5V1H5" stroke="#979797"/>
-              <path d="M15 11L15 15L11 15" stroke="#979797"/>
-              <path d="M11 1L15 1L15 5" stroke="#979797"/>
-              <path d="M5 15L1 15L1 11" stroke="#979797"/>
-            </svg>
-          </span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3.5" y="3.5" width="9" height="9" stroke="#979797"/>
+            <path d="M1 5V1H5" stroke="#979797"/>
+            <path d="M15 11L15 15L11 15" stroke="#979797"/>
+            <path d="M11 1L15 1L15 5" stroke="#979797"/>
+            <path d="M5 15L1 15L1 11" stroke="#979797"/>
+          </svg>
+        </span>
       </div>
     );
   }
@@ -283,7 +282,7 @@ class Pay extends Component {
         </div>
         {this.getDestinationFragment()}
         <div className="form-segment">
-          <button className="btn-primary btn-pay"  disabled={!this.readyToPay()} onClick={() => this.sendNetworkPayment()}>Pay</button>
+          <button className="btn-primary btn-pay" disabled={!this.readyToPay()} onClick={() => this.sendNetworkPayment()}>Pay</button>
         </div>
       </div>
     );
@@ -364,8 +363,9 @@ function mapDispatchToProps (dispatch) {
     sendLuminoPayment: (token, destination, amount, callbackHandlers) => {
       return dispatch(rifActions.createPayment(destination, token.address, amount, callbackHandlers));
     },
-    sendNetworkPayment: (network, destination, amount) => {
-      console.log('Network Payment', {network, destination, amount});
+    sendNetworkPayment: async (network, destination, amountInWei) => {
+      await dispatch(rifActions.createNetworkPayment(network, destination, amountInWei));
+      dispatch(rifActions.goToConfirmPageForLastTransaction());
     },
     getTokens: () => dispatch(rifActions.getTokensWithJoinedCheck()),
     showPopup: (title, opts) => {
@@ -375,6 +375,7 @@ function mapDispatchToProps (dispatch) {
       }));
     },
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
+    getDomainAddress: (domainName) => dispatch(rifActions.getDomainAddress(domainName)),
   }
 }
 module.exports = connect(mapStateToProps, mapDispatchToProps)(Pay)

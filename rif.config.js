@@ -1,4 +1,3 @@
-// This is file is going to be overwritten by gulp, to setup you can use the folde rif/rif.config.someenvironment.js files to specify your setup.
 module.exports = {
   lumino: {
     hub: {
@@ -7,6 +6,9 @@ module.exports = {
     explorer: {
       endpoint: '',
     },
+  },
+  notifier: {
+    availableNodes: [],
   },
   rns: {
     contracts: {
@@ -24,4 +26,5 @@ module.exports = {
       stringResolver: '',
     },
   },
+  mocksEnabled: false,
 }

@@ -58,8 +58,7 @@ class ChainAddresses extends Component {
   }
 
   async loadChainAddresses () {
-    console.debug('=================================================================this.props.redirectParams', this.props.redirectParams);
-    if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {
+  if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress && resolver.isMultiChain)) {
       const chainAddresses = await this.props.getChainAddresses(this.props.domainName, this.props.subdomainName);
       this.setState({chainAddresses: chainAddresses});
     } else if (rifConfig.mocksEnabled) {
@@ -157,7 +156,7 @@ class ChainAddresses extends Component {
             <span>No addresses found</span>
           </div>
         }
-        {(isOwner && resolvers.find(resolver => resolver.address === selectedResolverAddress)) &&
+        {(isOwner && resolvers.find(resolver => resolver.address === selectedResolverAddress && resolver.isMultiChain)) &&
         <div>
           <CustomButton
             svgIcon={SVG_PLUS}
