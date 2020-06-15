@@ -3,7 +3,7 @@ import extend from 'xtend';
 import {lumino} from '../../../../app/scripts/controllers/rif/constants';
 import {CallbackHandlers} from './callback-handlers';
 import ethUtils from 'ethereumjs-util';
-import { sumValuesOfArray } from '../utils/utils';
+import {sumValuesOfArray} from '../utils/utils';
 import rifConfig from '../../../../rif.config';
 import {mocks} from './mocks';
 import {parseLuminoError} from '../utils/parse';
@@ -778,14 +778,10 @@ function getTokensWithJoinedCheck () {
           const channels = Object.keys(channelObject).map(channelKey => channelObject[channelKey]);
           tokens.map(token => {
             const tokenJoined = token;
-            tokenJoined.openedChannels = channels.filter(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address));
-            if (channels.find(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address))) {
-              tokenJoined.joined = true;
-            } else {
-              tokenJoined.joined = false;
-            }
-            const userBalance = sumValuesOfArray(tokenJoined.openedChannels, 'balance');
-            tokenJoined.userBalance = userBalance;
+            tokenJoined.openedChannels = channels.filter(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address) &&
+                channel.sdk_status === 'CHANNEL_OPENED');
+            tokenJoined.joined = !!channels.find(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address));
+            tokenJoined.userBalance = sumValuesOfArray(tokenJoined.openedChannels, 'balance');
             tokensJoined.push(tokenJoined);
           });
           resolve(tokensJoined);
