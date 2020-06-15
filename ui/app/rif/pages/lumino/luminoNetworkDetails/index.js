@@ -29,8 +29,8 @@ class LuminoNetworkDetails extends Component {
 
 
   async componentDidMount () {
-    const {getUserChannels} = this.props;
-    const userChannels = await getUserChannels();
+    const {getUserChannels, networkTokenAddress} = this.props;
+    const userChannels = await getUserChannels(networkTokenAddress);
     if (userChannels && userChannels.length) return this.setState({userChannels, loading: false})
     // TODO: Run again a function to resolve addresses to RNS domains
     return this.setState({loading: false})
@@ -38,7 +38,6 @@ class LuminoNetworkDetails extends Component {
 
   render () {
     const {networkSymbol, networkName, networkAddress, networkTokenAddress} = this.props;
-    debugger;
     const {userChannels, loading} = this.state;
     return (
       <div className="body">
