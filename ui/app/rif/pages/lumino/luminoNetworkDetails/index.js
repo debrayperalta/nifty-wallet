@@ -27,11 +27,15 @@ class LuminoNetworkDetails extends Component {
     }
   }
 
-
-  async componentDidMount () {
+  reloadChannelsData = async () => {
     const {getUserChannels, networkTokenAddress} = this.props;
     const userChannels = await getUserChannels(networkTokenAddress);
     if (userChannels && userChannels.length) return this.setState({userChannels, loading: false})
+  }
+
+
+  async componentDidMount () {
+    await this.reloadChannelsData();
     // TODO: Run again a function to resolve addresses to RNS domains
     return this.setState({loading: false})
   }
@@ -63,6 +67,8 @@ class LuminoNetworkDetails extends Component {
           tokenAddress={networkTokenAddress}
           tokenNetworkAddress={networkAddress}
           tokenName={networkName}
+          afterChannelCreated={this.reloadChannelsData}
+          afterDepositCreated={this.reloadChannelsData}
           tokenSymbol={networkSymbol}/>
       </div>
     );
