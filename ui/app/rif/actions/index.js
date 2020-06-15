@@ -6,6 +6,8 @@ import ethUtils from 'ethereumjs-util';
 import { sumValuesOfArray } from '../utils/utils';
 import rifConfig from '../../../../rif.config';
 import {mocks} from './mocks';
+import {parseLuminoError} from '../utils/parse';
+import web3Utils from 'web3-utils';
 
 const rifActions = {
   SHOW_MODAL: 'SHOW_MODAL',
@@ -46,6 +48,7 @@ const rifActions = {
   onboarding,
   openChannel,
   closeChannel,
+  deleteChannelFromSdk,
   getChannels,
   getAvailableCallbacks,
   getTokensWithJoinedCheck,
@@ -58,6 +61,7 @@ const rifActions = {
   setupDefaultLuminoCallbacks,
   createNetworkPayment,
   getDomainAddress,
+  subscribeToCloseChannel,
 }
 
 let background = null;
@@ -643,7 +647,7 @@ function openChannel (partner, tokenAddress, callbackHandlers = new CallbackHand
   };
 }
 
-function closeChannel (partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, callbackHandlers = new CallbackHandlers()) {
+function closeChannel (partner, tokenAddress, tokenNetworkAddress, channelIdentifier, callbackHandlers = new CallbackHandlers()) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       if (callbackHandlers && callbackHandlers.requestHandler) {
@@ -655,7 +659,21 @@ function closeChannel (partner, tokenAddress, address, tokenNetworkAddress, chan
       if (callbackHandlers && callbackHandlers.errorHandler) {
         handleSdkCallback(lumino.callbacks.FAILED_CLOSE_CHANNEL, dispatch, callbackHandlers.errorHandler);
       }
-      background.rif.lumino.closeChannel(partner, tokenAddress, address, tokenNetworkAddress, channelIdentifier, (error) => {
+      background.rif.lumino.closeChannel(partner, tokenAddress, tokenNetworkAddress, channelIdentifier, (error) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve();
+      });
+    });
+  };
+}
+
+function deleteChannelFromSdk (channelIdentifier, tokenAddress) {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.lumino.deleteChannelFromSDK(channelIdentifier, tokenAddress, (error) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
@@ -814,7 +832,12 @@ function setupDefaultLuminoCallbacks () {
     return new Promise(resolve => {
       handleSdkCallback(lumino.callbacks.SIGNING_FAIL, dispatch, (error) => {
         console.debug('Error Signing', error);
-        dispatch(niftyActions.displayToast('Error Signing!', false));
+        const errorMessage = parseLuminoError(error);
+        if (errorMessage) {
+          this.props.showToast(errorMessage, false);
+        } else {
+          dispatch(niftyActions.displayToast('Error Signing!', false));
+        }
       });
       handleSdkCallback(lumino.callbacks.REQUEST_CLIENT_ONBOARDING, dispatch, (result) => {
         console.debug('Requesting onboarding', result);
@@ -841,6 +864,7 @@ function createNetworkPayment (network, destination, amountInWei) {
       dispatch(getSelectedAddress()).then(selectedAddress => {
         const txData = {
           from: selectedAddress,
+          value: web3Utils.toHex(amountInWei),
           to: destination,
         };
         global.ethQuery.sendTransaction(txData, (err, _data) => {
@@ -850,6 +874,20 @@ function createNetworkPayment (network, destination, amountInWei) {
         });
         resolve();
       }).catch(error => reject(error));
+    });
+  };
+}
+
+function subscribeToCloseChannel (channelId, tokenAddress) {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.lumino.subscribeToCloseChannel(channelId, tokenAddress, (error) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve();
+      });
     });
   };
 }

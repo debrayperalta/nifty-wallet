@@ -5,6 +5,7 @@ import {validateDecimalAmount} from '../../../utils/validations';
 import rifActions from '../../../actions';
 import {CallbackHandlers} from '../../../actions/callback-handlers';
 import niftyActions from '../../../../actions';
+import {parseLuminoError} from '../../../utils/parse';
 
 class OpenChannel extends Component {
 
@@ -17,6 +18,8 @@ class OpenChannel extends Component {
     showToast: PropTypes.func,
     showPopup: PropTypes.func,
     createDeposit: PropTypes.func,
+    afterChannelCreated: PropTypes.func,
+    afterDepositCreated: PropTypes.func,
   }
 
   constructor (props) {
@@ -91,6 +94,9 @@ class OpenChannel extends Component {
     callbackHandlers.successHandler = async (response) => {
       console.debug('CHANNEL OPENED', response);
       this.props.showToast('Channel Opened Successfully!');
+      if (this.props.afterChannelCreated) {
+        this.props.afterChannelCreated(response);
+      }
       if (this.state.amount) {
         const depositCallbackHandlers = new CallbackHandlers();
         depositCallbackHandlers.requestHandler = (result) => {
@@ -99,15 +105,18 @@ class OpenChannel extends Component {
         };
         depositCallbackHandlers.successHandler = (result) => {
           console.debug('DEPOSIT DONE', result);
+          if (this.props.afterDepositCreated) {
+            this.props.afterDepositCreated(result);
+          }
           this.props.showToast('Deposit Done Successfully');
         };
         depositCallbackHandlers.errorHandler = (result) => {
           console.debug('DEPOSIT ERROR', result);
-          const errorMessage = result.response.data.errors;
+          const errorMessage = parseLuminoError(result);
           if (errorMessage) {
             this.props.showToast(errorMessage, false);
           } else {
-            this.props.showToast('Unknown Error Trying to Deposit');
+            this.props.showToast('Unknown Error Trying to Deposit', false);
           }
         };
 
@@ -127,7 +136,7 @@ class OpenChannel extends Component {
     };
     callbackHandlers.errorHandler = (result) => {
       console.debug('OPEN CHANNEL ERROR', result);
-      const errorMessage = result.response.data.errors;
+      const errorMessage = parseLuminoError(result);
       if (errorMessage) {
         this.props.showToast(errorMessage, false);
       } else {
