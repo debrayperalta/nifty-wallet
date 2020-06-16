@@ -26,6 +26,8 @@ const JOINED_TEXT = 'JOINED';
 
 const UNJOINED_TEXT = 'NOT JOINED';
 
+const PAGINATION_DEFAULT_SIZE = 3;
+
 export {
   DEFAULT_ICON,
   domainIconProps,
@@ -36,4 +38,5 @@ export {
   SVG_PLUS,
   JOINED_TEXT,
   UNJOINED_TEXT,
+  PAGINATION_DEFAULT_SIZE,
 }

@@ -7,6 +7,7 @@ import {CustomButton, GenericTable} from './index';
 import ItemWithActions from './item-with-actions';
 import {SVG_PLUS} from '../constants';
 import AddNewSubdomain from '../pages/domainsDetailPage/domainDetailActive/addNewSubdomain';
+import { pageNames } from '../pages';
 
 class Subdomains extends Component {
 
@@ -24,6 +25,7 @@ class Subdomains extends Component {
     showTransactionConfirmPage: PropTypes.func,
     isSubdomainAvailable: PropTypes.func,
     deleteSubdomain: PropTypes.func,
+    showSubdomainDetails: PropTypes.func,
     newSubdomains: PropTypes.array,
     paginationSize: PropTypes.number,
     classes: PropTypes.any,
@@ -55,10 +57,22 @@ class Subdomains extends Component {
   }
 
   getData () {
-  const { classes } = this.props;
+  const { domainInfo, showSubdomainDetails, pageName, redirectParams, classes } = this.props;
   if (this.state.subdomains) {
       return this.state.subdomains.map((subdomain) => {
-        const item = <ItemWithActions contentClasses={classes.content} actionClasses={classes.contentActions} text={subdomain.name} enableRightChevron={true} />
+        const item = <ItemWithActions
+          contentClasses={classes.content}
+          actionClasses={classes.contentActions}
+          text={subdomain.name}
+          enableRightChevron={true}
+          onRightChevronClick={() => showSubdomainDetails({
+            domainName: domainInfo.domainName,
+            selectedResolverAddress: domainInfo.selectedResolverAddress,
+            subdomain: subdomain,
+            pageName: pageName,
+            redirectParams: redirectParams,
+          })}
+        />
         return {
           content: item,
         }
@@ -137,6 +151,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
+    showSubdomainDetails: (params) => dispatch(rifActions.navigateTo(pageNames.rns.subdomains, params)),
     getSubdomains: (domainName) => dispatch(rifActions.getSubdomains(domainName)),
     showPopup: (title, opts) => {
       dispatch(rifActions.showModal({

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { ChainAddresses, Subdomains, LuminoNetworkChannels } from '../../../components';
 import {pageNames} from '../../names';
-import { GET_RESOLVERS } from '../../../constants';
+import { GET_RESOLVERS, PAGINATION_DEFAULT_SIZE } from '../../../constants';
 import niftyActions from '../../../../actions';
 import rifActions from '../../../actions';
 import DomainHeader from '../../../components/domain-header';
@@ -136,6 +136,7 @@ class DomainsDetailActiveScreen extends Component {
       isLuminoNode,
       isRifStorage,
       content,
+      selectedResolverAddress,
     };
 		const { resolvers } = this.state;
 		return (
@@ -165,7 +166,7 @@ class DomainsDetailActiveScreen extends Component {
             <ChainAddresses
               domainName={domainName}
               selectedResolverAddress={selectedResolverAddress}
-              paginationSize={3}
+              paginationSize={PAGINATION_DEFAULT_SIZE}
               classes={styles.chainAddresses}
               isOwner={isOwner}
               newChainAddresses={newChainAddresses}
@@ -173,7 +174,7 @@ class DomainsDetailActiveScreen extends Component {
                 status: this.props.domain.status,
                 newChainAddresses: newChainAddresses,
               }}
-              pageName={pageNames.rns.domainsDetail}
+              redirectPage={pageNames.rns.domainsDetail}
             />
           </div>
           }
@@ -181,7 +182,7 @@ class DomainsDetailActiveScreen extends Component {
             isOwner={isOwner}
             domainInfo={domainInfo}
             classes={styles.subdomains}
-            paginationSize={3}
+            paginationSize={PAGINATION_DEFAULT_SIZE}
             newSubdomains={newSubdomains}
             redirectParams={{
               domain: this.props.domain,
@@ -191,7 +192,7 @@ class DomainsDetailActiveScreen extends Component {
           />
           <LuminoNetworkChannels
             isOwner={isOwner}
-            paginationSize={3}
+            paginationSize={PAGINATION_DEFAULT_SIZE}
             classes={styles.LuminoNetworkChannels}
             pageName={pageNames.rns.domainsDetail}
           />
