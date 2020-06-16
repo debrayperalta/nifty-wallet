@@ -79,7 +79,16 @@ export default class RnsManager extends AbstractManager {
     this.container.transfer.address = address;
   }
 
+  onNetworkChanged (network) {
+    const configuration = this.configurationProvider.getConfigurationObject();
+    this.reloadConfiguration(configuration);
+  }
+
   onConfigurationUpdated (configuration) {
+    this.reloadConfiguration(configuration);
+  }
+
+  reloadConfiguration (configuration) {
     this.rnsContractInstance = this.web3.eth.contract(RNS).at(configuration.rns.contracts.rns);
     this.rifContractInstance = this.web3.eth.contract(RIF).at(configuration.rns.contracts.rif);
     this.container.register.rnsContractInstance = this.rnsContractInstance;
@@ -88,6 +97,9 @@ export default class RnsManager extends AbstractManager {
     this.container.resolver.rifContractInstance = this.rifContractInstance;
     this.container.transfer.rnsContractInstance = this.rnsContractInstance;
     this.container.transfer.rifContractInstance = this.rifContractInstance;
+    this.container.register.onConfigurationUpdated(configuration);
+    this.container.resolver.onConfigurationUpdated(configuration);
+    this.container.transfer.onConfigurationUpdated(configuration);
   }
 
   /**

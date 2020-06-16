@@ -112,7 +112,7 @@ class RifConfiguration extends Component {
   deleteNotifierNode (index) {
     const configuration = this.state.configuration;
     if (index !== undefined && configuration) {
-      delete configuration.notifier.availableNodes[index];
+      configuration.notifier.availableNodes.splice(index, 1);
       this.setState({
         configuration,
       });
@@ -135,22 +135,23 @@ class RifConfiguration extends Component {
     }
     const notifierInputs = this.getNotifierInputs();
     return (
-      <div>
+      <div className="settings-body">
         <div className="form-segment">
+          <span>lumino hub</span>
           <input value={this.state.configuration.lumino.hub.endpoint} onChange={(event) => this.updateLuminoHubConfiguration(event)} placeholder="Lumino Hub Endpoint" />
         </div>
         <div className="form-segment">
+          <span>explorer</span>
           <input value={this.state.configuration.lumino.explorer.endpoint} onChange={(event) => this.updateExplorerConfiguration(event)} placeholder="Explorer Endpoint" />
         </div>
-        <div className="form-segment">
-          <span>Notifier</span>
-          <button className="btn-primary" onClick={() => this.addNotifierInput()}>Add</button>
+        <div className="form-segment notifier-list">
+          <button className="btn-primary" onClick={() => this.addNotifierInput()}><i className="fa fa-plus"/> Notifier</button>
           <ul>
             {notifierInputs}
           </ul>
         </div>
-        <div className="form-segment">
-          <span>Rns</span>
+        <div className="form-segment rns-list">
+          <span>rns</span>
           <ul>
             <li className="form-segment">
               <input value={this.state.configuration.rns.contracts.rns} onChange={(event) => this.updateContractAddress('rns', event)} placeholder="RNS Contract Address" />
@@ -184,7 +185,7 @@ function mapDispatchToProps (dispatch) {
   return {
     getConfiguration: () => dispatch(rifActions.getConfiguration()),
     updateConfiguration: (configuration) => dispatch(rifActions.setConfiguration(configuration)),
-    goToSettings: () => dispatch(niftyActions.showConfigPage(false)),
+    goToSettings: () => dispatch(niftyActions.showConfigPage()),
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
   }
 }

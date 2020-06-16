@@ -103,11 +103,13 @@ export default class RifController {
                                                 }
    */
   networkUpdated (networkState) {
-    this.network = {
-      id: networkState.network,
-      rskEndpoint: networkState.provider.rpcTarget,
-    };
-    this.onNetworkChanged(this.network);
+    if (networkState.network && networkState.network !== 'loading') {
+      this.network = {
+        id: networkState.network,
+        rskEndpoint: networkState.provider.rpcTarget,
+      };
+      this.onNetworkChanged(this.network);
+    }
   }
 
   /**
@@ -165,6 +167,7 @@ export default class RifController {
     this.configurationProvider.setConfiguration(configuration);
     this.rnsManager.onConfigurationUpdated(configuration);
     this.luminoManager.onConfigurationUpdated(configuration);
+    return Promise.resolve();
   }
 
   /**

@@ -4,6 +4,7 @@ const Component = require('react').Component
 const h = require('react-hyperscript')
 const connect = require('react-redux').connect
 import PropTypes from 'prop-types'
+import {isRskNetwork} from '../../app/scripts/controllers/rif/utils/general';
 const actions = require('../../ui/app/actions')
 const rifActions = require('../../ui/app/rif/actions');
 const LoadingIndicator = require('./components/loading')
@@ -64,6 +65,22 @@ class ConfigScreen extends Component {
       this.setState({
         dProvider: props.dProviderStore.dProvider,
       })
+    }
+
+    let rifConfiguration = null;
+    if (isRskNetwork(this.props.metamask.network)) {
+      rifConfiguration = h('div', [
+        h('p.config-title', `RIF Configuration`),
+        h('p.config-description', `This is for rif configuration only.`),
+        h('button.btn-spread', {
+          style: {
+            alignSelf: 'center',
+          },
+          onClick (event) {
+            props.openRifConfiguration();
+          },
+        }, 'Manage Configuration'),
+      ]);
     }
 
     return (
@@ -248,18 +265,7 @@ class ConfigScreen extends Component {
                 },
               }, 'Change password'),
             ]),
-            h('div', [
-              h('p.config-title', `RIF Configuration`),
-              h('p.config-description', `This is for rif configuration only.`),
-              h('button.btn-spread', {
-                style: {
-                  alignSelf: 'center',
-                },
-                onClick (event) {
-                  props.openRifConfiguration();
-                },
-              }, 'Manage Configuration'),
-            ]),
+            rifConfiguration,
           ]),
         ]),
       ])
@@ -386,12 +392,7 @@ const mapDispatchToProps = dispatch => {
     confirmChangePassword: () => dispatch(actions.confirmChangePassword()),
     resetAccount: () => dispatch(actions.resetAccount()),
     revealSeedConfirmation: () => dispatch(actions.revealSeedConfirmation()),
-    openRifConfiguration: () => dispatch(rifActions.navigateTo(pageNames.configuration, {
-      tabOptions: {
-        showBack: false,
-        showTitle: false,
-      },
-    })),
+    openRifConfiguration: () => dispatch(rifActions.navigateTo(pageNames.configuration)),
   }
 }
 

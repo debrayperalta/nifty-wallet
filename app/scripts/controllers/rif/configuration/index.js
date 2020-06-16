@@ -1,13 +1,17 @@
 import extend from 'xtend';
 import ObservableStore from 'obs-store';
-import {bindOperation, isRskNetwork} from '../utils/general';
+import {isRskNetwork} from '../utils/general';
 
 export class RifConfigurationProvider {
 
   constructor (props) {
     this.networkController = props.networkController;
     const initState = extend({
-      rifConfiguration: this.getInitialConfigStructure(this.networkController.getNetworkState()),
+      configuration: {
+        '30': null,
+        '31': null,
+        '33': null,
+      },
     }, props.initState);
     this.store = new ObservableStore(initState);
   }
@@ -20,12 +24,13 @@ export class RifConfigurationProvider {
    */
   loadConfiguration (chainId) {
     const actualState = this.store.getState();
-    if (!actualState.rifConfiguration) {
-      actualState.rifConfiguration = this.getInitialConfigStructure(chainId);
+    console.log('DEBUGGGGGGGG', JSON.stringify(actualState.rifConfiguration));
+    if (!actualState.configuration[chainId]) {
+      actualState.configuration[chainId] = this.getInitialConfigStructure(chainId);
       this.store.putState(actualState);
       return true;
     } else {
-      const configuration = actualState.rifConfiguration;
+      const configuration = actualState.configuration[chainId];
       return this.validateConfiguration(configuration);
     }
   }
@@ -163,13 +168,13 @@ export class RifConfigurationProvider {
   }
 
   getConfigurationObject () {
-    return this.store.getState().rifConfiguration;
+    return this.store.getState().configuration[this.network ? this.network.id : '33'];
   }
 
   setConfigurationObject (configuration) {
     const actualState = this.store.getState();
     if (this.validateConfiguration(configuration)) {
-      actualState.rifConfiguration = configuration;
+      actualState.configuration[this.network ? this.network.id : '33'] = configuration;
       this.store.putState(actualState);
     } else {
       throw new Error('Invalid configuration provided');

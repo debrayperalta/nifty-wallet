@@ -89,6 +89,10 @@ export class LuminoManager extends AbstractManager {
     this.initializeLumino(true);
   }
 
+  onConfigurationUpdated (configuration) {
+    this.initializeLumino(true);
+  }
+
   onAddressChanged (address) {
     super.onAddressChanged(address);
     if (this.signingHandler) {
