@@ -1,5 +1,6 @@
 import DomainsScreen from './domainsPage/domainsPage';
 import DomainsDetailScreen from './domainsDetailPage/domainsDetailPage';
+import DomainsDetailConfigurationScreen from './domainsDetailPage/domainDetailActive/domainDetailActiveConfig';
 import Subdomains from './rns/subdomains';
 import Exchange from './rns/exchange';
 import LuminoChannels from './rns/lumino-channels';
@@ -53,7 +54,7 @@ function buildTabs (screenName, tabOptions) {
       index,
       title: tabDefinition.title,
       component: (
-        <div>
+        <div className="rif-tab-content__inside">
           {getSearchBarComponent(showSearchbar)}
           {getTabTitleComponent(tabTitle, tabOptions.hideTitle)}
           {tabComponent}
@@ -130,6 +131,8 @@ function getPageComponent (screenName) {
       return (<LuminoTokenDetailPage/>);
     case pageNames.lumino.home:
       return (<LuminoHome />);
+    case pageNames.rns.domainsDetailConfiguration:
+      return (<DomainsDetailConfigurationScreen />);
   }
 }
 

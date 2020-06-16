@@ -1,5 +1,5 @@
 import rifConfig from './../../../../rif.config';
-import { DEFAULT_ICON, domainIconProps, luminoNodeIconProps, rifStorageIconProps, tokenIcons} from './icons';
+import { DEFAULT_ICON, domainIconProps, luminoNodeIconProps, rifStorageIconProps, tokenIcons, SVG_PLUS} from './icons';
 
 export const registrationTimeouts = {
   // number of seconds to wait before updating the page for the clock waiting.
@@ -7,16 +7,26 @@ export const registrationTimeouts = {
 }
 
 export function GET_RESOLVERS () {
-  return ([{
-    name: 'Multi-Chain',
-    address: rifConfig.rns.contracts.multiChainResolver,
-  }]);
+  return ([
+    {
+      name: 'Multi-Chain',
+      address: rifConfig.rns.contracts.multiChainResolver,
+      isMultiChain: true,
+    },
+    {
+      name: 'Public Resolver',
+      address: rifConfig.rns.contracts.publicResolver,
+      isMultiChain: false,
+    },
+  ]);
 }
 const PATH_TO_RIF_IMAGES = '/images/rif/';
 
 const JOINED_TEXT = 'JOINED';
 
 const UNJOINED_TEXT = 'NOT JOINED';
+
+const PAGINATION_DEFAULT_SIZE = 3;
 
 export {
   DEFAULT_ICON,
@@ -25,6 +35,8 @@ export {
   rifStorageIconProps,
   tokenIcons,
   PATH_TO_RIF_IMAGES,
+  SVG_PLUS,
   JOINED_TEXT,
   UNJOINED_TEXT,
+  PAGINATION_DEFAULT_SIZE,
 }

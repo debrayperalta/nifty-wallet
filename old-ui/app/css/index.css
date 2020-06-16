@@ -654,7 +654,7 @@ input.large-input {
   overflow-x: hidden;
   /*overflow-y: auto;*/
   overflow-y: -moz-scrollbars-none;
-  max-height: 585px;
+  max-height: 568px;
   flex-direction: inherit;
 }
 

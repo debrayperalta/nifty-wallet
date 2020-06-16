@@ -1,3 +1,4 @@
+import React from 'react';
 import { faCoins, faCheckCircle, faBolt, faArchive } from '@fortawesome/free-solid-svg-icons';
 import { faConnectdevelop } from '@fortawesome/free-brands-svg-icons';
 
@@ -36,3 +37,8 @@ export const tokenIcons = {
     icon: 'doc.png',
   },
 }
+
+export const SVG_PLUS = (
+  <svg width="10" height="11" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9.6 5.96H5.52V10.26H4.07V5.96H0.01V4.61H4.07V0.34H5.52V4.61H9.6V5.96Z" fill="#602A95"/>
+  </svg>)
