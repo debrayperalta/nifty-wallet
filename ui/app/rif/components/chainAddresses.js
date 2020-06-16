@@ -74,9 +74,17 @@ class ChainAddresses extends Component {
     return this.state.chainAddresses.map((chainAddress) => {
       const address = getChainAddressByChainAddress(chainAddress.chain);
       const icon = address.icon ? address.icon : DEFAULT_ICON;
-      const item = <ItemWithActions contentClasses={classes.content} actionClasses={classes.contentActions} enableEdit={isOwner} enableDelete={isOwner} text={chainAddress.address} leftIcon={icon} onDeleteClick={this.onDeleteClick.bind(this, chainAddress.chain)}>
-        <InputWithSubmit hiddenValue={chainAddress.chain} submit={this.onChangeSubmit} />
-      </ItemWithActions>
+      const item = (
+        <ItemWithActions
+          contentClasses={classes.content}
+          actionClasses={classes.contentActions}
+          enableEdit={isOwner} enableDelete={isOwner}
+          text={chainAddress.address} leftIcon={icon}
+          onDeleteClick={this.onDeleteClick.bind(this, chainAddress.chain)}
+        >
+          <InputWithSubmit hiddenValue={chainAddress.chain} submit={this.onChangeSubmit} />
+        </ItemWithActions>
+      )
       return {
         content: item,
       };

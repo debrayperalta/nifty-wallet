@@ -27,7 +27,7 @@ const Table = ({ title, columns, data, pageSize, displayColumnHeader, classes })
   );
   const styles = classes || {};
   return (
-    <>
+    <div>
       {title &&
       <span className={styles.title}>{title}</span>
       }
@@ -77,7 +77,7 @@ const Table = ({ title, columns, data, pageSize, displayColumnHeader, classes })
       {data.length === 0 &&
         <span className={styles.noData}>No data to display</span>
       }
-    </>
+    </div>
   );
 };
 

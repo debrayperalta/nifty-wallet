@@ -26,10 +26,6 @@ class AddNewSubdomain extends Component {
   }
 
   async addSubdomain () {
-    /**
-     * TODO Rodrigo
-     * When confirming and submiting is redirecting to wrong direction
-     */
     const transactionListenerId = await this.props.createSubdomain(
       this.props.domainName,
       this.state.newSubdomain.name.toLowerCase(),

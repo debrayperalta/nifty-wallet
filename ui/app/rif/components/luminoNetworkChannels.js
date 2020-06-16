@@ -46,7 +46,7 @@ class LuminoNetworkChannels extends Component {
   loadChannels () {
     this.props.getChannelsGroupedByNetwork().then(networkChannels => {
       const arrayNetworks = [];
-      for (let key of Object.keys(networkChannels)) {
+      for (const key of Object.keys(networkChannels)) {
         const network = {
           token_network_identifier: key,
           token_symbol: networkChannels[key][0].token_symbol,
@@ -89,7 +89,7 @@ class LuminoNetworkChannels extends Component {
           <span>No channels found</span>
         </div>
       }
-        {(isOwner || false) &&
+        {isOwner &&
         <CustomButton
           svgIcon={SVG_PLUS}
           text={'Add channel'}

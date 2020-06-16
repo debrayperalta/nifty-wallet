@@ -35,10 +35,10 @@ class AddNewChainAddressToResolver extends Component {
     const selectValue = ({value}) => {
       const icon = value.icon ? value.icon : DEFAULT_ICON;
       return (
-        <div className={''}>
+        <div>
           <span>
-          <FontAwesomeIcon className={''} icon={icon.icon} color={icon.color}/>
-            <span className={''}>{value.name}</span>
+          <FontAwesomeIcon icon={icon.icon} color={icon.color}/>
+            <span>{value.name}</span>
           </span>
         </div>
       )
@@ -59,14 +59,14 @@ class AddNewChainAddressToResolver extends Component {
               props.onFocus(option, event)
           }}
         >
-          <FontAwesomeIcon className={''} icon={icon.icon} color={icon.color}/>
-          <span className={''}>{option.name}</span>
+          <FontAwesomeIcon icon={icon.icon} color={icon.color}/>
+          <span>{option.name}</span>
         </div>
       )
     }
 		return (
-		<div className={''}>
-			<div id="comboChainAddresses" className={''}>
+		<div>
+			<div id="comboChainAddresses">
         <Select
 					searchable={false}
           arrowRenderer={() => <div className={'combo-selector-triangle'}></div>}
@@ -78,10 +78,10 @@ class AddNewChainAddressToResolver extends Component {
           valueComponent={selectValue}
         />
       </div>
-      <div id="inputAddress" className={''}>
+      <div id="inputAddress">
         <input type="text" placeholder="value" onChange={this.updateAddress} />
       </div>
-      <button className={''} onClick={() => this.props.confirmCallback() } >Add Address</button>
+      <button onClick={() => this.props.confirmCallback() } >Add Address</button>
 		</div>
 		)
 	}

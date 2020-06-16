@@ -73,7 +73,7 @@ class DomainsScreen extends Component {
   render () {
     if (this.props.domains && this.props.domains.length > 0) {
       return (
-        <ul className={'domains-list'}>
+        <ul className="domains-list">
           {this.props.domains.map((item, index) => {
             return this.chiplet(item, index)
           })}

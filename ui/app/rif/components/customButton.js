@@ -14,7 +14,7 @@ class CustomButton extends Component {
             {svgIcon &&
               svgIcon
             }
-            {(text && text !== '') &&
+            {(text) &&
               <span className={className.text}>{text}</span>
             }
           </div>

@@ -28,14 +28,16 @@ class TokenNetworkChannels extends Component {
       channels.map((channelJson) => {
         const channel = channelJson[Object.keys(channelJson)[0]];
         const tableRow = {};
-        tableRow.content =
+        tableRow.content =(
           <div className={classes.content}>
             <span>{channel.partner_address}</span>
           </div>
-        tableRow.actions =
+        )
+        tableRow.actions = (
           <div className={classes.contentActions}>
             <FontAwesomeIcon icon={faChevronRight} onClick={() => this.props.getChannel()}/>
           </div>
+        )
         this.setState({
           channelsData: [...this.state.channelsData, tableRow],
         });

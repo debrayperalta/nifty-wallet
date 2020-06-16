@@ -60,19 +60,21 @@ class Subdomains extends Component {
   const { domainInfo, showSubdomainDetails, pageName, redirectParams, classes } = this.props;
   if (this.state.subdomains) {
       return this.state.subdomains.map((subdomain) => {
-        const item = <ItemWithActions
-          contentClasses={classes.content}
-          actionClasses={classes.contentActions}
-          text={subdomain.name}
-          enableRightChevron={true}
-          onRightChevronClick={() => showSubdomainDetails({
-            domainName: domainInfo.domainName,
-            selectedResolverAddress: domainInfo.selectedResolverAddress,
-            subdomain: subdomain,
-            pageName: pageName,
-            redirectParams: redirectParams,
-          })}
-        />
+        const item = (
+          <ItemWithActions
+            contentClasses={classes.content}
+            actionClasses={classes.contentActions}
+            text={subdomain.name}
+            enableRightChevron={true}
+            onRightChevronClick={() => showSubdomainDetails({
+              domainName: domainInfo.domainName,
+              selectedResolverAddress: domainInfo.selectedResolverAddress,
+              subdomain: subdomain,
+              pageName: pageName,
+              redirectParams: redirectParams,
+            })}
+          />
+        )
         return {
           content: item,
         }
