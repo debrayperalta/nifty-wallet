@@ -41,7 +41,7 @@ class ChainAddresses extends Component {
         this.setState({
           resolvers,
         });
-      })
+      });
     const slipChainAddresses = Object.assign([], SLIP_ADDRESSES);
     this.state = {
       chainAddresses: [],

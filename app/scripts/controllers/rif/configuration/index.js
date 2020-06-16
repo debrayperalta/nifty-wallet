@@ -24,7 +24,6 @@ export class RifConfigurationProvider {
    */
   loadConfiguration (chainId) {
     const actualState = this.store.getState();
-    console.log('DEBUGGGGGGGG', JSON.stringify(actualState.rifConfiguration));
     if (!actualState.configuration[chainId]) {
       actualState.configuration[chainId] = this.getInitialConfigStructure(chainId);
       this.store.putState(actualState);
@@ -90,7 +89,6 @@ export class RifConfigurationProvider {
               rskOwner: '0x45d3e4fb311982a06ba52359d44cb4f5980e0ef1',
             },
           },
-          mocksEnabled: false,
         };
       case '31': // RSK Testnet
         return {
@@ -115,7 +113,6 @@ export class RifConfigurationProvider {
               rskOwner: '0xca0a477e19bac7e0e172ccfd2e3c28a7200bdb71',
             },
           },
-          mocksEnabled: false,
         };
       case '33': // RSK Regtest
         return {
@@ -140,7 +137,6 @@ export class RifConfigurationProvider {
               rskOwner: '',
             },
           },
-          mocksEnabled: false,
         };
     }
   }

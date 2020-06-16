@@ -83,6 +83,12 @@ class DomainsDetailConfigurationScreen extends Component {
   render () {
     const { selectedResolverAddress } = this.props;
     const { disableSelect } = this.state;
+    const { configuration } = this.state;
+
+    if (!configuration) {
+      return (<div>Loading...</div>);
+    }
+
     return (
       <div>
         <span>Resolver</span>
