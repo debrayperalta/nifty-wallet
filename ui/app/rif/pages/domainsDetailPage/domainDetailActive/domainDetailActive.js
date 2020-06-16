@@ -12,7 +12,6 @@ import niftyActions from '../../../../actions'
 import {pageNames} from '../../index'
 import rifActions from '../../../actions'
 import DomainHeader from '../../../components/domain-header'
-import {rns} from '../../../../../../rif.config'
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
@@ -41,6 +40,7 @@ class DomainsDetailActiveScreen extends Component {
     updateChains: PropTypes.bool,
     getDomain: PropTypes.func,
     showToast: PropTypes.func,
+    getConfiguration: PropTypes.func,
 	}
 	constructor (props) {
 		super(props);
@@ -55,7 +55,14 @@ class DomainsDetailActiveScreen extends Component {
 			insertedAddress: '',
       chainAddresses: [],
       updateChains: true,
+      configuration: null,
 		};
+		this.props.getConfiguration()
+      .then(configuration => {
+        this.setState({
+          configuration,
+        });
+      });
 	}
   updateChainAddress = (selectedOption) => {
     this.setState({ selectedChainAddress: selectedOption });
@@ -155,7 +162,7 @@ class DomainsDetailActiveScreen extends Component {
     if (selectedResolver) {
       return selectedResolver.name;
     }
-    return rns.contracts.publicResolver;
+    return this.state.configuration.rns.contracts.publicResolver;
   }
 
 	render () {
@@ -192,7 +199,7 @@ class DomainsDetailActiveScreen extends Component {
                   <select id="comboResolvers"
                           defaultValue={this.getDefaultSelectedValue(this.state.resolvers, selectedResolverAddress)}
                           className="select-css" disabled={disableCombo} onChange={!disableCombo ? this.onChangeComboResolvers.bind(this) : () => {}}>
-                    <option disabled value={rns.contracts.publicResolver} hidden> Select Resolver </option>
+                    <option disabled value={this.state.configuration.rns.contracts.publicResolver} hidden> Select Resolver </option>
                       {
                         this.state.resolvers.map((resolver, index) => {
                           return (<option
@@ -300,6 +307,7 @@ const mapDispatchToProps = dispatch => {
     displayToast: (message) => dispatch(niftyActions.displayToast(message)),
     getDomain: (domainName) => dispatch(rifActions.getDomain(domainName)),
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
+    getConfiguration: () => dispatch(rifActions.getConfiguration()),
 	}
 }
 
