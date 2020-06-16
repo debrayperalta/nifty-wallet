@@ -11,6 +11,7 @@ import rifConfig from '../../../../rif.config';
 import AddNewChainAddressToResolver
   from '../pages/domainsDetailPage/domainDetailActive/addNewTokenNetworkAddress/addNewChainAddressToResolver';
 import {SLIP_ADDRESSES} from '../constants/slipAddresses';
+import * as niftyActions from '../../actions';
 
 class ChainAddresses extends Component {
 
@@ -25,6 +26,7 @@ class ChainAddresses extends Component {
     getChainAddresses: PropTypes.func,
     newChainAddresses: PropTypes.array,
     waitForListener: PropTypes.func,
+    displayWarning: PropTypes.func,
     showTransactionConfirmPage: PropTypes.func,
     paginationSize: PropTypes.number,
     classes: PropTypes.any,
@@ -81,7 +83,11 @@ class ChainAddresses extends Component {
   }
 
   onChangeSubmit = (address, selectedChainAddress) => {
-    this.addAddress(address, selectedChainAddress);
+    if (address) {
+      this.addAddress(address, selectedChainAddress);
+    } else {
+      this.props.displayWarning('Address cannot be empty');
+    }
   }
 
   onDeleteClick = (selectedChainAddress) => {
@@ -193,6 +199,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
+    displayWarning: (error) => dispatch(niftyActions.displayWarning(error)),
     getChainAddresses: (domainName) => dispatch(rifActions.getChainAddresses(domainName)),
     setChainAddressForResolver: (domainName, chain, chainAddress) => dispatch(rifActions.setChainAddressForResolver(domainName, chain, chainAddress)),
     showThis: (pageName, props) => dispatch(rifActions.navigateTo(pageName, props)),
