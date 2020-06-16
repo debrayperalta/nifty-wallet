@@ -157,6 +157,16 @@ export default class RifController {
     return Promise.resolve(enabled);
   }
 
+  getConfiguration () {
+    return this.configurationProvider.getConfiguration();
+  }
+
+  setConfiguration (configuration) {
+    this.configurationProvider.setConfiguration(configuration);
+    this.rnsManager.onConfigurationUpdated(configuration);
+    this.luminoManager.onConfigurationUpdated(configuration);
+  }
+
   /**
    * This method publishes all the operations available to call from the ui for RifController
    * and all it's members.
@@ -164,7 +174,8 @@ export default class RifController {
    */
   exposeApi () {
     return {
-      configuration: this.configurationProvider.bindApi(),
+      getConfiguration: bindOperation(this.getConfiguration, this),
+      setConfiguration: bindOperation(this.setConfiguration, this),
       rns: this.rnsManager.bindApi(),
       lumino: this.luminoManager.bindApi(),
       cleanStore: bindOperation(this.cleanStore, this),

@@ -40,6 +40,11 @@ export class AbstractManager {
   }
 
   /**
+   * This event is to track when the user changes the rif configuration
+   */
+  onConfigurationUpdated (configuration) {}
+
+  /**
    * It binds all the operations to be accessed from the outside.
    * @returns an object like { operationName: function bind}
    */

@@ -193,13 +193,4 @@ export class RifConfigurationProvider {
       this.loadConfiguration(this.network.id);
     }
   }
-
-  bindApi () {
-    return {
-      getConfiguration: bindOperation(this.getConfiguration, this),
-      setConfiguration: bindOperation(this.setConfiguration, this),
-    };
-  }
-
-
 }

@@ -4,7 +4,6 @@ import {lumino} from '../../../../app/scripts/controllers/rif/constants';
 import {CallbackHandlers} from './callback-handlers';
 import ethUtils from 'ethereumjs-util';
 import {sumValuesOfArray} from '../utils/utils';
-import rifConfig from '../../../../rif.config';
 import {mocks} from './mocks';
 import {parseLuminoError} from '../utils/parse';
 import web3Utils from 'web3-utils';
@@ -739,17 +738,20 @@ function createPayment (partner, tokenAddress, netAmount, callbackHandlers = new
 function getChannels () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      if (rifConfig.mocksEnabled) {
-        return resolve(mocks.channels);
-      } else {
-        background.rif.lumino.getChannels((error, channels) => {
-          if (error) {
-            dispatch(niftyActions.displayWarning(error));
-            return reject(error);
+      dispatch(getConfiguration())
+        .then(configuration => {
+          if (configuration.mocksEnabled) {
+            return resolve(mocks.channels);
+          } else {
+            background.rif.lumino.getChannels((error, channels) => {
+              if (error) {
+                dispatch(niftyActions.displayWarning(error));
+                return reject(error);
+              }
+              return resolve(channels);
+            });
           }
-          return resolve(channels);
         });
-      }
     });
   };
 }
@@ -757,17 +759,20 @@ function getChannels () {
 function getTokens () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      if (rifConfig.mocksEnabled) {
-        return resolve(mocks.tokens);
-      } else {
-        background.rif.lumino.getTokens((error, tokens) => {
-          if (error) {
-            dispatch(niftyActions.displayWarning(error));
-            return reject(error);
+      dispatch(getConfiguration())
+        .then(configuration => {
+          if (configuration.mocksEnabled) {
+            return resolve(mocks.tokens);
+          } else {
+            background.rif.lumino.getTokens((error, tokens) => {
+              if (error) {
+                dispatch(niftyActions.displayWarning(error));
+                return reject(error);
+              }
+              return resolve(tokens);
+            });
           }
-          return resolve(tokens);
         });
-      }
     });
   };
 }
@@ -894,7 +899,7 @@ function subscribeToCloseChannel (channelId, tokenAddress) {
 function getConfiguration () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      background.rif.configuration.getConfiguration((error, configuration) => {
+      background.rif.getConfiguration((error, configuration) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
@@ -908,7 +913,7 @@ function getConfiguration () {
 function setConfiguration (configuration) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      background.rif.configuration.setConfiguration(configuration, (error) => {
+      background.rif.setConfiguration(configuration, (error) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
