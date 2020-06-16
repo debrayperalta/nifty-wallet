@@ -1,10 +1,11 @@
 import * as namehash from 'eth-ens-namehash';
+import {namehash as rskNameHash} from '@rsksmart/rns/lib/utils'
 import RnsJsDelegate from '../rnsjs-delegate';
 import web3Utils from 'web3-utils';
 import { DomainDetails, ChainAddress } from '../classes';
 import RSKOwner from '../abis/RSKOwner.json';
 import MultiChainresolver from '../abis/MultiChainResolver.json';
-import { DOMAIN_STATUSES, EXPIRING_REMAINING_DAYS } from '../../constants';
+import {DOMAIN_STATUSES, EXPIRING_REMAINING_DAYS, rns} from '../../constants';
 import { getDateFormatted } from '../../utils/dateUtils';
 import {ChainId} from '@rsksmart/rns/lib/types';
 
@@ -142,10 +143,16 @@ export default class RnsResolver extends RnsJsDelegate {
    * @param domainName DomainName with the .rsk extension
    * @returns {Promise<unknown>}
    */
-  getChainAddressForResolvers (domainName) {
+  getChainAddressForResolvers (domainName, subdomain = '') {
     return new Promise((resolve, reject) => {
-      const addrChangedEvent = this.multiChainresolverContractInstance.AddrChanged({node: namehash.hash(domainName)}, {fromBlock: 0, toBlock: 'latest'});
-      const chainAddrChangedEvent = this.multiChainresolverContractInstance.ChainAddrChanged({node: namehash.hash(domainName)}, {fromBlock: 0, toBlock: 'latest'});
+      let node = namehash.hash(domainName);
+      if (subdomain) {
+        node = rskNameHash(domainName);
+        const label = web3Utils.sha3(subdomain);
+        node = web3Utils.soliditySha3(node, label);
+      }
+      const addrChangedEvent = this.multiChainresolverContractInstance.AddrChanged({node: node}, {fromBlock: 0, toBlock: 'latest'});
+      const chainAddrChangedEvent = this.multiChainresolverContractInstance.ChainAddrChanged({node: node}, {fromBlock: 0, toBlock: 'latest'});
       const arrChains = [];
       const errorLogs = [];
       addrChangedEvent.get(function (error, result){
@@ -154,7 +161,9 @@ export default class RnsResolver extends RnsJsDelegate {
           errorLogs.push(error);
         }
         result.forEach(event => {
-          arrChains[0] = new ChainAddress(ChainId.RSK, event.args.addr);
+          if (event.args.addr !== rns.zeroAddress) {
+            arrChains[0] = new ChainAddress(ChainId.RSK, event.args.addr);
+          }
         });
         console.debug('getChainAddressForResolvers success', arrChains);
       });
@@ -165,12 +174,18 @@ export default class RnsResolver extends RnsJsDelegate {
           reject(errorLogs);
         }
         result.forEach(event => {
-          const chainAddrToPush = new ChainAddress(event.args.chain, event.args.addr)
+          const chainAddrToPush = new ChainAddress(event.args.chain, event.args.addr);
           const index = arrChains.findIndex((e) => e.chain === chainAddrToPush.chain);
           if (index === -1) {
-            arrChains.push(chainAddrToPush);
+            if (event.args.addr !== rns.zeroAddress) {
+              arrChains.push(chainAddrToPush);
+            }
           } else {
-            arrChains[index] = chainAddrToPush;
+            if (event.args.addr !== rns.zeroAddress) {
+              arrChains[index] = chainAddrToPush;
+            } else {
+              arrChains.splice(index, 1);
+            }
           }
         });
         console.debug('getChainAddressForResolvers success', arrChains);
@@ -184,11 +199,19 @@ export default class RnsResolver extends RnsJsDelegate {
    * @param domainName DomainName with the .rsk extension
    * @param chain
    * @param chainAddress
+   * @param subdomain
    * @returns {Promise<unknown>}
    */
-  setChainAddressForResolver (domainName, chain, chainAddress) {
+  setChainAddressForResolver (domainName, chain, chainAddress, subdomain = '') {
     return new Promise((resolve, reject) => {
-      const transactionListener = this.send(this.multiChainresolverContractInstance, 'setChainAddr', [namehash.hash(domainName), chain, chainAddress])
+      let node = namehash.hash(domainName);
+      if (subdomain) {
+        node = rskNameHash(domainName);
+        const label = web3Utils.sha3(subdomain);
+        node = web3Utils.soliditySha3(node, label);
+      }
+      const toBeSettedChainAddress = chainAddress || rns.zeroAddress;
+      const transactionListener = this.send(this.multiChainresolverContractInstance, 'setChainAddr', [node, chain, toBeSettedChainAddress])
       transactionListener.transactionConfirmed()
         .then(transactionReceipt => {
           console.debug('setChainAddressForResolver success', transactionReceipt);

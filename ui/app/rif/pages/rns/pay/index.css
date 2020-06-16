@@ -33,6 +33,12 @@
   color: #D8D8D8;
 }
 
+.amount-input--open-channel,
+.amount-input--deposit-channel {
+  min-width: 89px;
+  margin-left: 0;
+}
+
 .domain-address-input {
   border-width: 0 0 1px 0;
   border-radius: 0;
@@ -50,4 +56,8 @@
 
 .domain-address-input::placeholder {
   color: #D8D8D8;
+}
+
+.domain-address-input--open-channel {
+  min-width: 176px;
 }

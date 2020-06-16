@@ -30,7 +30,7 @@ class DomainsScreen extends Component {
   }
 
   chiplet = (data, id) => {
-    return <div id="chiplet" className={'chiplet'} key={id}>
+    return <li id="chiplet" className={'chiplet'} key={id}>
       <div className={'chiplet-body'}>
         <div onClick={() => {
           this.props.showDomainsDetailPage({
@@ -67,17 +67,17 @@ class DomainsScreen extends Component {
           <path d="M1 1L9 8.5L1 16" stroke="#5B2A92" strokeWidth="2"/>
         </svg>
       </span>
-    </div>
+    </li>
   }
 
   render () {
     if (this.props.domains && this.props.domains.length > 0) {
       return (
-        <div className={'domains-list'}>
+        <ul className="domains-list">
           {this.props.domains.map((item, index) => {
             return this.chiplet(item, index)
           })}
-        </div>
+        </ul>
       )
     } else if (this.props.domains && this.props.domains.length === 0) {
       return (<div className={'domains-list'}>No domains registered</div>);

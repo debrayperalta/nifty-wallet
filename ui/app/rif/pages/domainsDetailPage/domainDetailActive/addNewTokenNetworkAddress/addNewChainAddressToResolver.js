@@ -7,9 +7,10 @@ import {DEFAULT_ICON} from '../../../../constants';
 
 class AddNewChainAddressToResolver extends Component {
   static propTypes = {
+    slipChainAddresses: PropTypes.array.isRequired,
+    confirmCallback: PropTypes.func.isRequired,
     updateChainAddress: PropTypes.func.isRequired,
     updateAddress: PropTypes.func.isRequired,
-    slipChainAddresses: PropTypes.array.isRequired,
     option: PropTypes.object,
   }
   constructor(props) {
@@ -22,23 +23,22 @@ class AddNewChainAddressToResolver extends Component {
     };
 	}
   updateChainAddress = (selectedOption) => {
-    console.log('SELECTED OPTION', selectedOption);
 		this.setState({ selectedChainAddress: selectedOption });
-		this.props.updateChainAddress(selectedOption.chain);
+    this.props.updateChainAddress(selectedOption.chain);
 	}
 	updateAddress = (e) => {
 		this.setState({ insertedAddress: e.target.value });
-		this.props.updateAddress(e.target.value);
+    this.props.updateAddress(e.target.value);
 	}
 
 	render () {
     const selectValue = ({value}) => {
       const icon = value.icon ? value.icon : DEFAULT_ICON;
       return (
-        <div className={'add-new-multicrypto-select-value'}>
+        <div>
           <span>
-          <FontAwesomeIcon className={'add-new-multicrypto-select-value-icon'} icon={icon.icon} color={icon.color}/>
-            <span className={'add-new-multicrypto-select-value-text'}>{value.name}</span>
+          <FontAwesomeIcon icon={icon.icon} color={icon.color}/>
+            <span>{value.name}</span>
           </span>
         </div>
       )
@@ -59,14 +59,14 @@ class AddNewChainAddressToResolver extends Component {
               props.onFocus(option, event)
           }}
         >
-          <FontAwesomeIcon className={'add-new-multicrypto-select-value-icon'} icon={icon.icon} color={icon.color}/>
-          <span className={'label-spacing-left'}>{option.name}</span>
+          <FontAwesomeIcon icon={icon.icon} color={icon.color}/>
+          <span>{option.name}</span>
         </div>
       )
     }
 		return (
-		<div className={'add-new-multicrypto-modal'}>
-			<div id="comboChainAddresses" className={'add-new-multicrypto-select'}>
+		<div>
+			<div id="comboChainAddresses">
         <Select
 					searchable={false}
           arrowRenderer={() => <div className={'combo-selector-triangle'}></div>}
@@ -78,9 +78,10 @@ class AddNewChainAddressToResolver extends Component {
           valueComponent={selectValue}
         />
       </div>
-      <div id="inputAddress" className={'full-width add-new-multicrypto-input'}>
+      <div id="inputAddress">
         <input type="text" placeholder="value" onChange={this.updateAddress} />
       </div>
+      <button onClick={() => this.props.confirmCallback() } >Add Address</button>
 		</div>
 		)
 	}

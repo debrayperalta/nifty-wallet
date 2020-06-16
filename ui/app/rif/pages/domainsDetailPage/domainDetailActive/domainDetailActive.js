@@ -1,27 +1,103 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
-import { getChainAddressByChainAddress } from '../../../utils/utils';
-import { CustomButton, Menu } from '../../../components'
-import AddNewChainAddressToResolver from './addNewTokenNetworkAddress/addNewChainAddressToResolver'
-import { GET_RESOLVERS, DEFAULT_ICON } from '../../../constants'
-import { SLIP_ADDRESSES } from '../../../constants/slipAddresses'
-import niftyActions from '../../../../actions'
-import {pageNames} from '../../index'
-import rifActions from '../../../actions'
-import DomainHeader from '../../../components/domain-header'
+import { ChainAddresses, Subdomains, LuminoNetworkChannels } from '../../../components';
+import {pageNames} from '../../names';
+import { GET_RESOLVERS, PAGINATION_DEFAULT_SIZE } from '../../../constants';
+import niftyActions from '../../../../actions';
+import rifActions from '../../../actions';
+import DomainHeader from '../../../components/domain-header';
+
+// TODO @fmelo
+// Here you can set the classnames for the entire page
+const styles = {
+  chainAddresses: {
+    title: 'n-table-title',
+    table: 'n-table',
+    thead: '',
+    theadTr: '',
+    theadTh: '',
+    tbody: '',
+    tbodyTr: '',
+    tbodyTd: 'n-table-td',
+    noData: '',
+    content: 'n-table-content-address',
+    contentActions: 'n-table-actions',
+    customButton: {
+      button: 'btn-add',
+      icon: '',
+      text: '',
+    },
+    pagination: {
+      body: 'n-table-pagination',
+      buttonBack: 'n-table-pagination-back',
+      indexes: '',
+      activePageButton: 'n-table-pagination-active',
+      inactivePageButton: 'n-table-pagination-inactive',
+      buttonNext: 'n-table-pagination-next',
+    },
+  },
+  subdomains: {
+    title: 'n-table-title',
+    table: 'n-table',
+    thead: '',
+    theadTr: '',
+    theadTh: '',
+    tbody: '',
+    tbodyTr: '',
+    tbodyTd: 'n-table-td',
+    noData: '',
+    content: '',
+    contentActions: 'n-table-actions',
+    customButton: {
+      button: 'btn-add',
+      icon: '',
+      text: '',
+    },
+    pagination: {
+      body: 'n-table-pagination',
+      buttonBack: 'n-table-pagination-back',
+      indexes: '',
+      activePageButton: 'n-table-pagination-active',
+      inactivePageButton: 'n-table-pagination-inactive',
+      buttonNext: 'n-table-pagination-next',
+    },
+  },
+  LuminoNetworkChannels: {
+    title: 'n-table-title',
+    table: 'n-table',
+    thead: '',
+    theadTr: '',
+    theadTh: '',
+    tbody: '',
+    tbodyTr: '',
+    tbodyTd: 'n-table-td',
+    noData: '',
+    content: 'n-table-content-channels',
+    contentActions: 'n-table-actions',
+    customButton: {
+      button: 'btn-add',
+      icon: '',
+      text: '',
+    },
+    pagination: {
+      body: 'n-table-pagination',
+      buttonBack: 'n-table-pagination-back',
+      indexes: '',
+      activePageButton: 'n-table-pagination-active',
+      inactivePageButton: 'n-table-pagination-inactive',
+      buttonNext: 'n-table-pagination-next',
+    },
+  },
+}
 
 class DomainsDetailActiveScreen extends Component {
 	static propTypes = {
     addNewChainAddress: PropTypes.func.isRequired,
     setNewResolver: PropTypes.func.isRequired,
-    setChainAddressForResolver: PropTypes.func.isRequired,
+    deleteChainAddressForResolver: PropTypes.func.isRequired,
 		setAutoRenew: PropTypes.func.isRequired,
-    getChainAddresses: PropTypes.func,
     getUnapprovedTransactions: PropTypes.func,
-    showTransactionConfirmPage: PropTypes.func,
     domain: PropTypes.object.isRequired,
 		domainName: PropTypes.string.isRequired,
 		address: PropTypes.string.isRequired,
@@ -33,140 +109,31 @@ class DomainsDetailActiveScreen extends Component {
 		isOwner: PropTypes.bool,
 		isLuminoNode: PropTypes.bool,
 		isRifStorage: PropTypes.bool,
-    showDomainsDetailPage: PropTypes.func.isRequired,
     displayToast: PropTypes.func.isRequired,
-    waitForListener: PropTypes.func,
     disableResolvers: PropTypes.bool,
-    updateChains: PropTypes.bool,
+    newChainAddresses: PropTypes.array,
+    newSubdomains: PropTypes.array,
     getDomain: PropTypes.func,
     showToast: PropTypes.func,
+    showConfigPage: PropTypes.func,
     getConfiguration: PropTypes.func,
 	}
 	constructor (props) {
 		super(props);
-    const resolvers = Object.assign([], GET_RESOLVERS());
-    const slipChainAddresses = Object.assign([], SLIP_ADDRESSES);
-    const enableComboResolvers = this.props.isOwner && !(props.disableResolvers || false);
-		this.state = {
-      disableCombo: !enableComboResolvers,
-			resolvers: resolvers,
-      slipChainAddresses: slipChainAddresses,
-      selectedChainAddress: slipChainAddresses[0].chain,
-			insertedAddress: '',
-      chainAddresses: [],
-      updateChains: true,
-      configuration: null,
-		};
-		this.props.getConfiguration()
+    this.props.getConfiguration()
       .then(configuration => {
+        const resolvers = Object.assign([], GET_RESOLVERS(configuration));
         this.setState({
-          configuration,
+          resolvers,
         });
       });
-	}
-  updateChainAddress = (selectedOption) => {
-    this.setState({ selectedChainAddress: selectedOption });
-	}
-	updateAddress = (address) => {
-		this.setState({ insertedAddress: address });
-	}
-  async addAddress () {
-    const transactionListenerId = await this.props.setChainAddressForResolver(this.props.domainName, this.state.selectedChainAddress, this.state.insertedAddress);
-    this.props.waitForListener(transactionListenerId)
-      .then(transactionReceipt => {
-        this.props.showDomainsDetailPage({updateChains: true, ...this.props.domain});
-      });
-    this.props.showTransactionConfirmPage({
-      action: () => this.props.showDomainsDetailPage(this.props.domain),
-    });
-	}
-  showModalAddChainAddress = () => {
-    const elements = [];
-		elements.push(<AddNewChainAddressToResolver
-      updateChainAddress={this.updateChainAddress.bind(this)}
-			updateAddress={this.updateAddress.bind(this)}
-      slipChainAddresses={this.state.slipChainAddresses}
-		/>);
-    const message = {
-			title: 'Add new chain address',
-			body: {
-				elements: elements,
-			},
-			confirmLabel: 'SAVE',
-			cancelLabel: 'CANCEL',
-			confirmCallback: () => {
-				this.addAddress()
-			},
-			cancelCallback: () => {
-			},
+		this.state = {
+			resolvers: [],
 		};
-		this.props.addNewChainAddress(message);
 	}
-
-	async onChangeComboResolvers (e) {
-    for (const resolverItem of e.target.children) {
-      if (resolverItem.value === e.target.value) {
-        const address = resolverItem.getAttribute('data-address');
-        const transactionListenerId = await this.props.setNewResolver(this.props.domainName, address);
-        this.props.waitForListener(transactionListenerId)
-          .then(transactionReceipt => {
-            this.props.showDomainsDetailPage({
-              domain: this.props.domain,
-              status: this.props.domain.details.status,
-              disableResolvers: false,
-              selectedResolverAddress: address,
-            });
-          });
-        this.props.showTransactionConfirmPage({
-          action: () => {
-            this.props.showDomainsDetailPage({
-              domain: this.props.domain,
-              status: this.props.domain.details.status,
-              disableResolvers: true,
-              selectedResolverAddress: address,
-            });
-            this.props.showToast('Waiting Confirmation');
-          },
-        });
-        return;
-      }
-    }
-  }
-  componentDidMount () {
-    this.loadChainAddresses();
-  }
-
-  componentDidUpdate (prevProps, prevState) {
-    if (prevProps.domainName !== this.props.domainName) {
-      this.loadChainAddresses();
-    } else if (this.props.updateChains) {
-      if (this.state.updateChains) {
-        this.setState({ updateChains: false });
-        this.loadChainAddresses();
-      }
-    }
-    if (this.props.disableResolvers !== this.state.disableCombo) {
-      this.setState({ disableCombo: this.props.disableResolvers });
-    }
-  }
-
-  async loadChainAddresses () {
-    if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) {
-      const chainAddresses = await this.props.getChainAddresses(this.props.domainName);
-      this.setState({chainAddresses: chainAddresses});
-    }
-  }
-
-  getDefaultSelectedValue (resolvers, selectedResolverAddress) {
-    const selectedResolver = resolvers.find(resolver => resolver.address === selectedResolverAddress);
-    if (selectedResolver) {
-      return selectedResolver.name;
-    }
-    return this.state.configuration.rns.contracts.publicResolver;
-  }
 
 	render () {
-		const { domainName, address, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress } = this.props;
+    const { domain, domainName, content, expirationDate, autoRenew, ownerAddress, isOwner, isLuminoNode, isRifStorage, selectedResolverAddress, newChainAddresses, newSubdomains } = this.props;
     const domainInfo = {
       domainName,
       expirationDate,
@@ -176,89 +143,66 @@ class DomainsDetailActiveScreen extends Component {
       isLuminoNode,
       isRifStorage,
       content,
+      selectedResolverAddress,
     };
-		const { chainAddresses, disableCombo } = this.state;
+		const { resolvers } = this.state;
 		return (
-      <div className={'body'}>
+      <div className="domain-detail">
         <DomainHeader domainName={domainName}
                       showOwnerIcon={isOwner}
                       showLuminoNodeIcon={isLuminoNode}
-                      showRifStorageIcon={isRifStorage}/>
-        <div id="domainDetailBody" className={'domain-detail-body'}>
-          <div id="bodyDescription" className={'domain-description'}>
-            <div><span className={'domain-description-field'}>Address:</span><span className={'domain-description-value label-spacing-left'}>{address}</span></div>
-            <div><span className={'domain-description-field'}>Content:</span><span className={'domain-description-value label-spacing-left'}>{content}</span></div>
-            <div><span className={'domain-description-field'}>Expires on:</span><span className={'domain-description-value label-spacing-left'}>{expirationDate}</span></div>
-            <div><span className={'domain-description-field'}>Auto renew: <a href={this.props.setAutoRenew()}>{autoRenew ? 'on' : 'off'}</a></span></div>
-            <div><span className={'domain-description-field'}>Owner:</span><span className={'domain-description-value label-spacing-left'}>{ownerAddress}</span></div>
+                      showRifStorageIcon={isRifStorage}>
+          <svg width="19" height="23" viewBox="0 0 19 23" fill="none" xmlns="http://www.w3.org/2000/svg"
+            onClick={() => this.props.showConfigPage({
+              domain: domain,
+              domainName: domainName,
+              selectedResolverAddress: selectedResolverAddress,
+            })}
+          >
+            <line x1="16" y1="4.37114e-08" x2="16" y2="23" stroke="#602A95" strokeWidth="2"/>
+            <line x1="9" y1="4.37114e-08" x2="9" y2="23" stroke="#602A95" strokeWidth="2"/>
+            <line x1="3" y1="4.37114e-08" x2="3" y2="23" stroke="#602A95" strokeWidth="2"/>
+            <ellipse cx="9" cy="17" rx="3" ry="3" transform="rotate(90 9 17)" fill="#602A95"/>
+            <ellipse cx="16" cy="5" rx="3" ry="3" transform="rotate(90 16 5)" fill="#602A95"/>
+            <ellipse cx="3" cy="8" rx="3" ry="3" transform="rotate(90 3 8)" fill="#602A95"/>
+          </svg>
+        </DomainHeader>
+        <div id="domainDetailBody" className={''}>
+          {resolvers &&
+          <div id="chainAddressesBody" className={''}>
+            <ChainAddresses
+              domainName={domainName}
+              selectedResolverAddress={selectedResolverAddress}
+              paginationSize={PAGINATION_DEFAULT_SIZE}
+              classes={styles.chainAddresses}
+              isOwner={isOwner}
+              newChainAddresses={newChainAddresses}
+              redirectParams={{domain: this.props.domain,
+                status: this.props.domain.status,
+                newChainAddresses: newChainAddresses,
+              }}
+              redirectPage={pageNames.rns.domainsDetail}
+            />
           </div>
-          {this.state.resolvers &&
-            <div id="resolversBody" className={'resolvers-body'}>
-              <div className="resolver-body-top">
-                <div id="selectResolver" className={'custom-select'}>
-                  <select id="comboResolvers"
-                          defaultValue={this.getDefaultSelectedValue(this.state.resolvers, selectedResolverAddress)}
-                          className="select-css" disabled={disableCombo} onChange={!disableCombo ? this.onChangeComboResolvers.bind(this) : () => {}}>
-                    <option disabled value={this.state.configuration.rns.contracts.publicResolver} hidden> Select Resolver </option>
-                      {
-                        this.state.resolvers.map((resolver, index) => {
-                          return (<option
-                            key={index}
-                            value={resolver.name}
-                            data-address={resolver.address}
-                          >{resolver.name}</option>)
-                        })
-                      }
-                  </select>
-                </div>
-                {(isOwner && this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress)) &&
-                  <CustomButton
-                    icon={faPlusCircle}
-                    text={'NEW'}
-                    onClick={() => this.showModalAddChainAddress()}
-                    className={
-                      {
-                        button: 'domain-detail-new-button',
-                        icon: 'domain-icon centerY',
-                        text: 'center',
-                      }
-                    }
-                  />
-                }
-              </div>
-              <div id="resolverChainAddressBody" className={'resolver-chainaddress'}>
-                {
-                  chainAddresses.length <= 0 ? <div></div> :
-                    chainAddresses.map((chainAddress, index) => {
-                    const address = getChainAddressByChainAddress(chainAddress.chain);
-                    const icon = address.icon ? address.icon : DEFAULT_ICON;
-                    return <div key={index} className={'resolver-chainaddress-description'}>
-                      <div className={'resolver-chainaddress-description-chain'}>
-                        <FontAwesomeIcon icon={icon.icon} color={icon.color} className={'domain-icon'}/>
-                        <span>{address.symbol}</span>
-                      </div>
-                      <div className={'resolver-chainaddress-description-chain-address'}>
-                        <span>{chainAddress.address}</span>
-                      </div>
-                    </div>
-                  })
-                }
-              </div>
-            </div>
           }
-          {!isOwner &&
-          <CustomButton
-            text={'WATCH & REGISTER'}
-            onClick={() => {}}
-            className={
-              {
-                button: 'domain-detail-watch-and-register',
-                text: 'center',
-              }
-            }
+          <Subdomains
+            isOwner={isOwner}
+            domainInfo={domainInfo}
+            classes={styles.subdomains}
+            paginationSize={PAGINATION_DEFAULT_SIZE}
+            newSubdomains={newSubdomains}
+            redirectParams={{
+              domain: this.props.domain,
+              status: this.props.domain.status,
+            }}
+            pageName={pageNames.rns.domainsDetail}
           />
-          }
-          <Menu domainInfo={domainInfo} />
+          <LuminoNetworkChannels
+            isOwner={isOwner}
+            paginationSize={PAGINATION_DEFAULT_SIZE}
+            classes={styles.LuminoNetworkChannels}
+            pageName={pageNames.rns.domainsDetail}
+          />
         </div>
       </div>
 		);
@@ -268,7 +212,7 @@ class DomainsDetailActiveScreen extends Component {
 function mapStateToProps (state) {
 	const params = state.appState.currentView.params;
 	const domain = params.domain;
-	const details = domain.details;
+	const details = domain.details || params.details;
   return {
 		dispatch: state.dispatch,
 		status: details.status,
@@ -282,7 +226,8 @@ function mapStateToProps (state) {
 		isLuminoNode: details.isLuminoNode,
 		isRifStorage: details.isRifStorage,
     selectedResolverAddress: params.selectedResolverAddress ? params.selectedResolverAddress : details.selectedResolverAddress,
-    updateChains: details.updateChains,
+    newChainAddresses: details.newChainAddresses || [],
+    newSubdomains: details.newSubdomains || [],
     disableResolvers: details.disableResolvers,
 		domain: domain,
 	}
@@ -292,21 +237,13 @@ const mapDispatchToProps = dispatch => {
 	return {
 		addNewChainAddress: (message) => dispatch(rifActions.showModal(message)),
     setNewResolver: (domainName, resolverAddress) => dispatch(rifActions.setResolverAddress(domainName, resolverAddress)),
-    getChainAddresses: (domainName) => dispatch(rifActions.getChainAddresses(domainName)),
-    setChainAddressForResolver: (domainName, chain, chainAddress) => dispatch(rifActions.setChainAddressForResolver(domainName, chain, chainAddress)),
+    deleteChainAddressForResolver: (domainName, chain, chainAddress) => {},
     getUnapprovedTransactions: () => dispatch(rifActions.getUnapprovedTransactions()),
-    showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
-    waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
 		setAutoRenew: () => {},
-    showDomainsDetailPage: (props) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetail, {
-      tabOptions: {
-        screenTitle: 'Domain Details',
-      },
-      ...props,
-    })),
     displayToast: (message) => dispatch(niftyActions.displayToast(message)),
     getDomain: (domainName) => dispatch(rifActions.getDomain(domainName)),
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
+    showConfigPage: (props) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetailConfiguration, props)),
     getConfiguration: () => dispatch(rifActions.getConfiguration()),
 	}
 }

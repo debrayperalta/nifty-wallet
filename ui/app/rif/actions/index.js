@@ -1,5 +1,6 @@
 import * as niftyActions from '../../actions';
 import extend from 'xtend';
+import _ from 'lodash';
 import {lumino} from '../../../../app/scripts/controllers/rif/constants';
 import {CallbackHandlers} from './callback-handlers';
 import ethUtils from 'ethereumjs-util';
@@ -49,6 +50,7 @@ const rifActions = {
   closeChannel,
   deleteChannelFromSdk,
   getChannels,
+  getChannelsGroupedByNetwork,
   getAvailableCallbacks,
   getTokensWithJoinedCheck,
   listenCallback,
@@ -193,11 +195,11 @@ function setResolverAddress (domainName, resolverAddress) {
   }
 }
 
-function setChainAddressForResolver (domainName, chain, chainAddress) {
+function setChainAddressForResolver (domainName, chain, chainAddress, subdomain = '') {
   return (dispatch) => {
     dispatch(niftyActions.showLoadingIndication());
     return new Promise((resolve, reject) => {
-      background.rif.rns.resolver.setChainAddressForResolver(domainName, chain, chainAddress, (error, result) => {
+      background.rif.rns.resolver.setChainAddressForResolver(domainName, chain, chainAddress, subdomain, (error, result) => {
         dispatch(niftyActions.hideLoadingIndication());
         if (error) {
           dispatch(niftyActions.displayWarning(error));
@@ -209,16 +211,20 @@ function setChainAddressForResolver (domainName, chain, chainAddress) {
   }
 }
 
-function getChainAddresses (domainName) {
+function getChainAddresses (domainName, subdomain = '') {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      background.rif.rns.resolver.getChainAddressForResolvers(domainName, (error, result) => {
-        if (error) {
-          dispatch(niftyActions.displayWarning(error));
-          return reject(error);
-        }
-        return resolve(result);
-      });
+      if (rifConfig.mocksEnabled) {
+        return resolve(mocks.chainAddresses);
+      } else {
+        background.rif.rns.resolver.getChainAddressForResolvers(domainName, subdomain, (error, result) => {
+          if (error) {
+            dispatch(niftyActions.displayWarning(error));
+            return reject(error);
+          }
+          return resolve(result);
+        });
+      }
     })
   }
 }
@@ -410,13 +416,17 @@ function getSubdomains (domainName) {
     dispatch(niftyActions.showLoadingIndication())
     return new Promise((resolve, reject) => {
       dispatch(niftyActions.hideLoadingIndication());
-      background.rif.rns.register.getSubdomainsForDomain(domainName, (error, result) => {
-        if (error) {
-          dispatch(niftyActions.displayWarning(error));
-          return reject(error);
-        }
-        return resolve(result);
-      });
+      if (rifConfig.mocksEnabled) {
+        return resolve(mocks.subdomains);
+      } else {
+        background.rif.rns.register.getSubdomainsForDomain(domainName, (error, result) => {
+          if (error) {
+            dispatch(niftyActions.displayWarning(error));
+            return reject(error);
+          }
+          return resolve(result);
+        });
+      }
     });
   };
 }
@@ -752,6 +762,38 @@ function getChannels () {
             });
           }
         });
+    });
+  };
+}
+
+function getChannelsGroupedByNetwork () {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      if (rifConfig.mocksEnabled) {
+        const channelObject = mocks.channels;
+        const arrayWithoutKeys = [];
+        channelObject.map(channelJson => {
+          const channel = channelJson[Object.keys(channelJson)[0]];
+          arrayWithoutKeys.push(channel);
+        });
+        const groupedBy = _.groupBy(arrayWithoutKeys, 'token_network_identifier');
+        return resolve(groupedBy);
+      } else {
+      dispatch(this.getChannels()).then(channelObject => {
+        const arrayWithoutKeys = [];
+        if (Object.keys(channelObject).length !== 0 && channelObject.constructor !== Object) {
+          channelObject.map(channelJson => {
+            const channel = channelJson[Object.keys(channelJson)[0]];
+            arrayWithoutKeys.push(channel);
+          });
+        }
+        const groupedBy = _.groupBy(arrayWithoutKeys, 'token_network_identifier');
+        return resolve(groupedBy);
+      }).catch(error => {
+        dispatch(niftyActions.displayWarning(error));
+        reject(error)
+      });
+      }
     });
   };
 }

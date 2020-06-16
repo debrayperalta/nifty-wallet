@@ -1,3 +1,8 @@
+.rif-tabs {
+  display: flex;
+  flex-direction: column;
+}
+
 .rif-tabs-bar {
   height: 75px;
   background: var(--primary-color);
@@ -6,9 +11,16 @@
   align-items: center;
 }
 
+.rif-tab-content__inside {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 118px);
+}
+
 .rif-tabs-bar li {
   margin: 0 15px;
 }
+
 
 .rif-tabs-bar-item {
   cursor: pointer;
