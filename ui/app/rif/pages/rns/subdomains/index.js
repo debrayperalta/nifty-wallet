@@ -5,7 +5,7 @@ import rifActions from '../../../actions';
 import niftyActions from '../../../../actions';
 import {pageNames} from '../../../pages/index';
 import {ChainAddresses, CustomButton, LuminoNetworkChannels} from '../../../components';
-import {GET_RESOLVERS} from '../../../constants';
+import { GET_RESOLVERS, PAGINATION_DEFAULT_SIZE} from '../../../constants';
 import DomainHeader from '../../../components/domain-header';
 
 // TODO @fmelo
@@ -133,7 +133,7 @@ class Subdomains extends Component {
         >
           {isOwner &&
             <CustomButton
-              text={'Delete'}
+              text="Delete"
               onClick={() => this.openDeletePopup(subdomain)}
               className={
                 {
@@ -151,7 +151,7 @@ class Subdomains extends Component {
             domainName={domainName}
             subdomainName={subdomain.name}
             selectedResolverAddress={selectedResolverAddress}
-            paginationSize={3}
+            paginationSize={PAGINATION_DEFAULT_SIZE}
             classes={styles.chainAddresses}
             isOwner={isOwner}
             newChainAddresses={newChainAddresses}
@@ -165,7 +165,7 @@ class Subdomains extends Component {
         }
         <LuminoNetworkChannels
           isOwner={isOwner}
-          paginationSize={3}
+          paginationSize={PAGINATION_DEFAULT_SIZE}
           classes={styles.luminoNetworkChannels}
           pageName={pageNames.rns.subdomains}
         />

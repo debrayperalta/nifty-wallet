@@ -140,7 +140,7 @@ export default class RnsResolver extends RnsJsDelegate {
   getChainAddressForResolvers (domainName, subdomain = '') {
     return new Promise((resolve, reject) => {
       let node = namehash.hash(domainName);
-      if (subdomain && subdomain !== '') {
+      if (subdomain) {
         node = rskNameHash(domainName);
         const label = web3Utils.sha3(subdomain);
         node = web3Utils.soliditySha3(node, label);
@@ -199,7 +199,7 @@ export default class RnsResolver extends RnsJsDelegate {
   setChainAddressForResolver (domainName, chain, chainAddress, subdomain = '') {
     return new Promise((resolve, reject) => {
       let node = namehash.hash(domainName);
-      if (subdomain && subdomain !== '') {
+      if (subdomain) {
         node = rskNameHash(domainName);
         const label = web3Utils.sha3(subdomain);
         node = web3Utils.soliditySha3(node, label);
