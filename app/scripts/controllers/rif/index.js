@@ -2,7 +2,7 @@ import RnsManager from './rns'
 import Web3 from 'web3'
 import ComposableObservableStore from './../../lib/ComposableObservableStore'
 import {LuminoManager} from './lumino';
-import {bindOperation} from './utils/general';
+import {bindOperation, isRskNetwork} from './utils/general';
 import {RifConfigurationProvider} from './configuration';
 
 /**
@@ -149,6 +149,15 @@ export default class RifController {
   }
 
   /**
+   * Checks if rif is enabled for the current selected network
+   * @returns Promise with boolean that indicates if rif is enabled or not.
+   */
+  enabled () {
+    const enabled = isRskNetwork(this.network.id);
+    return Promise.resolve(enabled);
+  }
+
+  /**
    * This method publishes all the operations available to call from the ui for RifController
    * and all it's members.
    * @returns an object like { operationName: functionBind, }
@@ -159,6 +168,7 @@ export default class RifController {
       rns: this.rnsManager.bindApi(),
       lumino: this.luminoManager.bindApi(),
       cleanStore: bindOperation(this.cleanStore, this),
+      enabled: bindOperation(this.enabled, this),
     }
   }
 }

@@ -31,24 +31,20 @@ class RifConfiguration extends Component {
 
   updateLuminoHubConfiguration (event) {
     const luminoHubEndpoint = event.target.value;
-    if (luminoHubEndpoint) {
-      const configuration = this.state.configuration;
-      configuration.lumino.hub.endpoint = luminoHubEndpoint;
-      this.setState({
-        configuration,
-      });
-    }
+    const configuration = this.state.configuration;
+    configuration.lumino.hub.endpoint = luminoHubEndpoint;
+    this.setState({
+      configuration,
+    });
   }
 
   updateExplorerConfiguration (event) {
     const explorerEndpoint = event.target.value;
-    if (explorerEndpoint) {
-      const configuration = this.state.configuration;
-      configuration.lumino.explorer.endpoint = explorerEndpoint;
-      this.setState({
-        configuration,
-      });
-    }
+    const configuration = this.state.configuration;
+    configuration.lumino.explorer.endpoint = explorerEndpoint;
+    this.setState({
+      configuration,
+    });
   }
 
   updateNotifierNodeToAdd (event) {
@@ -94,7 +90,7 @@ class RifConfiguration extends Component {
   updateContractAddress (contractKey, event) {
     const address = event.target.value;
     const configuration = this.state.configuration;
-    if (address && configuration) {
+    if (contractKey && configuration) {
       configuration.rns.contracts[contractKey] = address;
       this.setState({
         configuration,
@@ -105,7 +101,7 @@ class RifConfiguration extends Component {
   updateNotifierNode (event, index) {
     const configuration = this.state.configuration;
     const endpoint = event.target.value;
-    if (endpoint && index && configuration) {
+    if (index !== undefined && configuration) {
       configuration.notifier.availableNodes.push(endpoint);
       this.setState({
         configuration,

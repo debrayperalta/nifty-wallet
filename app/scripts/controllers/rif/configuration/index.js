@@ -1,6 +1,6 @@
 import extend from 'xtend';
 import ObservableStore from 'obs-store';
-import {bindOperation} from '../utils/general';
+import {bindOperation, isRskNetwork} from '../utils/general';
 
 export class RifConfigurationProvider {
 
@@ -189,7 +189,9 @@ export class RifConfigurationProvider {
    * This operation is executed when the user unlocks the wallet
    */
   onUnlock () {
-    this.loadConfiguration(this.networkController.getNetworkState());
+    if (isRskNetwork(this.network.id)) {
+      this.loadConfiguration(this.network.id);
+    }
   }
 
   bindApi () {

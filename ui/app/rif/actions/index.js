@@ -64,6 +64,7 @@ const rifActions = {
   subscribeToCloseChannel,
   getConfiguration,
   setConfiguration,
+  rifEnabled,
 }
 
 let background = null;
@@ -913,6 +914,20 @@ function setConfiguration (configuration) {
           return reject(error);
         }
         return resolve();
+      });
+    });
+  };
+}
+
+function rifEnabled () {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.enabled((error, enabled) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(enabled);
       });
     });
   };
