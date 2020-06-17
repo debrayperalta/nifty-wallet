@@ -4,9 +4,9 @@ import RnsTransfer from './transfer'
 import RNS from './abis/RNS.json'
 import RIF from './abis/RIF.json'
 import extend from 'xtend'
-import ObservableStore from 'obs-store'
 import {RnsContainer} from './container';
 import {AbstractManager} from '../abstract-manager';
+import {isRskNetwork} from '../utils/general';
 
 /**
  * This class encapsulates all the RNS operations, it initializes and call to all the delegates and exposes their operations.
@@ -17,16 +17,15 @@ import {AbstractManager} from '../abstract-manager';
  */
 export default class RnsManager extends AbstractManager {
   constructor (props) {
-    super(props);
-    const configuration = this.configurationProvider.getConfigurationObject();
-    this.rnsContractInstance = this.web3.eth.contract(RNS).at(configuration.rns.contracts.rns);
-    this.rifContractInstance = this.web3.eth.contract(RIF).at(configuration.rns.contracts.rif);
     const initState = extend({
       register: {},
       resolver: {},
       transfer: {},
     }, props.initState);
-    this.store = new ObservableStore(initState);
+    super(props, initState);
+    const configuration = this.configurationProvider.getConfigurationObject();
+    this.rnsContractInstance = this.web3.eth.contract(RNS).at(configuration.rns.contracts.rns);
+    this.rifContractInstance = this.web3.eth.contract(RIF).at(configuration.rns.contracts.rif);
 
     const register = new RnsRegister({
       web3: this.web3,
@@ -80,8 +79,10 @@ export default class RnsManager extends AbstractManager {
   }
 
   onNetworkChanged (network) {
-    const configuration = this.configurationProvider.getConfigurationObject();
-    this.reloadConfiguration(configuration);
+    if (isRskNetwork(network.id)) {
+      const configuration = this.configurationProvider.getConfigurationObject();
+      this.reloadConfiguration(configuration);
+    }
   }
 
   onConfigurationUpdated (configuration) {

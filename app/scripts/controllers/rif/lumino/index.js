@@ -62,13 +62,13 @@ export class LuminoManager extends AbstractManager {
         },
       }
       await this.lumino.init(signingHandler, storageHandler, configParams);
-      const state = this.store.getState();
+      const state = this.getStoreState();
         if (state.apiKey && !cleanApiKey) {
           await this.operations.setApiKey(state.apiKey);
         } else {
           await this.operations.onboarding();
           state.apiKey = await this.operations.getApiKey();
-          this.store.putState(state);
+          this.updateStoreState(state);
         }
       await this.afterInitialization();
     }
