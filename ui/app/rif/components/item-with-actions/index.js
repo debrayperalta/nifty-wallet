@@ -59,45 +59,43 @@ class ItemWithActions extends Component {
       const {showEditChildren} = this.state;
       return (
        <div>
-         {leftIcon && (
-           <div>
+         <div className="row-data-container">
+           {leftIcon && (
              <FontAwesomeIcon
                icon={leftIcon.icon}
                color={leftIcon.color}
                className={''}
              />
+           )}
+           {leftContent && <div>{leftContent}</div>}
+           <div className={contentClasses}>
+             <p>{text}</p>
            </div>
-         )}
-         {leftContent && <div>{leftContent}</div>}
-         <div className={contentClasses}>
-           <p>{text}</p>
+           <div className={actionClasses}>
+             {enableEdit && (
+               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={this.onEditClick}>
+                 <path d="M1 11.5L11.5 1L15 4.5L4.5 15H1V11.5Z" stroke="#602A95"/>
+               </svg>
+             )}
+             {enableDelete && (
+               <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={onDeleteClick}>
+                 <line x1="12" y1="0.707107" x2="0.707108" y2="12" stroke="#602A95" strokeLinecap="round"/>
+                 <line x1="0.707107" y1="1" x2="12" y2="12.2929" stroke="#602A95" strokeLinecap="round"/>
+               </svg>
+             )}
+             {enableRightChevron && (
+               <div>
+                 <FontAwesomeIcon
+                   icon={faChevronRight}
+                   className={''}
+                   onClick={onRightChevronClick}
+                 />
+               </div>
+             )
+             }
+           </div>
          </div>
-         <div className={actionClasses}>
-           {enableEdit && (
-             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={this.onEditClick}>
-              <path d="M1 11.5L11.5 1L15 4.5L4.5 15H1V11.5Z" stroke="#602A95"/>
-             </svg>
-           )}
-           {enableDelete && (
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={onDeleteClick}>
-              <line x1="12" y1="0.707107" x2="0.707108" y2="12" stroke="#602A95" strokeLinecap="round"/>
-              <line x1="0.707107" y1="1" x2="12" y2="12.2929" stroke="#602A95" strokeLinecap="round"/>
-            </svg>
-           )}
-           {enableRightChevron && (
-             <div>
-               <FontAwesomeIcon
-                 icon={faChevronRight}
-                 className={''}
-                 onClick={onRightChevronClick}
-               />
-             </div>
-           )
-           }
-         </div>
-         {showEditChildren && children && (
-           children
-         )}
+         {showEditChildren && children && (children)}
        </div>
      );
    }

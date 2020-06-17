@@ -52,7 +52,7 @@ class DomainsScreen extends Component {
       </div>
       <div className={'chiplet-status-wrapper ' + statusStyle(data.status)}>
         <div id="chipletStatus" className={'chiplet-status-text'}>
-          <div className="chiplet-status-circle"></div>
+          <div className="chiplet-status-circle"/>
           <span className="chiplet-status">{data.status}</span>
         </div>
       </div>
