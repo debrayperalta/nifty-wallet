@@ -1,9 +1,9 @@
 .domain-info-container {
-  padding: 0 28px;
+  padding: 0 20px;
 }
 
 .domain-detail {
-  padding: 0 28px 28px;
+  padding: 0 20px 20px;
 }
 
 .n-table {
@@ -21,6 +21,16 @@
   margin-bottom: 0;
 }
 
+.not-found-info {
+  font-family: var(--primary-font);
+  color: var(--gray-text);
+  font-weight: 400;
+  font-size: 14px;
+  display: block;
+  text-align: center;
+  margin: 20px auto;
+}
+
 .n-table-td {
   border-bottom: 1px solid var(--gray-soft);
   font-family: var(--primary-font);
@@ -29,7 +39,7 @@
   font-size: 16px;
 }
 
-.n-table-td > div {
+.row-data-container {
   height: 50px;
   display: flex;
   flex-wrap: wrap;
@@ -40,8 +50,8 @@
 .n-table-content {
 }
 
-.n-table-td > div div + .n-table-content-address,
-.n-table-td > div div + .n-table-content-channels {
+.row-data-container svg + .n-table-content-address,
+.row-data-container svg + .n-table-content-channels {
   margin-left: 10px;
 }
 
@@ -63,6 +73,10 @@
   flex: 0 0 auto;
   display: flex;
   align-items: center;
+}
+
+.n-table-actions svg {
+  cursor: pointer;
 }
 
 .n-table-actions svg + svg {
@@ -138,16 +152,10 @@
   font-family: var(--primary-font);
   color: var(--primary-color);
   font-weight: 400;
-  font-size: 24px;
+  font-size: 22px;
   margin-bottom: 16px;
-}
-
-.domain-name span {
-  margin-right: 1rem;
-}
-
-.domain-icon {
-  margin-left: 0.5rem;
+  display: flex;
+  align-items: center;
 }
 
 .domain-description {
@@ -320,7 +328,6 @@
   margin: 0 auto 30px;
 }
 
-
 .payment-mode-dropdown .mode-dropdown-item {
   font-family: var(--primary-font);
   color: var(--gray-text);
@@ -339,4 +346,9 @@
   font-size: 8px;
   display: block;
   line-height: 1.2;
+}
+
+.config-domain-btn {
+  cursor: pointer;
+  margin-left: auto;
 }

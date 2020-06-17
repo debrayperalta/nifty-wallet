@@ -64,18 +64,20 @@ class AddNewSubdomain extends Component {
 
   render () {
     return (
-      <div className={''}>
-        <input key="subdomain-name" type="text" placeholder="Subdomain Name" onChange={(e) => {
+      <div className="add-subdomain-container">
+        <input id="subdomain-name" key="subdomain-name" type="text" placeholder="Subdomain Name" onChange={(e) => {
           const newSubdomain = this.state.newSubdomain;
           newSubdomain.name = e.target.value;
           this.setState({newSubdomain});
         }}/>
-        <input key="subdomain-owner" type="text" placeholder="Owner Address (Optional)" onChange={(e) => {
-          const newSubdomain = this.state.newSubdomain;
-          newSubdomain.owner = e.target.value;
-          this.setState({newSubdomain});
-        }}/>
-        <button className={''} onClick={() => this.addSubdomain()} >Change</button>
+        <div className="add-subdomain__inputs">
+          <input key="subdomain-owner" type="text" placeholder="Owner Address (Optional)" onChange={(e) => {
+            const newSubdomain = this.state.newSubdomain;
+            newSubdomain.owner = e.target.value;
+            this.setState({newSubdomain});
+          }}/>
+          <button className="btn-primary" onClick={() => this.addSubdomain()} >Change</button>
+        </div>
       </div>
     )
   }

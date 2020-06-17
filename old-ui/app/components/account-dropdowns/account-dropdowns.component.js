@@ -12,6 +12,7 @@ import { getFullABI } from '../../accounts/import/helpers'
 import log from 'loglevel'
 import Web3 from 'web3'
 import { AccountsDropdownItemView } from './accounts-dropdown-item-view'
+import {isRskNetwork} from '../../../../app/scripts/controllers/rif/utils/general';
 
 class AccountsDropdownItemWrapper extends DropdownMenuItem {
   render () {
@@ -53,6 +54,7 @@ class AccountDropdowns extends Component {
       optionsMenuActive: false,
       isProxy: false,
       contractProps: null,
+      rifEnabled: false,
     }
     this.accountSelectorToggleClassName = 'accounts-selector'
     this.optionsMenuToggleClassName = 'account-dropdown'
@@ -62,7 +64,6 @@ class AccountDropdowns extends Component {
   renderAccounts () {
       const { identities, selected, keyrings, network } = this.props
       const accountOrder = getAllKeyRingsAccounts(keyrings, network)
-
       const accountsViews = accountOrder.map((address, index) => {
         const identity = identities[address]
         if (!identity) {
@@ -152,11 +153,22 @@ class AccountDropdowns extends Component {
     )
   }
 
+  getRifOptions (network) {
+    if (isRskNetwork(network)) {
+      return (<DropdownMenuItem
+        closeMenu={() => {}}
+        onClick={() => this.exploreRifServices()}>Explore RIF Services</DropdownMenuItem>);
+    }
+    return null;
+  }
+
   renderAccountOptions () {
     const { actions, selected, network, keyrings, identities } = this.props
     const { optionsMenuActive, isProxy } = this.state
 
     const keyring = getCurrentKeyring(selected, network, keyrings, identities)
+
+    const rifOptions = this.getRifOptions(network);
 
     return (
       <Dropdown
@@ -176,10 +188,7 @@ class AccountDropdowns extends Component {
           }
         }}
       >
-        <DropdownMenuItem
-          closeMenu={() => {}}
-          onClick={() => this.exploreRifServices()}
-        >Explore RIF Services</DropdownMenuItem>
+        {rifOptions}
         <DropdownMenuItem
           closeMenu={() => {}}
           onClick={() => this.viewOnBlockExplorer()}

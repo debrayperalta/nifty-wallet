@@ -19,13 +19,15 @@ import Tabs from '../components/tabs';
 import ToastComponent from '../../../../old-ui/app/components/toast';
 import ErrorComponent from '../../../../old-ui/app/components/error';
 import LuminoHome from './lumino/index';
+import LuminoNetworkDetails from './lumino/luminoNetworkDetails/index';
 import {pageNames} from './names';
+import RifConfiguration from './configuration';
 
 function getSearchBarComponent (show) {
   if (!show) {
     return null;
   }
-  return (<SearchDomains />);
+  return (<SearchDomains/>);
 }
 
 function getTabTitleComponent (title, hideTitle) {
@@ -68,6 +70,12 @@ function buildTabs (screenName, tabOptions) {
 }
 
 function buildTabScreen (screenName, context, dispatch) {
+  if (screenName === pageNames.configuration) {
+    return (<div>
+      <ToastComponent/>
+      <RifConfiguration/>
+    </div>);
+  }
   const tabOptions = context.params.tabOptions;
   const tabs = buildTabs(screenName, tabOptions, dispatch);
   const onTabChange = (tab) => {
@@ -84,8 +92,8 @@ function buildTabScreen (screenName, context, dispatch) {
   }
   return (
     <div className="rif-app-container">
-      <ToastComponent />
-      <ErrorComponent />
+      <ToastComponent/>
+      <ErrorComponent/>
       <Tabs tabs={tabs}
             onChange={(tab) => onTabChange(tab)}
             showBack={tabOptions.showBack}
@@ -130,9 +138,11 @@ function getPageComponent (screenName) {
     case pageNames.rns.luminoTokenDetailPage:
       return (<LuminoTokenDetailPage/>);
     case pageNames.lumino.home:
-      return (<LuminoHome />);
+      return (<LuminoHome/>);
+    case pageNames.lumino.networkDetails:
+      return (<LuminoNetworkDetails/>);
     case pageNames.rns.domainsDetailConfiguration:
-      return (<DomainsDetailConfigurationScreen />);
+      return (<DomainsDetailConfigurationScreen/>);
   }
 }
 

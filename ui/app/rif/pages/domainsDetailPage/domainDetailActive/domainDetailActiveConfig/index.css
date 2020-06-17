@@ -1,0 +1,30 @@
+.resolver-setting-container {
+  padding: 0 28px;
+}
+
+.resolver-setting-container .resolver-setting__title {
+  font-family: var(--primary-font);
+  color: var(--gray-text);
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.resolver-setting-container .resolver-setting__text {
+  font-family: var(--primary-font);
+  color: var(--gray-text);
+  font-size: 10px;
+  font-weight: 400;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.resolver-setting-container #comboResolvers {
+  width: 100%;
+  max-width: 200px;
+  border: 1px solid var(--gray-text);
+  padding: 4px;
+  font-family: var(--primary-font);
+  color: var(--gray-text);
+  font-size: 12px;
+}

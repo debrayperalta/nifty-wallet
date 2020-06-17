@@ -1,4 +1,3 @@
-import rifConfig from './../../../../rif.config';
 import { DEFAULT_ICON, domainIconProps, luminoNodeIconProps, rifStorageIconProps, tokenIcons, SVG_PLUS} from './icons';
 
 export const registrationTimeouts = {
@@ -6,16 +5,16 @@ export const registrationTimeouts = {
   secondsToCheckForCommitment: 4,
 }
 
-export function GET_RESOLVERS () {
+export function GET_RESOLVERS (configuration) {
   return ([
     {
       name: 'Multi-Chain',
-      address: rifConfig.rns.contracts.multiChainResolver,
+      address: configuration.rns.contracts.multiChainResolver,
       isMultiChain: true,
     },
     {
       name: 'Public Resolver',
-      address: rifConfig.rns.contracts.publicResolver,
+      address: configuration.rns.contracts.publicResolver,
       isMultiChain: false,
     },
   ]);
