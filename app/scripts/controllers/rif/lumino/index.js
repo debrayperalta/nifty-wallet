@@ -1,5 +1,4 @@
 import {Lumino} from '@rsksmart/lumino-light-client-sdk';
-import {lumino, rns, notifier} from '../../../../../rif.config';
 import {LuminoSigningHandler} from './signing-handler';
 import {AbstractManager} from '../abstract-manager';
 import {bindOperation, isRskNetwork} from '../utils/general';
@@ -22,6 +21,7 @@ export class LuminoManager extends AbstractManager {
     this.operations = new LuminoOperations({
       lumino: this.lumino,
       address: this.address,
+      configurationProvider: this.configurationProvider,
     });
     this.callbacks = new LuminoCallbacks(this.lumino);
     this.keyringController = props.keyringController;
@@ -30,17 +30,20 @@ export class LuminoManager extends AbstractManager {
       address: this.address,
       keyringController: this.keyringController,
     });
-    this.luminoExplorer = new LuminoExplorer();
+    this.luminoExplorer = new LuminoExplorer({
+      configurationProvider: this.configurationProvider,
+    });
   }
 
   async initializeLumino (cleanApiKey = false) {
+    const configuration = this.configurationProvider.getConfigurationObject();
     if (this.unlocked && isRskNetwork(this.network.id)) {
       const configParams = {
         chainId: this.network.id,
         rskEndpoint: this.network.rskEndpoint,
-        hubEndpoint: lumino.hub.endpoint,
+        hubEndpoint: configuration.lumino.hub.endpoint,
         address: ethUtils.toChecksumAddress(this.address),
-        registryAddress: rns.contracts.rns,
+        registryAddress: configuration.rns.contracts.rns,
       };
       await this.signingHandler.initialize();
       const signingHandler = {
@@ -72,7 +75,8 @@ export class LuminoManager extends AbstractManager {
   };
 
   async afterInitialization () {
-    await this.operations.notifiersInitialization(notifier.availableNodes);
+    const configuration = this.configurationProvider.getConfigurationObject();
+    await this.operations.notifiersInitialization(configuration.notifier.availableNodes);
   }
 
   onUnlock () {
@@ -82,6 +86,10 @@ export class LuminoManager extends AbstractManager {
 
   onNetworkChanged (network) {
     super.onNetworkChanged(network);
+    this.initializeLumino(true);
+  }
+
+  onConfigurationUpdated (configuration) {
     this.initializeLumino(true);
   }
 

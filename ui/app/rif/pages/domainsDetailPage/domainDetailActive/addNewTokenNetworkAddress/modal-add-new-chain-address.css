@@ -1,65 +1,40 @@
-.add-new-multicrypto-modal {
-    width: 17.5rem;
-}
-.custom-select{
-    float: left;
-}
-.full-width {
-    width: 100%;
-    position: relative;
-}
-.add-new-multicrypto-title {
-    text-align: center;
-    font-size: 1.5rem;
-    color: #3399FF;
+.add-address-container {
+  margin-bottom: 48px;
 }
 
-.add-new-multicrypto-select {
-  flex: 0 0 auto;
-}
-
-.add-new-multicrypto-select-value {
-  padding-right: 40px;
-  align-items: center;
-  font-family: var(--primary-font);
+.add-address-container .Select-control {
+  max-width: 200px;
+  border-width: 1px;
+  padding: 2px;
   color: var(--gray-text);
-  font-size: 14px;
-  font-weight: 400;
+  font-size: 12px;
 }
 
-.add-new-multicrypto-select .Select-input {
-    display: none !important;
+.add-address-container .Select-control .Select-input {
+  height: auto;
+  display: inherit !important;
 }
 
-.add-new-multicrypto-select-value-icon {
-    margin-right: 5px;
-}
-.add-new-multicrypto-select-value-text {
-    margin-left: 5%;
+.add-address-container .Select-control svg + span{
+  margin-left: 5px;
 }
 
-.add-new-multicrypto-input {
-    margin-top: 1rem;
-    margin-bottom: 4rem;
+.add-address__inputs {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
 }
-.add-new-multicrypto-input input{
-    width: 90%;
-    margin: 5%;
-    font-size: 1rem;
-    border-top: 0rem;
-    border-left: 0rem;
-    border-right: 0rem;
+
+.add-address__inputs #inputAddress {
+  flex: 1;
+  padding-right: 10px;
 }
-.add-new-multicrypto-bottom {
-    display: flex;
-}
-.add-new-multicrypto-button-cancel {
-    width: 50%;
-    float: left;
-    position: relative;
-}
-.add-new-multicrypto-button-save {
-    width: 50%;
-    float: left;
-    position: relative;
+
+.add-address__inputs #inputAddress input {
+  width: 100%;
+  border-radius: 12px;
+  height: 32px;
+  border: 1px solid var(--gray-text);
+  text-align: center;
+  font-size: 12px;
 }

@@ -7,6 +7,7 @@ import ObservableStore from 'obs-store';
 export class AbstractManager {
   constructor (props, initStoreState) {
     this.web3 = props.web3;
+    this.configurationProvider = props.configurationProvider;
     this.transactionController = props.transactionController;
     this.preferencesController = props.preferencesController;
     this.networkController = props.networkController;
@@ -37,6 +38,11 @@ export class AbstractManager {
   onUnlock () {
     this.unlocked = true;
   }
+
+  /**
+   * This event is to track when the user changes the rif configuration
+   */
+  onConfigurationUpdated (configuration) {}
 
   /**
    * It binds all the operations to be accessed from the outside.

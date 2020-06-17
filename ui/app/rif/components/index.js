@@ -4,7 +4,12 @@ import {DomainIcon, LuminoNodeIcon, RifStorageIcon} from './commons'
 import Menu from './menu/index'
 import h from 'react-hyperscript'
 import CustomModal from './modal/modal';
-import { Logo, Channels, JoinedChip, ChannelStatusChip,ChannelChiplet } from './tokens';
+import { GenericTable } from './table';
+import Subdomains from './subDomains';
+import ChainAddresses from './chainAddresses';
+import LuminoChannels from './luminoChannels';
+import LuminoNetworkChannels from './luminoNetworkChannels';
+import { Logo, Channels, JoinedChip, ChannelStatusChip, ChannelChiplet } from './tokens';
 
 function buildModal (modalComponent, currentModal) {
   return h(modalComponent, {key: currentModal.name, message: currentModal.message})
@@ -28,6 +33,11 @@ export {
   RifStorageIcon,
   Menu,
   showModal,
+  GenericTable,
+  Subdomains,
+  ChainAddresses,
+  LuminoChannels,
+  LuminoNetworkChannels,
   Logo,
   Channels,
   JoinedChip,

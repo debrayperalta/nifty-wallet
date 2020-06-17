@@ -1,0 +1,16 @@
+.settings-body {
+  height: 36em;
+  width: 22.3em;
+  overflow: scroll;
+}
+.settings-body .form-segment > input {
+  width: 100%;
+}
+.settings-body .form-segment{
+  flex-flow: column;
+}
+.settings-body .form-segment > span {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+}

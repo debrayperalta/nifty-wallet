@@ -53,7 +53,7 @@ class OpenChannel extends Component {
     return (
       <div>
         <div className="form-segment">
-          <input className="domain-address-input" type="text" placeholder="Enter address / domain"
+          <input className="domain-address-input domain-address-input--open-channel" type="text" placeholder="Enter address / domain"
                  onChange={(event) => this.changeDestination(event)}/>
           <span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -66,7 +66,7 @@ class OpenChannel extends Component {
           </span>
         </div>
         <div className="form-segment">
-          <input className="amount-input"
+          <input className="amount-input amount-input--open-channel"
                  type="text"
                  placeholder={this.props.tokenSymbol + ' Amount'}
                  onKeyDown={event => this.validateAmount(event)}
@@ -166,7 +166,7 @@ class OpenChannel extends Component {
     return (
       <div>
         <div className="form-segment">
-          <span onClick={() => this.open()}>+ Add channel</span>
+          <span className="ml-0" onClick={() => this.open()}>+ Add channel</span>
         </div>
         {body}
       </div>

@@ -1,11 +1,10 @@
 import * as niftyActions from '../../actions';
 import extend from 'xtend';
+import _ from 'lodash';
 import {lumino} from '../../../../app/scripts/controllers/rif/constants';
 import {CallbackHandlers} from './callback-handlers';
 import ethUtils from 'ethereumjs-util';
 import {sumValuesOfArray} from '../utils/utils';
-import rifConfig from '../../../../rif.config';
-import {mocks} from './mocks';
 import {parseLuminoError} from '../utils/parse';
 import web3Utils from 'web3-utils';
 
@@ -50,6 +49,7 @@ const rifActions = {
   closeChannel,
   deleteChannelFromSdk,
   getChannels,
+  getChannelsGroupedByNetwork,
   getAvailableCallbacks,
   getTokensWithJoinedCheck,
   getLuminoNetworks,
@@ -64,6 +64,9 @@ const rifActions = {
   createNetworkPayment,
   getDomainAddress,
   subscribeToCloseChannel,
+  getConfiguration,
+  setConfiguration,
+  rifEnabled,
 }
 
 let background = null;
@@ -195,11 +198,11 @@ function setResolverAddress (domainName, resolverAddress) {
   }
 }
 
-function setChainAddressForResolver (domainName, chain, chainAddress) {
+function setChainAddressForResolver (domainName, chain, chainAddress, subdomain = '') {
   return (dispatch) => {
     dispatch(niftyActions.showLoadingIndication());
     return new Promise((resolve, reject) => {
-      background.rif.rns.resolver.setChainAddressForResolver(domainName, chain, chainAddress, (error, result) => {
+      background.rif.rns.resolver.setChainAddressForResolver(domainName, chain, chainAddress, subdomain, (error, result) => {
         dispatch(niftyActions.hideLoadingIndication());
         if (error) {
           dispatch(niftyActions.displayWarning(error));
@@ -211,10 +214,10 @@ function setChainAddressForResolver (domainName, chain, chainAddress) {
   }
 }
 
-function getChainAddresses (domainName) {
+function getChainAddresses (domainName, subdomain = '') {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      background.rif.rns.resolver.getChainAddressForResolvers(domainName, (error, result) => {
+      background.rif.rns.resolver.getChainAddressForResolvers(domainName, subdomain, (error, result) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
           return reject(error);
@@ -740,17 +743,34 @@ function createPayment (partner, tokenAddress, netAmount, callbackHandlers = new
 function getChannels () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      if (rifConfig.mocksEnabled) {
-        return resolve(mocks.channels);
-      } else {
-        background.rif.lumino.getChannels((error, channels) => {
-          if (error) {
-            dispatch(niftyActions.displayWarning(error));
-            return reject(error)
-          }
-          return resolve(channels);
-        });
-      }
+      background.rif.lumino.getChannels((error, channels) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error)
+        }
+        return resolve(channels);
+      });
+    });
+  };
+}
+
+function getChannelsGroupedByNetwork () {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      dispatch(this.getChannels()).then(channelObject => {
+        const arrayWithoutKeys = [];
+        if (Object.keys(channelObject).length !== 0 && channelObject.constructor !== Object) {
+          channelObject.map(channelJson => {
+            const channel = channelJson[Object.keys(channelJson)[0]];
+            arrayWithoutKeys.push(channel);
+          });
+        }
+        const groupedBy = _.groupBy(arrayWithoutKeys, 'token_network_identifier');
+        return resolve(groupedBy);
+      }).catch(error => {
+        dispatch(niftyActions.displayWarning(error));
+        reject(error)
+      });
     });
   };
 }
@@ -758,17 +778,13 @@ function getChannels () {
 function getTokens () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      if (rifConfig.mocksEnabled) {
-        return resolve(mocks.tokens);
-      } else {
-        background.rif.lumino.getTokens((error, tokens) => {
-          if (error) {
-            dispatch(niftyActions.displayWarning(error));
-            return reject(error);
-          }
-          return resolve(tokens);
-        });
-      }
+      background.rif.lumino.getTokens((error, tokens) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(tokens);
+      });
     });
   };
 }
@@ -782,14 +798,10 @@ function getTokensWithJoinedCheck () {
           const channels = Object.keys(channelObject).map(channelKey => channelObject[channelKey]);
           tokens.map(token => {
             const tokenJoined = token;
-            tokenJoined.openedChannels = channels.filter(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address));
-            if (channels.find(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address))) {
-              tokenJoined.joined = true;
-            } else {
-              tokenJoined.joined = false;
-            }
-            const userBalance = sumValuesOfArray(tokenJoined.openedChannels, 'balance');
-            tokenJoined.userBalance = userBalance;
+            tokenJoined.openedChannels = channels.filter(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address) &&
+              channel.sdk_status === 'CHANNEL_OPENED');
+            tokenJoined.joined = !!channels.find(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address));
+            tokenJoined.userBalance = sumValuesOfArray(tokenJoined.openedChannels, 'balance');
             tokensJoined.push(tokenJoined);
           });
           resolve(tokensJoined);
@@ -808,32 +820,6 @@ function getTokensWithJoinedCheck () {
 function getLuminoNetworks (userAddress) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      // TODO: Delete this mock config when we do not need it anymore;
-      if (rifConfig.mocksEnabled) {
-        const networkMock1 = {
-          symbol: 'MRIF',
-          networkTokenAddress: '0x1234',
-          name: 'Mock RIF',
-          networkAddress: '0x12345',
-          channels: 20,
-          nodes: 5,
-          userChannels: 0,
-        }
-        const networkMock2 = {
-          symbol: 'MDoC',
-          networkTokenAddress: '0x12234',
-          name: 'Mock DoC',
-          networkAddress: '0x122345',
-          channels: 20,
-          nodes: 5,
-          userChannels: 2,
-        }
-        const networksMock = {
-          withChannels: [networkMock2],
-          withoutChannels: [networkMock1],
-        }
-        resolve(networksMock);
-      }
       dispatch(this.getTokens()).then(tokens => {
         const networks = {
           withChannels: [],
@@ -875,30 +861,7 @@ function getLuminoNetworks (userAddress) {
 }
 
 function getUserChannelsInNetwork (tokenAddress) {
-  // TODO: Replace the implementation with a direct fetch of the SDK
   return (dispatch) => new Promise((resolve, reject) => {
-      if (rifConfig.mocksEnabled) {
-        if (tokenAddress !== '0x12234') {
-          return resolve([]);
-        }
-        const mockData = [
-          {
-            balance: '100000000000',
-            partner_address: '0x460218fcd497991b380f38b77c61334ad442e7f6',
-            channel_identifier: 1,
-            state: 'Open',
-          },
-          {
-            balance: '1000000000000000000000000',
-            channel_identifier: 2,
-            state: 'Open',
-            token_network_identifier: '0x41a34C1B6035E89FAdecb445dbAFe5804BC13a8E',
-            partner_address: '0xd7387C9b5a2860bFb6e8E8F36c8983B0469C6d18',
-          },
-        ]
-        return resolve(mockData);
-      }
-
       background.rif.lumino.getChannels((error, channels) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
@@ -1010,5 +973,48 @@ function subscribeToCloseChannel (channelId, tokenAddress) {
     });
   };
 }
+
+function getConfiguration () {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.getConfiguration((error, configuration) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(configuration);
+      });
+    });
+  };
+}
+
+function setConfiguration (configuration) {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.setConfiguration(configuration, (error) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve();
+      });
+    });
+  };
+}
+
+function rifEnabled () {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      background.rif.enabled((error, enabled) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(enabled);
+      });
+    });
+  };
+}
+
 
 module.exports = rifActions

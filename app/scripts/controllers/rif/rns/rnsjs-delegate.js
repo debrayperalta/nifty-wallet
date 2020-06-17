@@ -1,6 +1,5 @@
 import RnsDelegate from './rns-delegate'
 import RNS from '@rsksmart/rns'
-import rifConfig from './../../../../../rif.config';
 import {rns} from '../constants'
 import {namehash} from '@rsksmart/rns/lib/utils'
 import web3Utils from 'web3-utils'
@@ -39,10 +38,11 @@ export default class RnsJsDelegate extends RnsDelegate {
    * @returns an object like {{networkId: (() => number) | number, contractAddresses: {registry: string}}}
    */
   getRNSOptions () {
+    const configuration = this.configurationProvider.getConfigurationObject();
     return {
       networkId: this.networkController.store.getState().networkId,
       contractAddresses: {
-        registry: rifConfig.rns.contracts.rns,
+        registry: configuration.rns.contracts.rns,
       },
     };
   }

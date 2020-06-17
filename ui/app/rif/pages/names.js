@@ -2,6 +2,7 @@ const pageNames = {
   rns: {
     domains: 'domains',
     domainsDetail: 'domainsDetail',
+    domainsDetailConfiguration: 'domainsDetailConfiguration',
     domainRegister: 'domainRegister',
     subdomains: 'subdomains',
     exchange: 'exchange',
@@ -17,6 +18,7 @@ const pageNames = {
     home: 'luminoHome',
     networkDetails: 'networkDetails',
   },
+  configuration: 'rifConfiguration',
 }
 
 export {

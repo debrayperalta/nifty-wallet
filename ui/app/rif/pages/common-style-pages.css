@@ -15,10 +15,11 @@
 .hand-over {
   cursor: pointer;
 }
+
 .body {
   width: 100%;
-  overflow: scroll;
-  height: 26.5em;
+  overflow-y: auto;
+  height: 352px;
   overflow-x: hidden;
   font-family: var(--primary-font);
 }

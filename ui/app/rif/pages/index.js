@@ -1,5 +1,6 @@
 import DomainsScreen from './domainsPage/domainsPage';
 import DomainsDetailScreen from './domainsDetailPage/domainsDetailPage';
+import DomainsDetailConfigurationScreen from './domainsDetailPage/domainDetailActive/domainDetailActiveConfig';
 import Subdomains from './rns/subdomains';
 import Exchange from './rns/exchange';
 import LuminoChannels from './rns/lumino-channels';
@@ -20,6 +21,7 @@ import ErrorComponent from '../../../../old-ui/app/components/error';
 import LuminoHome from './lumino/index';
 import LuminoNetworkDetails from './lumino/luminoNetworkDetails/index';
 import {pageNames} from './names';
+import RifConfiguration from './configuration';
 
 function getSearchBarComponent (show) {
   if (!show) {
@@ -54,7 +56,7 @@ function buildTabs (screenName, tabOptions) {
       index,
       title: tabDefinition.title,
       component: (
-        <div>
+        <div className="rif-tab-content__inside">
           {getSearchBarComponent(showSearchbar)}
           {getTabTitleComponent(tabTitle, tabOptions.hideTitle)}
           {tabComponent}
@@ -68,6 +70,12 @@ function buildTabs (screenName, tabOptions) {
 }
 
 function buildTabScreen (screenName, context, dispatch) {
+  if (screenName === pageNames.configuration) {
+    return (<div>
+      <ToastComponent/>
+      <RifConfiguration/>
+    </div>);
+  }
   const tabOptions = context.params.tabOptions;
   const tabs = buildTabs(screenName, tabOptions, dispatch);
   const onTabChange = (tab) => {
@@ -133,6 +141,8 @@ function getPageComponent (screenName) {
       return (<LuminoHome/>);
     case pageNames.lumino.networkDetails:
       return (<LuminoNetworkDetails/>);
+    case pageNames.rns.domainsDetailConfiguration:
+      return (<DomainsDetailConfigurationScreen/>);
   }
 }
 
