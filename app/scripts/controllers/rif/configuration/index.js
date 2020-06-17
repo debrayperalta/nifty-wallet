@@ -1,17 +1,18 @@
 import extend from 'xtend';
 import ObservableStore from 'obs-store';
 import {isRskNetwork} from '../utils/general';
+import {global} from '../constants';
 
 export class RifConfigurationProvider {
 
   constructor (props) {
     this.networkController = props.networkController;
+    const initConfiguration = {};
+    Object.keys(global.networks).forEach(key => {
+      initConfiguration[global.networks[key]] = null;
+    });
     const initState = extend({
-      configuration: {
-        '30': null,
-        '31': null,
-        '33': null,
-      },
+      configuration: initConfiguration,
     }, props.initState);
     this.store = new ObservableStore(initState);
   }
@@ -66,7 +67,7 @@ export class RifConfigurationProvider {
    */
   getInitialConfigStructure (chainId) {
     switch (chainId) {
-      case '30': // RSK Mainnet
+      case global.networks.main: // RSK Mainnet
         return {
           lumino: {
             hub: {
@@ -90,7 +91,7 @@ export class RifConfigurationProvider {
             },
           },
         };
-      case '31': // RSK Testnet
+      case global.networks.test: // RSK Testnet
         return {
           lumino: {
             hub: {
@@ -114,7 +115,7 @@ export class RifConfigurationProvider {
             },
           },
         };
-      case '33': // RSK Regtest
+      case global.networks.reg: // RSK Regtest
         return {
           lumino: {
             hub: {
@@ -164,13 +165,13 @@ export class RifConfigurationProvider {
   }
 
   getConfigurationObject () {
-    return this.store.getState().configuration[this.network ? this.network.id : '33'];
+    return this.store.getState().configuration[this.network ? this.network.id : global.networks.main];
   }
 
   setConfigurationObject (configuration) {
     const actualState = this.store.getState();
     if (this.validateConfiguration(configuration)) {
-      actualState.configuration[this.network ? this.network.id : '33'] = configuration;
+      actualState.configuration[this.network ? this.network.id : global.networks.main] = configuration;
       this.store.putState(actualState);
     } else {
       throw new Error('Invalid configuration provided');
