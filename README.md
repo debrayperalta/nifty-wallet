@@ -5,48 +5,6 @@
 
 [Internal documentation](./docs#documentation)
 
-## RIF
-
-Before you try to build this you need to deploy
- [rns-suite](https://github.com/rnsdomains/rns-suite) contracts into the 
-chain that you are working on. In the case you are testing using a real chain
-you should have the contracts addresses needed for this. After you have those 
-addresses you need to fill the file `rif/rif.config.{environment}.js` with those values, an example could be:
-
-```js
-module.exports = {
-  rns: {
-    contracts: {
-      rns: '0x03F23ae1917722d5A27a2Ea0Bcc98725a2a2a49a',
-      registrar: '0xfD1dda8C3BC734Bc1C8e71F69F25BFBEe9cE9535',
-      reverseRegistrar: '0x8901a2Bbf639bFD21A97004BA4D7aE2BD00B8DA8',
-      publicResolver: '0x1eD614cd3443EFd9c70F04b6d777aed947A4b0c4',
-      nameResolver: '0x0e19674ebc2c2B6Df3e7a1417c49b50235c61924',
-      multiChainResolver: '0x5159345aaB821172e795d56274D0f5FDFdC6aBD9',
-      rif: '0xdac5481925A298B95Bf5b54c35b68FC6fc2eF423',
-      fifsRegistrar: '0x8921BF2f074b5470c02Cc7473F17282576111591',
-      fifsAddrRegistrar: '0xc53A82b9B7c9af4801c7d8EA531719E7657aFF3C',
-      rskOwner: '0xA66939ac57893C2E65425a5D66099Bc20C76D4CD',
-      renewer: '0x23EF9610F53092A66bf224862BfD45216d9f3ea2',
-      stringResolver: '0x20804b7317D2F4d0d2123f30c2D3A6B0E33DfB37',
-    },
-  },
-}
-```
-As you can see in the file name we have a {environment} placeholder, that's because by default is production so
-if you run ```yarn start``` the project will take the file ```rif/rif.config.production.js```. You can 
-use any environment that you want, you just need to create a new file and then run the project
-with ```yarn start --environment=environmentname```.
-An example, let's say you have your environment setup and you put testing as the environment name. So you 
-create a file in the folder rif inside the project root called ```rif.config.testing.js```, then you run
-the project using this command ```yarn start --environment=testing``` that will load your environment
-into the ```rif.config.js``` file in the root of the project. ```rif.config.js``` gets overwritten each time 
-by the selected environment so don't use that file for setup. 
-
-NOTE: This applies to builds too. So if you want to build a production bundle you don't need to do anything since
-production is the default environment, but if you want to build another environment you need to specify the
-argument on the build command.
-
 ## Building locally
 
  - Install [Node.js](https://nodejs.org/en/) version 10.x.x and npm version 6.13.4

@@ -1,11 +1,15 @@
-import {lumino} from '../../../../../rif.config';
-
 const ENDPOINT_EXPLORER_DASHBOARD = '/dashboard';
 
 export class LuminoExplorer {
+
+  constructor (props) {
+    this.configurationProvider = props.configurationProvider;
+  }
+
   getTokens () {
+    const configuration = this.configurationProvider.getConfigurationObject();
     return new Promise((resolve, reject) => {
-      fetch(lumino.explorer.endpoint + ENDPOINT_EXPLORER_DASHBOARD)
+      fetch(configuration.lumino.explorer.endpoint + ENDPOINT_EXPLORER_DASHBOARD)
         .then(response => {
           return response.json();
         })

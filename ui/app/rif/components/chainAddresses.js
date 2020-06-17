@@ -7,7 +7,6 @@ import {getChainAddressByChainAddress} from '../utils/utils';
 import {DEFAULT_ICON, GET_RESOLVERS, SVG_PLUS} from '../constants';
 import ItemWithActions from './item-with-actions';
 import InputWithSubmit from './InputWithSubmit';
-import rifConfig from '../../../../rif.config';
 import AddNewChainAddressToResolver
   from '../pages/domainsDetailPage/domainDetailActive/addNewTokenNetworkAddress/addNewChainAddressToResolver';
 import {SLIP_ADDRESSES} from '../constants/slipAddresses';
@@ -31,15 +30,22 @@ class ChainAddresses extends Component {
     showTransactionConfirmPage: PropTypes.func,
     paginationSize: PropTypes.number,
     classes: PropTypes.any,
+    getConfiguration: PropTypes.func,
   }
 
   constructor (props) {
     super(props);
-    const resolvers = Object.assign([], GET_RESOLVERS());
+    this.props.getConfiguration()
+      .then(configuration => {
+        const resolvers = Object.assign([], GET_RESOLVERS(configuration));
+        this.setState({
+          resolvers,
+        });
+      });
     const slipChainAddresses = Object.assign([], SLIP_ADDRESSES);
     this.state = {
       chainAddresses: [],
-      resolvers: resolvers,
+      resolvers: [],
       slipChainAddresses: slipChainAddresses,
       selectedChainAddress: slipChainAddresses[0].chain,
       insertedAddress: '',
@@ -60,10 +66,11 @@ class ChainAddresses extends Component {
   }
 
   async loadChainAddresses () {
-  if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress && resolver.isMultiChain)) {
+    const configuration = await this.props.getConfiguration();
+    if (this.state.resolvers.find(resolver => resolver.address === this.props.selectedResolverAddress && resolver.isMultiChain)) {
       const chainAddresses = await this.props.getChainAddresses(this.props.domainName, this.props.subdomainName);
       this.setState({chainAddresses: chainAddresses});
-    } else if (rifConfig.mocksEnabled) {
+    } else if (configuration.mocksEnabled) {
       const chainAddresses = await this.props.getChainAddresses(this.props.domainName, this.props.subdomainName);
       this.setState({chainAddresses: chainAddresses});
     }
@@ -217,6 +224,7 @@ function mapDispatchToProps (dispatch) {
     showThis: (pageName, props) => dispatch(rifActions.navigateTo(pageName, props)),
     waitForListener: (transactionListenerId) => dispatch(rifActions.waitForTransactionListener(transactionListenerId)),
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
+    getConfiguration: () => dispatch(rifActions.getConfiguration()),
   }
 }
 module.exports = connect(mapStateToProps, mapDispatchToProps)(ChainAddresses);

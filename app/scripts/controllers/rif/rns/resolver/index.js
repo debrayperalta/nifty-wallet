@@ -14,8 +14,14 @@ import {ChainId} from '@rsksmart/rns/lib/types';
  */
 export default class RnsResolver extends RnsJsDelegate {
   initialize () {
-    this.rskOwnerContractInstance = this.web3.eth.contract(RSKOwner).at(this.rifConfig.rns.contracts.rskOwner);
-    this.multiChainresolverContractInstance = this.web3.eth.contract(MultiChainresolver).at(this.rifConfig.rns.contracts.multiChainResolver);
+    const configuration = this.configurationProvider.getConfigurationObject();
+    this.rskOwnerContractInstance = this.web3.eth.contract(RSKOwner).at(configuration.rns.contracts.rskOwner);
+    this.multiChainresolverContractInstance = this.web3.eth.contract(MultiChainresolver).at(configuration.rns.contracts.multiChainResolver);
+  }
+
+  onConfigurationUpdated (configuration) {
+    this.rskOwnerContractInstance = this.web3.eth.contract(RSKOwner).at(configuration.rns.contracts.rskOwner);
+    this.multiChainresolverContractInstance = this.web3.eth.contract(MultiChainresolver).at(configuration.rns.contracts.multiChainResolver);
   }
 
   buildApi () {

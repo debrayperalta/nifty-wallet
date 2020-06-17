@@ -48,7 +48,3 @@ notes.txt
 .nyc_output
 
 /old-ui/app/css/rif.css
-rif.config.js
-rif/rif.config.local.js
-rif/rif.config.staging.js
-rif/rif.config.production.js

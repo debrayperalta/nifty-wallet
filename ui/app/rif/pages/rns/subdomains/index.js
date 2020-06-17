@@ -82,13 +82,20 @@ class Subdomains extends Component {
     showThis: PropTypes.func,
     showToast: PropTypes.func,
     getSubdomains: PropTypes.func,
+    getConfiguration: PropTypes.func,
   }
 
   constructor (props) {
     super(props);
-    const resolvers = Object.assign([], GET_RESOLVERS());
+    this.props.getConfiguration()
+      .then(configuration => {
+        const resolvers = Object.assign([], GET_RESOLVERS(configuration));
+        this.setState({
+          resolvers,
+        });
+      });
     this.state = {
-      resolvers: resolvers,
+      resolvers: [],
     };
   }
 
@@ -197,6 +204,7 @@ function mapDispatchToProps (dispatch) {
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
     isSubdomainAvailable: (domainName, subdomain) => dispatch(rifActions.isSubdomainAvailable(domainName, subdomain)),
     deleteSubdomain: (domainName, subdomain) => dispatch(rifActions.deleteSubdomain(domainName, subdomain)),
+    getConfiguration: () => dispatch(rifActions.getConfiguration()),
   }
 }
 module.exports = connect(mapStateToProps, mapDispatchToProps)(Subdomains);

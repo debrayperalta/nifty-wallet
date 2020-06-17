@@ -116,12 +116,19 @@ class DomainsDetailActiveScreen extends Component {
     getDomain: PropTypes.func,
     showToast: PropTypes.func,
     showConfigPage: PropTypes.func,
+    getConfiguration: PropTypes.func,
 	}
 	constructor (props) {
 		super(props);
-    const resolvers = Object.assign([], GET_RESOLVERS());
+    this.props.getConfiguration()
+      .then(configuration => {
+        const resolvers = Object.assign([], GET_RESOLVERS(configuration));
+        this.setState({
+          resolvers,
+        });
+      });
 		this.state = {
-			resolvers: resolvers,
+			resolvers: [],
 		};
 	}
 
@@ -237,6 +244,7 @@ const mapDispatchToProps = dispatch => {
     getDomain: (domainName) => dispatch(rifActions.getDomain(domainName)),
     showToast: (message, success) => dispatch(niftyActions.displayToast(message, success)),
     showConfigPage: (props) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetailConfiguration, props)),
+    getConfiguration: () => dispatch(rifActions.getConfiguration()),
 	}
 }
 
