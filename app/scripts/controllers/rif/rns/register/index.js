@@ -21,6 +21,7 @@ export default class RnsRegister extends RnsJsDelegate {
   }
 
   onConfigurationUpdated (configuration) {
+    super.onConfigurationUpdated(configuration);
     this.fifsAddrRegistrarAddress = configuration.rns.contracts.fifsAddrRegistrar;
     this.fifsAddrRegistrarInstance = this.web3.eth.contract(FIFSRegistrar).at(this.fifsAddrRegistrarAddress);
   }
