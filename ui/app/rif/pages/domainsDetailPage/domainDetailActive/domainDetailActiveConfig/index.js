@@ -76,9 +76,9 @@ class DomainsDetailConfigurationScreen extends Component {
     const { selectedResolverAddress } = this.props;
     const { disableSelect } = this.state;
     return (
-      <div>
-        <span>Resolver</span>
-        <p>The Resolver is a Smart Contract responsible for the process of translating names into addresses. You can select a public resolver or a custom resolver.</p>
+      <div className="resolver-setting-container">
+        <h3 className="resolver-setting__title">Resolver</h3>
+        <p className="resolver-setting__text">The Resolver is a Smart Contract responsible for the process of translating names into addresses. You can select a public resolver or a custom resolver.</p>
         <div id="selectResolver">
           <select id="comboResolvers"
                   defaultValue={this.getDefaultSelectedValue(this.state.resolvers, selectedResolverAddress)}

@@ -82,7 +82,7 @@ class ChainAddresses extends Component {
           text={chainAddress.address} leftIcon={icon}
           onDeleteClick={this.onDeleteClick.bind(this, chainAddress.chain)}
         >
-          <InputWithSubmit hiddenValue={chainAddress.chain} submit={this.onChangeSubmit} />
+          <InputWithSubmit classes={classes.editSubmit} hiddenValue={chainAddress.chain} submit={this.onChangeSubmit} placeholderText={'Type new address'} />
         </ItemWithActions>
       )
       return {
@@ -166,8 +166,8 @@ class ChainAddresses extends Component {
         {
           data.length === 0 &&
           <div>
-            <span>Addresses</span>
-            <span>No addresses found</span>
+            <span className={classes.title}>Addresses</span>
+            <span className={classes.notFound}>No addresses found</span>
           </div>
         }
         {(isOwner && resolvers.find(resolver => resolver.address === selectedResolverAddress && resolver.isMultiChain)) &&

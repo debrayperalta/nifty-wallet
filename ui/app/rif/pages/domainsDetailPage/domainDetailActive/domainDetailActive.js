@@ -36,6 +36,8 @@ const styles = {
       inactivePageButton: 'n-table-pagination-inactive',
       buttonNext: 'n-table-pagination-next',
     },
+    notFound: 'not-found-info',
+    editSubmit: 'edit-submit-container',
   },
   subdomains: {
     title: 'n-table-title',
@@ -62,6 +64,8 @@ const styles = {
       inactivePageButton: 'n-table-pagination-inactive',
       buttonNext: 'n-table-pagination-next',
     },
+    notFound: 'not-found-info',
+    editSubmit: 'edit-submit-container',
   },
   LuminoNetworkChannels: {
     title: 'n-table-title',
@@ -88,6 +92,8 @@ const styles = {
       inactivePageButton: 'n-table-pagination-inactive',
       buttonNext: 'n-table-pagination-next',
     },
+    notFound: 'not-found-info',
+    editSubmit: 'edit-submit-container',
   },
 }
 
@@ -145,7 +151,7 @@ class DomainsDetailActiveScreen extends Component {
                       showOwnerIcon={isOwner}
                       showLuminoNodeIcon={isLuminoNode}
                       showRifStorageIcon={isRifStorage}>
-          <svg width="19" height="23" viewBox="0 0 19 23" fill="none" xmlns="http://www.w3.org/2000/svg"
+          <svg width="19" height="23" viewBox="0 0 19 23" fill="none" xmlns="http://www.w3.org/2000/svg" className="config-domain-btn"
             onClick={() => this.props.showConfigPage({
               domain: domain,
               domainName: domainName,

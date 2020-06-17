@@ -65,7 +65,7 @@ class AddNewChainAddressToResolver extends Component {
       )
     }
 		return (
-		<div>
+		<div className="add-address-container">
 			<div id="comboChainAddresses">
         <Select
 					searchable={false}
@@ -78,10 +78,12 @@ class AddNewChainAddressToResolver extends Component {
           valueComponent={selectValue}
         />
       </div>
-      <div id="inputAddress">
-        <input type="text" placeholder="value" onChange={this.updateAddress} />
+      <div className="add-address__inputs">
+        <div id="inputAddress">
+          <input type="text" placeholder="Type address" onChange={this.updateAddress} />
+        </div>
+        <button className="btn-primary" onClick={() => this.props.confirmCallback() } >Add</button>
       </div>
-      <button onClick={() => this.props.confirmCallback() } >Add Address</button>
 		</div>
 		)
 	}

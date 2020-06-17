@@ -85,8 +85,8 @@ class LuminoNetworkChannels extends Component {
       {
         data.length === 0 &&
         <div>
-          <span>Lumino Channels</span>
-          <span>No channels found</span>
+          <span className={classes.title}>Lumino Channels</span>
+          <span className={classes.notFound}>No channels found</span>
         </div>
       }
         {isOwner &&

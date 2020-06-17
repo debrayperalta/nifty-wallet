@@ -7,6 +7,8 @@ class InputWithSubmit extends Component {
   static propTypes = {
     hiddenValue: PropTypes.any,
     submit: PropTypes.func,
+    classes: PropTypes.string,
+    placeholderText: PropTypes.string,
   }
 
   constructor (props) {
@@ -31,10 +33,12 @@ class InputWithSubmit extends Component {
   }
 
   render = () => {
+    const {classes, placeholderText} = this.props
     const {value} = this.state;
-    return <div>
-      <input onChange={this.onChange} value={value} />
-      <button onClick={this.onSubmit}>Submit</button>
+
+    return <div className={classes}>
+      <input onChange={this.onChange} value={value} placeholder={placeholderText} />
+      <button onClick={this.onSubmit} className="btn-primary">Change</button>
     </div>;
   }
 }

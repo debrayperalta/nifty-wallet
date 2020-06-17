@@ -36,6 +36,8 @@ const styles = {
       inactivePageButton: 'n-table-pagination-inactive',
       buttonNext: 'n-table-pagination-next',
     },
+    notFound: 'not-found-info',
+    editSubmit: 'edit-submit-container',
   },
   luminoNetworkChannels: {
     title: 'n-table-title',
@@ -62,6 +64,8 @@ const styles = {
       inactivePageButton: 'n-table-pagination-inactive',
       buttonNext: 'n-table-pagination-next',
     },
+    notFound: 'not-found-info',
+    editSubmit: 'edit-submit-container',
   },
 }
 
@@ -126,7 +130,7 @@ class Subdomains extends Component {
     const displayName = domainName + '.' + subdomain.name;
     const { resolvers } = this.state;
     return (
-      <div>
+      <div className="subdomain-page">
         <DomainHeader
           domainName={displayName}
           showOwnerIcon={isOwner}
@@ -137,9 +141,9 @@ class Subdomains extends Component {
               onClick={() => this.openDeletePopup(subdomain)}
               className={
                 {
-                  button: '',
+                  button: 'ml-auto',
                   icon: '',
-                  text: '',
+                  text: 'btn-primary btn-primary-outlined',
                 }
               }
             />
