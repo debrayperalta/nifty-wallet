@@ -15,7 +15,15 @@ export default class RnsRegister extends RnsJsDelegate {
   }
 
   initialize () {
-    this.fifsAddrRegistrarInstance = this.web3.eth.contract(FIFSRegistrar).at(this.rifConfig.rns.contracts.fifsAddrRegistrar);
+    const configuration = this.configurationProvider.getConfigurationObject();
+    this.fifsAddrRegistrarAddress = configuration.rns.contracts.fifsAddrRegistrar;
+    this.fifsAddrRegistrarInstance = this.web3.eth.contract(FIFSRegistrar).at(this.fifsAddrRegistrarAddress);
+  }
+
+  onConfigurationUpdated (configuration) {
+    super.onConfigurationUpdated(configuration);
+    this.fifsAddrRegistrarAddress = configuration.rns.contracts.fifsAddrRegistrar;
+    this.fifsAddrRegistrarInstance = this.web3.eth.contract(FIFSRegistrar).at(this.fifsAddrRegistrarAddress);
   }
 
   buildApi () {
@@ -150,7 +158,7 @@ export default class RnsRegister extends RnsJsDelegate {
               const secret = registerInformation.secret;
               const durationBN = this.web3.toBigNumber(registerInformation.yearsToRegister);
               const data = this.getAddrRegisterData(cleanDomainName, this.address, secret, durationBN, this.address);
-              const transactionListener = this.send(this.rifContractInstance, 'transferAndCall', [this.rifConfig.rns.contracts.fifsAddrRegistrar, rifCost, data]);
+              const transactionListener = this.send(this.rifContractInstance, 'transferAndCall', [this.fifsAddrRegistrarAddress, rifCost, data]);
               transactionListener.transactionConfirmed()
                 .then(transactionReceipt => {
                   console.debug('Transaction success', transactionReceipt);

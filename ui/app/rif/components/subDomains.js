@@ -112,8 +112,8 @@ class Subdomains extends Component {
         {
           data.length === 0 &&
           <div>
-            <span>Subdomains</span>
-            <span>No subdomains found</span>
+            <span className={classes.title}>Subdomains</span>
+            <span className={classes.notFound}>No subdomains found</span>
           </div>
         }
         {isOwner &&

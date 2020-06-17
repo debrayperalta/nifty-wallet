@@ -36,6 +36,8 @@ const styles = {
       inactivePageButton: 'n-table-pagination-inactive',
       buttonNext: 'n-table-pagination-next',
     },
+    notFound: 'not-found-info',
+    editSubmit: 'edit-submit-container',
   },
   luminoNetworkChannels: {
     title: 'n-table-title',
@@ -62,6 +64,8 @@ const styles = {
       inactivePageButton: 'n-table-pagination-inactive',
       buttonNext: 'n-table-pagination-next',
     },
+    notFound: 'not-found-info',
+    editSubmit: 'edit-submit-container',
   },
 }
 
@@ -82,13 +86,20 @@ class Subdomains extends Component {
     showThis: PropTypes.func,
     showToast: PropTypes.func,
     getSubdomains: PropTypes.func,
+    getConfiguration: PropTypes.func,
   }
 
   constructor (props) {
     super(props);
-    const resolvers = Object.assign([], GET_RESOLVERS());
+    this.props.getConfiguration()
+      .then(configuration => {
+        const resolvers = Object.assign([], GET_RESOLVERS(configuration));
+        this.setState({
+          resolvers,
+        });
+      });
     this.state = {
-      resolvers: resolvers,
+      resolvers: [],
     };
   }
 
@@ -126,7 +137,7 @@ class Subdomains extends Component {
     const displayName = domainName + '.' + subdomain.name;
     const { resolvers } = this.state;
     return (
-      <div>
+      <div className="subdomain-page">
         <DomainHeader
           domainName={displayName}
           showOwnerIcon={isOwner}
@@ -137,9 +148,9 @@ class Subdomains extends Component {
               onClick={() => this.openDeletePopup(subdomain)}
               className={
                 {
-                  button: '',
+                  button: 'ml-auto',
                   icon: '',
-                  text: '',
+                  text: 'btn-primary btn-primary-outlined',
                 }
               }
             />
@@ -197,6 +208,7 @@ function mapDispatchToProps (dispatch) {
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
     isSubdomainAvailable: (domainName, subdomain) => dispatch(rifActions.isSubdomainAvailable(domainName, subdomain)),
     deleteSubdomain: (domainName, subdomain) => dispatch(rifActions.deleteSubdomain(domainName, subdomain)),
+    getConfiguration: () => dispatch(rifActions.getConfiguration()),
   }
 }
 module.exports = connect(mapStateToProps, mapDispatchToProps)(Subdomains);

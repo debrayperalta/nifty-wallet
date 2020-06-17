@@ -1,6 +1,7 @@
 import {TransactionListener} from '../transaction-listener';
 import extend from 'xtend';
 import {bindOperation} from '../utils/general';
+import {global} from '../constants';
 
 /**
  * Delegate class to encapsulate all the logic related to delegates.
@@ -11,12 +12,12 @@ export default class RnsDelegate {
     this.preferencesController = props.preferencesController;
     this.networkController = props.networkController;
     this.transactionController = props.transactionController;
-    this.rifConfig = props.rifConfig;
     this.rnsContractInstance = props.rnsContractInstance;
     this.rifContractInstance = props.rifContractInstance;
     this.address = props.address;
     this.store = props.store;
     this.store.transactionListeners = {};
+    this.configurationProvider = props.configurationProvider;
     this.initialize();
   }
 
@@ -195,7 +196,10 @@ export default class RnsDelegate {
    * @param newState
    */
   updateStoreState (newState) {
-    this.store.putState(newState);
+    const storeState = this.store.getState();
+    const currentNetworkId = this.networkController.getNetworkState() === 'loading' ? global.networks.main : this.networkController.getNetworkState();
+    storeState[currentNetworkId] = newState;
+    this.store.putState(storeState);
   }
 
   /**
@@ -203,7 +207,9 @@ export default class RnsDelegate {
    * @returns the current state
    */
   getStoreState () {
-    return this.store.getState();
+    const storeState = this.store.getState();
+    const currentNetworkId = this.networkController.getNetworkState() === 'loading' ? global.networks.main : this.networkController.getNetworkState();
+    return storeState[currentNetworkId] ? storeState[currentNetworkId] : {};
   }
 
   /**
@@ -237,4 +243,9 @@ export default class RnsDelegate {
     currentState[containerName][[this.address]] = extend(currentState[containerName][[this.address]], newState);
     this.updateStoreState(currentState);
   }
+
+  /**
+   * This event is to track when the user changes the rif configuration
+   */
+  onConfigurationUpdated (configuration) {}
 }

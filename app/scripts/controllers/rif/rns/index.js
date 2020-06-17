@@ -1,13 +1,12 @@
 import RnsRegister from './register'
 import RnsResolver from './resolver'
 import RnsTransfer from './transfer'
-import rifConfig from './../../../../../rif.config'
 import RNS from './abis/RNS.json'
 import RIF from './abis/RIF.json'
 import extend from 'xtend'
-import ObservableStore from 'obs-store'
 import {RnsContainer} from './container';
 import {AbstractManager} from '../abstract-manager';
+import {isRskNetwork} from '../utils/general';
 
 /**
  * This class encapsulates all the RNS operations, it initializes and call to all the delegates and exposes their operations.
@@ -18,49 +17,48 @@ import {AbstractManager} from '../abstract-manager';
  */
 export default class RnsManager extends AbstractManager {
   constructor (props) {
-    super(props);
-    this.rifConfig = rifConfig;
-    this.rnsContractInstance = this.web3.eth.contract(RNS).at(this.rifConfig.rns.contracts.rns);
-    this.rifContractInstance = this.web3.eth.contract(RIF).at(this.rifConfig.rns.contracts.rif);
     const initState = extend({
       register: {},
       resolver: {},
       transfer: {},
     }, props.initState);
-    this.store = new ObservableStore(initState);
+    super(props, initState);
+    const configuration = this.configurationProvider.getConfigurationObject();
+    this.rnsContractInstance = this.web3.eth.contract(RNS).at(configuration.rns.contracts.rns);
+    this.rifContractInstance = this.web3.eth.contract(RIF).at(configuration.rns.contracts.rif);
 
     const register = new RnsRegister({
       web3: this.web3,
       preferencesController: this.preferencesController,
       networkController: this.networkController,
       transactionController: this.transactionController,
-      rifConfig,
       rnsContractInstance: this.rnsContractInstance,
       rifContractInstance: this.rifContractInstance,
       address: this.address,
       store: this.store,
+      configurationProvider: this.configurationProvider,
     });
     const resolver = new RnsResolver({
       web3: this.web3,
       preferencesController: this.preferencesController,
       networkController: this.networkController,
       transactionController: this.transactionController,
-      rifConfig,
       rnsContractInstance: this.rnsContractInstance,
       rifContractInstance: this.rifContractInstance,
       address: this.address,
       store: this.store,
+      configurationProvider: this.configurationProvider,
     });
     const transfer = new RnsTransfer({
       web3: this.web3,
       preferencesController: this.preferencesController,
       networkController: this.networkController,
       transactionController: this.transactionController,
-      rifConfig,
       rnsContractInstance: this.rnsContractInstance,
       rifContractInstance: this.rifContractInstance,
       address: this.address,
       store: this.store,
+      configurationProvider: this.configurationProvider,
     });
     this.container = new RnsContainer({
       register,
@@ -78,6 +76,31 @@ export default class RnsManager extends AbstractManager {
     this.container.register.address = address;
     this.container.resolver.address = address;
     this.container.transfer.address = address;
+  }
+
+  onNetworkChanged (network) {
+    if (isRskNetwork(network.id)) {
+      const configuration = this.configurationProvider.getConfigurationObject();
+      this.reloadConfiguration(configuration);
+    }
+  }
+
+  onConfigurationUpdated (configuration) {
+    this.reloadConfiguration(configuration);
+  }
+
+  reloadConfiguration (configuration) {
+    this.rnsContractInstance = this.web3.eth.contract(RNS).at(configuration.rns.contracts.rns);
+    this.rifContractInstance = this.web3.eth.contract(RIF).at(configuration.rns.contracts.rif);
+    this.container.register.rnsContractInstance = this.rnsContractInstance;
+    this.container.register.rifContractInstance = this.rifContractInstance;
+    this.container.resolver.rnsContractInstance = this.rnsContractInstance;
+    this.container.resolver.rifContractInstance = this.rifContractInstance;
+    this.container.transfer.rnsContractInstance = this.rnsContractInstance;
+    this.container.transfer.rifContractInstance = this.rifContractInstance;
+    this.container.register.onConfigurationUpdated(configuration);
+    this.container.resolver.onConfigurationUpdated(configuration);
+    this.container.transfer.onConfigurationUpdated(configuration);
   }
 
   /**

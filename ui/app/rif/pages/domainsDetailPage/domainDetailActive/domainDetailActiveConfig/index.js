@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { GET_RESOLVERS } from '../../../../constants';
-import {rns} from '../../../../../../../rif.config'
 import niftyActions from '../../../../../actions';
 import rifActions from '../../../../actions';
 import {pageNames} from '../../../names';
@@ -18,13 +17,22 @@ class DomainsDetailConfigurationScreen extends Component {
     showTransactionConfirmPage: PropTypes.func,
     showDomainConfigPage: PropTypes.func,
     disableSelect: PropTypes.bool,
+    getConfiguration: PropTypes.func,
   }
 
   constructor (props) {
     super(props);
-    const resolvers = Object.assign([], GET_RESOLVERS());
+    this.props.getConfiguration()
+      .then(configuration => {
+        const resolvers = Object.assign([], GET_RESOLVERS(configuration));
+        this.setState({
+          resolvers,
+          configuration,
+        });
+      });
     this.state = {
-      resolvers: resolvers,
+      resolvers: [],
+      configuration: null,
       disableSelect: props.disableSelect || false,
       selectedAddress: '',
     };
@@ -35,7 +43,7 @@ class DomainsDetailConfigurationScreen extends Component {
     if (selectedResolver) {
       return selectedResolver.name;
     }
-    return rns.contracts.publicResolver;
+    return this.state.configuration.rns.contracts.publicResolver;
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -75,17 +83,23 @@ class DomainsDetailConfigurationScreen extends Component {
   render () {
     const { selectedResolverAddress } = this.props;
     const { disableSelect } = this.state;
+    const { configuration } = this.state;
+
+    if (!configuration) {
+      return (<div>Loading...</div>);
+    }
+
     return (
-      <div>
-        <span>Resolver</span>
-        <p>The Resolver is a Smart Contract responsible for the process of translating names into addresses. You can select a public resolver or a custom resolver.</p>
+      <div className="resolver-setting-container">
+        <h3 className="resolver-setting__title">Resolver</h3>
+        <p className="resolver-setting__text">The Resolver is a Smart Contract responsible for the process of translating names into addresses. You can select a public resolver or a custom resolver.</p>
         <div id="selectResolver">
           <select id="comboResolvers"
                   defaultValue={this.getDefaultSelectedValue(this.state.resolvers, selectedResolverAddress)}
                   onChange={this.onChangeComboResolvers.bind(this)}
                   disabled={disableSelect}
           >
-            <option disabled value={rns.contracts.publicResolver} hidden> Select Resolver </option>
+            <option disabled value={this.state.configuration.rns.contracts.publicResolver} hidden> Select Resolver </option>
             {
               this.state.resolvers.map((resolver, index) => {
                 return (<option
@@ -123,6 +137,7 @@ const mapDispatchToProps = dispatch => {
     setNewResolver: (domainName, resolverAddress) => dispatch(rifActions.setResolverAddress(domainName, resolverAddress)),
     showTransactionConfirmPage: (afterApproval) => dispatch(rifActions.goToConfirmPageForLastTransaction(afterApproval)),
     showDomainConfigPage: (props) => dispatch(rifActions.navigateTo(pageNames.rns.domainsDetailConfiguration, props)),
+    getConfiguration: () => dispatch(rifActions.getConfiguration()),
   }
 }
 

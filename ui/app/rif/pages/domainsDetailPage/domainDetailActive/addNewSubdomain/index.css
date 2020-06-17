@@ -1,0 +1,25 @@
+.add-subdomain-container {
+  margin-bottom: 48px;
+}
+
+.add-subdomain-container input {
+  height: 30px;
+  border: 1px solid var(--gray-text);
+  text-align: center;
+  font-size: 12px;
+}
+
+.add-subdomain__inputs {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.add-subdomain__inputs input {
+  border-radius: 12px;
+  flex: 1;
+}
+
+.add-subdomain__inputs input + button {
+  margin-left: 10px;
+}

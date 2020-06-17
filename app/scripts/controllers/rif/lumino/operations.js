@@ -1,13 +1,13 @@
 import web3Utils from 'web3-utils';
 import {checkRequiredParameters, checksumAddresses} from '../utils/general';
 import {isValidRNSDomain} from '../../../../../ui/app/rif/utils/parse';
-import {notifier} from '../../../../../rif.config';
 
 export class LuminoOperations {
 
   constructor (props) {
     this.lumino = props.lumino;
     this.address = web3Utils.toChecksumAddress(props.address);
+    this.configurationProvider = props.configurationProvider;
   }
 
   updateAddress (newAddress) {
@@ -139,7 +139,8 @@ export class LuminoOperations {
   }
 
   subscribeToCloseChannel (channelId, tokenAddress) {
-    this.subscribeToCloseChannelForNotifiers(notifier.availableNodes, channelId, tokenAddress);
+    const configuration = this.configurationProvider.getConfigurationObject();
+    this.subscribeToCloseChannelForNotifiers(configuration.notifier.availableNodes, channelId, tokenAddress);
     return Promise.resolve();
   }
 
