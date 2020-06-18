@@ -20,6 +20,7 @@ export default class RnsResolver extends RnsJsDelegate {
   }
 
   onConfigurationUpdated (configuration) {
+    super.onConfigurationUpdated(configuration);
     this.rskOwnerContractInstance = this.web3.eth.contract(RSKOwner).at(configuration.rns.contracts.rskOwner);
     this.multiChainresolverContractInstance = this.web3.eth.contract(MultiChainresolver).at(configuration.rns.contracts.multiChainResolver);
   }

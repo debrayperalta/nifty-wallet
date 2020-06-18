@@ -4,6 +4,7 @@ import ComposableObservableStore from './../../lib/ComposableObservableStore'
 import {LuminoManager} from './lumino';
 import {bindOperation, isRskNetwork} from './utils/general';
 import {RifConfigurationProvider} from './configuration';
+import {global} from './constants';
 
 /**
  * RIF Controller
@@ -27,10 +28,15 @@ export default class RifController {
 
     const initState = props.initState || {};
 
+    const currentNetworkId = this.metamaskController.networkController.getNetworkState() === 'loading' ? global.networks.main :
+      this.metamaskController.networkController.getNetworkState();
+
     this.configurationProvider = new RifConfigurationProvider({
       initState: initState.RifConfigurationProvider,
       networkController: this.metamaskController.networkController,
     });
+
+    this.configurationProvider.loadConfiguration(currentNetworkId);
 
     this.rnsManager = new RnsManager({
       initState: initState.RnsManager,
@@ -164,9 +170,11 @@ export default class RifController {
   }
 
   setConfiguration (configuration) {
-    this.configurationProvider.setConfiguration(configuration);
-    this.rnsManager.onConfigurationUpdated(configuration);
-    this.luminoManager.onConfigurationUpdated(configuration);
+    if (configuration) {
+      this.configurationProvider.setConfiguration(configuration);
+      this.rnsManager.onConfigurationUpdated(configuration);
+      this.luminoManager.onConfigurationUpdated(configuration);
+    }
     return Promise.resolve();
   }
 

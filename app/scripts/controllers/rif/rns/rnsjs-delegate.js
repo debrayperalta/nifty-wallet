@@ -372,5 +372,9 @@ export default class RnsJsDelegate extends RnsDelegate {
     this.updateStateForContainer(rns.storeContainers.register, state);
   }
 
+  onConfigurationUpdated (configuration) {
+    super.onConfigurationUpdated(configuration);
+    this.rnsJs = new RNS(this.web3, this.getRNSOptions());
+  }
 
 }
