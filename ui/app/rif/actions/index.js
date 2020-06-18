@@ -819,7 +819,31 @@ function getTokensWithJoinedCheck () {
 
 function getLuminoNetworks (userAddress) {
   return (dispatch) => {
+
     return new Promise((resolve, reject) => {
+      const networkMock1 = {
+        symbol: 'MRIF',
+        networkTokenAddress: '0x1234',
+        name: 'Mock RIF',
+        networkAddress: '0x12345',
+        channels: 20,
+        nodes: 5,
+        userChannels: 0,
+      }
+      const networkMock2 = {
+        symbol: 'MDoC',
+        networkTokenAddress: '0x12234',
+        name: 'Mock DoC',
+        networkAddress: '0x122345',
+        channels: 20,
+        nodes: 5,
+        userChannels: 2,
+      }
+      const networksMock = {
+        withChannels: [networkMock2],
+        withoutChannels: [networkMock1],
+      }
+      resolve(networksMock);
       dispatch(this.getTokens()).then(tokens => {
         const networks = {
           withChannels: [],
@@ -862,6 +886,25 @@ function getLuminoNetworks (userAddress) {
 
 function getUserChannelsInNetwork (tokenAddress) {
   return (dispatch) => new Promise((resolve, reject) => {
+      if (tokenAddress !== '0x12234') {
+        return resolve([]);
+      }
+      const mockData = [
+        {
+          balance: '100000000000',
+          partner_address: '0x460218fcd497991b380f38b77c61334ad442e7f6',
+          channel_identifier: 1,
+          state: 'Open',
+        },
+        {
+          balance: '1000000000000000000000000',
+          channel_identifier: 2,
+          state: 'Open',
+          token_network_identifier: '0x41a34C1B6035E89FAdecb445dbAFe5804BC13a8E',
+          partner_address: '0xd7387C9b5a2860bFb6e8E8F36c8983B0469C6d18',
+        },
+      ]
+      return resolve(mockData);
       background.rif.lumino.getChannels((error, channels) => {
         if (error) {
           dispatch(niftyActions.displayWarning(error));
