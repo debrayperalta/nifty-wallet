@@ -53,6 +53,7 @@ const rifActions = {
   getAvailableCallbacks,
   getTokensWithJoinedCheck,
   getLuminoNetworks,
+  getLuminoNetworkData,
   getUserChannelsInNetwork,
   listenCallback,
   createPayment,
@@ -844,7 +845,7 @@ function getLuminoNetworks (userAddress) {
         withChannels: [networkMock2],
         withoutChannels: [networkMock1],
       }
-      resolve(networksMock);
+      return resolve(networksMock);
       dispatch(this.getTokens()).then(tokens => {
         const networks = {
           withChannels: [],
@@ -885,46 +886,80 @@ function getLuminoNetworks (userAddress) {
   };
 }
 
+function getLuminoNetworkData (tokenAddress) {
+  return dispatch => {
+    return new Promise((resolve, reject) => {
+      const emptyNetwork = {
+        symbol: '???',
+        networkTokenAddress: '0x',
+        name: '???',
+        networkAddress: '0x',
+        channels: 0,
+        nodes: 0,
+        userChannels: 0,
+      }
+      dispatch(this.getTokens()).then(tokens => {
+        const data = tokens.find(n => n.address === tokenAddress);
+        if (data) {
+          const nodesMap = {};
+          data.channels.forEach(c => {
+            const {from_address: from, to_address: to} = c;
+            nodesMap[from] = true;
+            nodesMap[to] = true;
+          })
+          const network = {
+            symbol: data.symbol,
+            networkTokenAddress: data.address,
+            name: data.name,
+            networkAddress: data.network_address,
+            channels: data.channels.length,
+            nodes: Object.keys(nodesMap).length,
+          }
+          return resolve(network);
+        }
+        resolve(emptyNetwork)
+      }).catch(err => reject(err))
+    })
+  }
+
+}
+
+
 function getUserChannelsInNetwork (tokenAddress) {
   return (dispatch) => new Promise((resolve, reject) => {
-      // TODO: Remove these mocks
-      if (tokenAddress !== '0x12234') {
-        return resolve([]);
-      }
-      const mockData = [
-        {
-          balance: '100000000000',
-          partner_address: '0x460218fcd497991b380f38b77c61334ad442e7f6',
-          channel_identifier: 1,
-          state: 'Open',
-        },
-        {
-          balance: '1000000000000000000000000',
-          channel_identifier: 2,
-          state: 'Open',
-          token_network_identifier: '0x41a34C1B6035E89FAdecb445dbAFe5804BC13a8E',
-          partner_address: '0xd7387C9b5a2860bFb6e8E8F36c8983B0469C6d18',
-        },
-      ]
-      return resolve(mockData);
-      background.rif.lumino.getChannels((error, channels) => {
-        if (error) {
-          dispatch(niftyActions.displayWarning(error));
-          return reject(error);
-        }
-        if (channels) {
-          // We get only the values, since these are the ones we care about
-          const channelsArr = Object.values(channels).filter(ch => ch.token_address.toLowerCase() === tokenAddress);
-          return resolve(channelsArr);
-        }
-        return resolve([])
-      });
-
+    // TODO: Remove these mocks
+    if (tokenAddress !== '0x12234') {
+      return resolve([]);
     }
-
-    ,
-  )
-    ;
+    const mockData = [
+      {
+        balance: '100000000000',
+        partner_address: '0x460218fcd497991b380f38b77c61334ad442e7f6',
+        channel_identifier: 1,
+        state: 'Open',
+      },
+      {
+        balance: '1000000000000000000000000',
+        channel_identifier: 2,
+        state: 'Open',
+        token_network_identifier: '0x41a34C1B6035E89FAdecb445dbAFe5804BC13a8E',
+        partner_address: '0xd7387C9b5a2860bFb6e8E8F36c8983B0469C6d18',
+      },
+    ]
+    return resolve(mockData);
+    background.rif.lumino.getChannels((error, channels) => {
+      if (error) {
+        dispatch(niftyActions.displayWarning(error));
+        return reject(error);
+      }
+      if (channels) {
+        // We get only the values, since these are the ones we care about
+        const channelsArr = Object.values(channels).filter(ch => ch.token_address.toLowerCase() === tokenAddress);
+        return resolve(channelsArr);
+      }
+      return resolve([])
+    });
+  });
 }
 
 function cleanStore () {

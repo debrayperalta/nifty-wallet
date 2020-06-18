@@ -12,6 +12,7 @@ class LuminoNetworkDetails extends Component {
     networkSymbol: PropTypes.string,
     networkAddress: PropTypes.string,
     getUserChannels: PropTypes.func,
+    getNetworkData: PropTypes.func,
     networkTokenAddress: PropTypes.string,
     networkName: PropTypes.string,
   }
@@ -29,9 +30,11 @@ class LuminoNetworkDetails extends Component {
   }
 
   reloadChannelsData = async () => {
-    const {getUserChannels, networkTokenAddress} = this.props;
+    const {getUserChannels, networkTokenAddress, getNetworkData} = this.props;
     const userChannels = await getUserChannels(networkTokenAddress);
-    if (userChannels && userChannels.length) return this.setState({userChannels, loading: false})
+    if (userChannels && userChannels.length) this.setState({userChannels, loading: false})
+    const networkData = await getNetworkData(networkTokenAddress);
+    if (networkData) this.setState({networkData})
   }
 
 
@@ -55,7 +58,7 @@ class LuminoNetworkDetails extends Component {
 
   render () {
     const {networkSymbol, networkName, networkAddress, networkTokenAddress} = this.props;
-    const {userChannels, loading} = this.state;
+    const {userChannels, loading, networkData} = this.state;
     const channelItems = this.getChannelItems(userChannels);
     const columns = [{
       Header: 'Content',
@@ -64,6 +67,17 @@ class LuminoNetworkDetails extends Component {
     return (
       <div className="body">
         <div>{networkSymbol} Network</div>
+        <div>
+          <div>
+            <img height={15} width={15} src="images/rif/node.svg"/>
+            {networkData.nodes} nodes
+          </div>
+          <div>
+            <img height={15} width={15} src="images/rif/node.svg"/>
+            {networkData.channels} channels
+          </div>
+
+        </div>
         <button>Leave</button>
         {loading && <div>Loading data</div>}
         {!loading && <div>
@@ -110,6 +124,7 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     getUserChannels: networkAddress => dispatch(rifActions.getUserChannelsInNetwork(networkAddress)),
+    getNetworkData: tokenAddress => dispatch(rifActions.getLuminoNetworkData(tokenAddress)),
   }
 }
 
