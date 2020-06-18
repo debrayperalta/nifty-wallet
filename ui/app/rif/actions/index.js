@@ -821,6 +821,7 @@ function getLuminoNetworks (userAddress) {
   return (dispatch) => {
 
     return new Promise((resolve, reject) => {
+      // TODO: Remove these mocks
       const networkMock1 = {
         symbol: 'MRIF',
         networkTokenAddress: '0x1234',
@@ -886,6 +887,7 @@ function getLuminoNetworks (userAddress) {
 
 function getUserChannelsInNetwork (tokenAddress) {
   return (dispatch) => new Promise((resolve, reject) => {
+      // TODO: Remove these mocks
       if (tokenAddress !== '0x12234') {
         return resolve([]);
       }
