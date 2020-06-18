@@ -20,18 +20,26 @@ class GenericSearch extends Component {
     placeholder: PropTypes.string,
   }
 
+  includesCriteria = (element, criteria) => {
+    const lowerString = v => String(v).toLowerCase()
+    const lowerElement = lowerString(element);
+    const lowerCriteria = lowerString(criteria);
+    return lowerElement.includes(lowerCriteria);
+  }
+
   handleKeyDown = async (e) => {
     if (e.key === 'Enter') {
       const {value} = e.target;
       const {resultSetFunction, criteria, filterProperty, data} = this.props;
+
       // Simple filter in elements of array (no objects)
       if (criteria && !filterProperty) {
-        const result = data.filter(element => String(element).includes(String(criteria)));
+        const result = data.filter(element => this.includesCriteria(element, criteria));
         return resultSetFunction(result);
       }
       // Filter of 1st level, with the property to check
       if (criteria && filterProperty) {
-        const result = data.filter(element => String(element[filterProperty]).includes(String(criteria)));
+        const result = data.filter(element => this.includesCriteria(element[filterProperty], criteria));
         return resultSetFunction(result);
       }
       // In other cases, we just perform the function passed down
