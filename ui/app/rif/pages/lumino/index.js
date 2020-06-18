@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 import rifActions from '../../actions';
 import LuminoNetworkItem from '../../components/LuminoNetworkItem';
 import {pageNames} from '../names';
+import {GenericTable} from '../../components';
 
 class LuminoHome extends Component {
 
@@ -35,22 +36,37 @@ class LuminoHome extends Component {
     return navigateTo(symbol, networkAddress, name, networkTokenAddress)
   }
 
+  getNetworkItems = networkArr => {
+    return networkArr.map(n => {
+      return {
+        content: <LuminoNetworkItem key={n.symbol} userChannels={n.userChannels}
+                                    symbol={n.symbol} nodes={n.nodes}
+                                    channels={n.channels}
+                                    onRightChevronClick={() => this.navigateToNetworkDetail(n)}/>,
+      }
+    });
+  }
+
   render () {
     const {networks} = this.state;
-    // TODO: Replace .map with instances of the <GenericTable /> from other branches
+    const myNetworks = this.getNetworkItems(networks.withChannels)
+    const otherNetworks = this.getNetworkItems(networks.withoutChannels)
+    const columns = [{
+      Header: 'Content',
+      accessor: 'content',
+    }];
     return (
       <div className="body">
-        <div>My Lumino networks available</div>
-        {networks.withChannels.map(n => <LuminoNetworkItem key={n.symbol} userChannels={n.userChannels}
-                                                           symbol={n.symbol} nodes={n.nodes}
-                                                           channels={n.channels}
-                                                           onRightChevronClick={() => this.navigateToNetworkDetail(n)}/>,
-        )}
-        <div>Lumino networks available</div>
-        {networks.withoutChannels.map(n => <LuminoNetworkItem key={n.symbol} symbol={n.symbol} nodes={n.nodes}
-                                                              channels={n.channels}
-                                                              onRightChevronClick={() => this.navigateToNetworkDetail(n)}/>,
-        )}
+        <GenericTable
+          title={'My Lumino Networks'}
+          columns={columns}
+          data={myNetworks}
+          paginationSize={3}/>
+        <GenericTable
+          title={'Lumino networks available'}
+          columns={columns}
+          data={otherNetworks}
+          paginationSize={3}/>
       </div>
     );
   }
