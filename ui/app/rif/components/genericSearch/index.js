@@ -20,10 +20,11 @@ class GenericSearch extends Component {
   }
 
   render () {
+    const {placeholder} = this.props;
     return (
       <div className="search-bar-container">
         <input
-          placeholder="Search for domains"
+          placeholder={placeholder || ''}
           className={'search-bar'}
           onKeyDown={this.handleKeyDown}
         />
