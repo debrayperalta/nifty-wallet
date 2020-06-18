@@ -9,6 +9,7 @@ const GOERLI_TESTNET = 'goerli_testnet'
 const CLASSIC = 'classic'
 const RSK = 'rsk'
 const RSK_TESTNET = 'rsk_testnet'
+const RSK_REGTEST = 'rsk_regtest'
 const LOCALHOST = 'localhost'
 
 const ETH_TICK = 'ETH'
@@ -26,6 +27,7 @@ const DAI_CHAINID = '0x64'
 const POA_SOKOL_CHAINID = '0x4D'
 const RSK_CHAINID = '0x1E'
 const RSK_TESTNET_CHAINID = '0x1F'
+const RSK_REGTEST_CHAINID = '0x21'
 const CLASSIC_CHAINID = '0x3D'
 
 const POA_CODE = 99
@@ -39,6 +41,7 @@ const GOERLI_TESTNET_CODE = 5
 const CLASSIC_CODE = 61
 const RSK_CODE = 30
 const RSK_TESTNET_CODE = 31
+const RSK_REGTEST_CODE = 33;
 
 const POA_DISPLAY_NAME = 'POA'
 const DAI_DISPLAY_NAME = 'xDai'
@@ -94,6 +97,7 @@ module.exports = {
   POA_SOKOL_CHAINID,
   RSK_CHAINID,
   RSK_TESTNET_CHAINID,
+  RSK_REGTEST_CHAINID,
   DAI,
   POA_SOKOL,
   MAINNET,
@@ -104,6 +108,7 @@ module.exports = {
   CLASSIC,
   RSK,
   RSK_TESTNET,
+  RSK_REGTEST,
   LOCALHOST,
   POA_CODE,
   DAI_CODE,
@@ -117,6 +122,7 @@ module.exports = {
   CLASSIC_CHAINID,
   RSK_CODE,
   RSK_TESTNET_CODE,
+  RSK_REGTEST_CODE,
   POA_DISPLAY_NAME,
   DAI_DISPLAY_NAME,
   POA_SOKOL_DISPLAY_NAME,

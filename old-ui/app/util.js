@@ -30,6 +30,8 @@ const {
   RSK_CODE,
   RSK_CHAINID,
   RSK_TESTNET_CODE,
+  RSK_REGTEST_CODE,
+  RSK_REGTEST_CHAINID,
   RSK_TESTNET_CHAINID,
   LOCALHOST,
   CLASSIC,
@@ -38,6 +40,7 @@ const {
   CLASSIC_TICK,
   RSK,
   RSK_TESTNET,
+  RSK_REGTEST,
   RSK_TICK,
   customDPaths,
 } = require('../../app/scripts/controllers/network/enums')
@@ -428,12 +431,12 @@ function getAllKeyRingsAccounts (keyrings, network) {
 function ifRSK (network) {
   if (!network) return false
   const numericNet = isNaN(network) ? network : parseInt(network)
-  return numericNet === RSK_CODE || numericNet === RSK_TESTNET_CODE
+  return numericNet === RSK_CODE || numericNet === RSK_TESTNET_CODE || numericNet === RSK_REGTEST_CODE
 }
 
 function ifRSKByProviderType (type) {
   if (!type) return false
-  return type === RSK || type === RSK_TESTNET
+  return type === RSK || type === RSK_TESTNET || type === RSK_REGTEST
 }
 
 function ifPOA (network) {
@@ -485,7 +488,8 @@ function isKnownProvider (type) {
   type === GOERLI_TESTNET ||
   type === CLASSIC ||
   type === RSK ||
-  type === RSK_TESTNET
+  type === RSK_TESTNET ||
+  type === RSK_REGTEST
 }
 
 function getNetworkID ({ network }) {
@@ -541,6 +545,11 @@ function getNetworkID ({ network }) {
     case RSK_TESTNET:
       netId = RSK_TESTNET_CODE.toString()
       chainId = RSK_TESTNET_CHAINID
+      ticker = RSK_TICK
+      break
+    case RSK_REGTEST:
+      netId = RSK_REGTEST_CODE.toString()
+      chainId = RSK_REGTEST_CHAINID
       ticker = RSK_TICK
       break
     case CLASSIC:
