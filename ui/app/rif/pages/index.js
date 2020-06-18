@@ -21,6 +21,7 @@ import ErrorComponent from '../../../../old-ui/app/components/error';
 import LuminoHome from './lumino/index';
 import {pageNames} from './names';
 import RifConfiguration from './configuration';
+import niftyActions from '../../actions';
 
 function getSearchBarComponent (show) {
   if (!show) {
@@ -75,6 +76,14 @@ function buildTabScreen (screenName, context, dispatch) {
               <RifConfiguration />
             </div>);
   }
+  // check if rif it's available
+  dispatch(rifActions.rifEnabled())
+    .then(enabled => {
+      if (!enabled) {
+        // if not available we redirect to home
+        dispatch(niftyActions.goHome());
+      }
+    });
   const tabOptions = context.params.tabOptions;
   const tabs = buildTabs(screenName, tabOptions, dispatch);
   const onTabChange = (tab) => {
