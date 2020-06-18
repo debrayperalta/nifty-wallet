@@ -5,6 +5,7 @@ import rifActions from '../../actions';
 import LuminoNetworkItem from '../../components/LuminoNetworkItem';
 import {pageNames} from '../names';
 import {GenericTable} from '../../components';
+import SearchLuminoNetworks from '../../components/searchLuminoNetworks';
 
 class LuminoHome extends Component {
 
@@ -21,13 +22,34 @@ class LuminoHome extends Component {
         withChannels: [],
         withoutChannels: [],
       },
+      filteredNetworks: {
+        withChannels: [],
+        withoutChannels: [],
+      },
     }
   }
 
   async componentDidMount () {
     const {getLuminoNetworks, currentAddress} = this.props;
     const networks = await getLuminoNetworks(currentAddress);
-    if (networks && networks.withChannels.length || networks.withoutChannels.length) this.setState({networks});
+    if (networks && networks.withChannels.length || networks.withoutChannels.length) {
+      this.setState({
+        networks,
+        filteredNetworks: networks,
+      });
+    }
+  }
+
+  setFilteredNetworks = result => {
+    const filteredNetworks = {
+      withChannels: [],
+      withoutChannels: [],
+    }
+    result.forEach(n => {
+      if (n.userChannels) return filteredNetworks.withChannels.push(n);
+      return filteredNetworks.withoutChannels.push(n);
+    })
+    return this.setState({filteredNetworks})
   }
 
   navigateToNetworkDetail = (network) => {
@@ -48,15 +70,17 @@ class LuminoHome extends Component {
   }
 
   render () {
-    const {networks} = this.state;
-    const myNetworks = this.getNetworkItems(networks.withChannels)
-    const otherNetworks = this.getNetworkItems(networks.withoutChannels)
+    const {networks, filteredNetworks} = this.state;
+    const myNetworks = this.getNetworkItems(filteredNetworks.withChannels)
+    const otherNetworks = this.getNetworkItems(filteredNetworks.withoutChannels)
+    const combinedNetworks = [...networks.withChannels, ...networks.withoutChannels];
     const columns = [{
       Header: 'Content',
       accessor: 'content',
     }];
     return (
       <div className="body">
+        <SearchLuminoNetworks data={combinedNetworks} setFilteredNetworks={this.setFilteredNetworks}/>
         <GenericTable
           title={'My Lumino Networks'}
           columns={columns}
