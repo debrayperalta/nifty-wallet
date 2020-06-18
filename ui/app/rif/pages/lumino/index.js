@@ -6,6 +6,7 @@ import LuminoNetworkItem from '../../components/LuminoNetworkItem';
 import {pageNames} from '../names';
 import {GenericTable} from '../../components';
 import SearchLuminoNetworks from '../../components/searchLuminoNetworks';
+import '../index.css';
 
 class LuminoHome extends Component {
 
@@ -74,23 +75,40 @@ class LuminoHome extends Component {
     const myNetworks = this.getNetworkItems(filteredNetworks.withChannels)
     const otherNetworks = this.getNetworkItems(filteredNetworks.withoutChannels)
     const combinedNetworks = [...networks.withChannels, ...networks.withoutChannels];
+    const quantityOfAllNetworks = networks.withoutChannels.length + networks.withoutChannels.length;
+    const quantityOfFilteredNetworks = filteredNetworks.withoutChannels.length + filteredNetworks.withoutChannels.length;
+    const itemsWereFiltered = quantityOfAllNetworks !== quantityOfFilteredNetworks;
+
     const columns = [{
       Header: 'Content',
       accessor: 'content',
     }];
     return (
-      <div className="body">
+      <div className="rif-home-body">
         <SearchLuminoNetworks data={combinedNetworks} setFilteredNetworks={this.setFilteredNetworks}/>
+        {!itemsWereFiltered && <h2 className="page-title">Lumino networks directory</h2>}
+        {itemsWereFiltered &&
         <GenericTable
-          title={'My Lumino Networks'}
+          title={'Network Results'}
           columns={columns}
-          data={myNetworks}
+          data={[...myNetworks, ...otherNetworks]}
           paginationSize={3}/>
-        <GenericTable
-          title={'Lumino networks available'}
-          columns={columns}
-          data={otherNetworks}
-          paginationSize={3}/>
+        }
+        {!itemsWereFiltered &&
+        <div>
+          <GenericTable
+            title={'My Lumino Networks'}
+            columns={columns}
+            data={myNetworks}
+            paginationSize={3}/>
+          <GenericTable
+            title={'Lumino networks available'}
+            columns={columns}
+            data={otherNetworks}
+            paginationSize={3}/>
+        </div>
+        }
+
       </div>
     );
   }
