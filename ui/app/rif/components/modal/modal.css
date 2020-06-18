@@ -36,8 +36,19 @@
   text-align: center;
 }
 
-.modal-buttons button {
+.modal-buttons .btn-confirm {
   background: var(--gray-modal-btn);
   border-radius: 5px;
   color: #fff;
+}
+
+.modal-buttons .btn-cancel {
+  background: transparent;
+  border-radius: 5px;
+  color: var(--gray-modal-btn);
+  border: 1px solid var(--gray-modal-btn);
+}
+
+.modal-buttons button + button {
+  margin-left: 10px;
 }
