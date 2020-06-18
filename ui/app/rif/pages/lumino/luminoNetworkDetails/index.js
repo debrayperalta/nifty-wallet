@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 import rifActions from '../../../actions';
 import LuminoChannelItem from '../../../components/luminoChannelItem';
 import OpenChannel from '../../../components/lumino/open-channel';
+import {GenericTable} from '../../../components';
 
 class LuminoNetworkDetails extends Component {
 
@@ -40,16 +41,39 @@ class LuminoNetworkDetails extends Component {
     return this.setState({loading: false})
   }
 
+  getChannelItems = channels => {
+    const {networkSymbol} = this.props;
+    return channels.map(c => {
+      return {
+        content: <LuminoChannelItem key={c.channel_identifier} partnerAddress={c.partner_address}
+                                    balance={c.balance}
+                                    state={c.state} tokenSymbol={networkSymbol}
+                                    onRightChevronClick={() => console.warn(c)}/>,
+      };
+    });
+  }
+
   render () {
     const {networkSymbol, networkName, networkAddress, networkTokenAddress} = this.props;
     const {userChannels, loading} = this.state;
+    const channelItems = this.getChannelItems(userChannels);
+    const columns = [{
+      Header: 'Content',
+      accessor: 'content',
+    }];
     return (
       <div className="body">
         <div>{networkSymbol} Network</div>
         <button>Leave</button>
         {loading && <div>Loading data</div>}
         {!loading && <div>
-          {userChannels.length && <div>My channels in the {networkSymbol} Network </div>}
+          {!!userChannels.length &&
+          <GenericTable
+            title={`My channels in ${networkSymbol} network`}
+            columns={columns}
+            data={channelItems}
+            paginationSize={3}/>
+          }
           {!userChannels.length && <div>
             <div>
               No channels yet
@@ -57,10 +81,6 @@ class LuminoNetworkDetails extends Component {
             <div>Add a channel to join the {networkSymbol} network</div>
           </div>
           }
-          {userChannels.map(c => <LuminoChannelItem key={c.channel_identifier} partnerAddress={c.partner_address}
-                                                    balance={c.balance}
-                                                    state={c.state} tokenSymbol={networkSymbol}
-                                                    onRightChevronClick={() => console.warn(c)}/>)}
         </div>
         }
         <OpenChannel
