@@ -1,5 +1,6 @@
 import extend from 'xtend';
 import ObservableStore from 'obs-store';
+import {global} from './constants';
 
 /**
  * Abstract manager to encapsulate the logic to catch preferences updates and other stuff shared by managers.
@@ -49,4 +50,25 @@ export class AbstractManager {
    * @returns an object like { operationName: function bind}
    */
   bindApi () {}
+
+  /**
+   * Updates the store state
+   * @param newState
+   */
+  updateStoreState (newState) {
+    const storeState = this.store.getState();
+    const currentNetworkId = this.networkController.getNetworkState() === 'loading' ? global.networks.main : this.networkController.getNetworkState();
+    storeState[currentNetworkId] = newState;
+    this.store.putState(storeState);
+  }
+
+  /**
+   * Gets the store state
+   * @returns the current state
+   */
+  getStoreState () {
+    const storeState = this.store.getState();
+    const currentNetworkId = this.networkController.getNetworkState() === 'loading' ? global.networks.main : this.networkController.getNetworkState();
+    return storeState[currentNetworkId] ? storeState[currentNetworkId] : {};
+  }
 }
