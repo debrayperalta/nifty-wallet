@@ -10,10 +10,10 @@ class LuminoNetworkDetails extends Component {
 
   static propTypes = {
     networkSymbol: PropTypes.string,
-    networkAddress: PropTypes.string,
+    tokenNetwork: PropTypes.string,
     getUserChannels: PropTypes.func,
     getNetworkData: PropTypes.func,
-    networkTokenAddress: PropTypes.string,
+    tokenAddress: PropTypes.string,
     networkName: PropTypes.string,
   }
 
@@ -30,10 +30,10 @@ class LuminoNetworkDetails extends Component {
   }
 
   reloadChannelsData = async () => {
-    const {getUserChannels, networkTokenAddress, getNetworkData} = this.props;
-    const userChannels = await getUserChannels(networkTokenAddress);
+    const {getUserChannels, tokenAddress, getNetworkData} = this.props;
+    const userChannels = await getUserChannels(tokenAddress);
     if (userChannels && userChannels.length) this.setState({userChannels, loading: false})
-    const networkData = await getNetworkData(networkTokenAddress);
+    const networkData = await getNetworkData(tokenAddress);
     if (networkData) this.setState({networkData})
   }
 
@@ -57,7 +57,7 @@ class LuminoNetworkDetails extends Component {
   }
 
   render () {
-    const {networkSymbol, networkName, networkAddress, networkTokenAddress} = this.props;
+    const {networkSymbol, networkName, tokenNetwork, tokenAddress} = this.props;
     const {userChannels, loading, networkData} = this.state;
     const channelItems = this.getChannelItems(userChannels);
     const columns = [{
@@ -98,8 +98,8 @@ class LuminoNetworkDetails extends Component {
         </div>
         }
         <OpenChannel
-          tokenAddress={networkTokenAddress}
-          tokenNetworkAddress={networkAddress}
+          tokenAddress={tokenAddress}
+          tokenNetworkAddress={tokenNetwork}
           tokenName={networkName}
           afterChannelCreated={this.reloadChannelsData}
           afterDepositCreated={this.reloadChannelsData}
@@ -115,15 +115,15 @@ function mapStateToProps (state) {
   return {
     currentAddress: state.metamask.selectedAddress.toLowerCase(),
     networkSymbol: params.networkSymbol,
-    networkAddress: params.networkAddress,
-    networkTokenAddress: params.networkTokenAddress,
+    tokenNetwork: params.tokenNetwork,
+    tokenAddress: params.tokenAddress,
     networkName: params.networkName,
   }
 }
 
 function mapDispatchToProps (dispatch) {
   return {
-    getUserChannels: networkAddress => dispatch(rifActions.getUserChannelsInNetwork(networkAddress)),
+    getUserChannels: tokenAddress => dispatch(rifActions.getUserChannelsInNetwork(tokenAddress)),
     getNetworkData: tokenAddress => dispatch(rifActions.getLuminoNetworkData(tokenAddress)),
   }
 }

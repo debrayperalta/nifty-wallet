@@ -32,8 +32,8 @@ class LuminoHome extends Component {
 
   navigateToNetworkDetail = (network) => {
     const {navigateTo} = this.props;
-    const {symbol, networkAddress, name, networkTokenAddress} = network;
-    return navigateTo(symbol, networkAddress, name, networkTokenAddress)
+    const {symbol, tokenAddress, name, tokenNetwork} = network;
+    return navigateTo(symbol, tokenAddress, name, tokenNetwork)
   }
 
   getNetworkItems = networkArr => {
@@ -83,12 +83,12 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     getLuminoNetworks: (userAddress) => dispatch(rifActions.getLuminoNetworks(userAddress)),
-    navigateTo: (networkSymbol, networkAddress, networkName, networkTokenAddress) => {
+    navigateTo: (networkSymbol, tokenAddress, networkName, tokenNetwork) => {
       dispatch(rifActions.navigateTo(pageNames.lumino.networkDetails, {
         networkSymbol,
-        networkAddress,
+        tokenAddress,
         networkName,
-        networkTokenAddress,
+        tokenNetwork,
         tabOptions: {
           tabIndex: 1,
           showBack: true,

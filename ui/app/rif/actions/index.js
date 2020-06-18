@@ -825,18 +825,18 @@ function getLuminoNetworks (userAddress) {
       // TODO: Remove these mocks
       const networkMock1 = {
         symbol: 'MRIF',
-        networkTokenAddress: '0x1234',
+        tokenAddress: '0x1234',
         name: 'Mock RIF',
-        networkAddress: '0x12345',
+        tokenNetwork: '0x12345',
         channels: 20,
         nodes: 5,
         userChannels: 0,
       }
       const networkMock2 = {
         symbol: 'MDoC',
-        networkTokenAddress: '0x12234',
+        tokenAddress: '0x12234',
         name: 'Mock DoC',
-        networkAddress: '0x122345',
+        tokenNetwork: '0x122345',
         channels: 20,
         nodes: 5,
         userChannels: 2,
@@ -854,9 +854,9 @@ function getLuminoNetworks (userAddress) {
         tokens.forEach(t => {
           const network = {
             symbol: t.symbol,
-            networkTokenAddress: t.address,
+            tokenAddress: t.address,
             name: t.name,
-            networkAddress: t.network_address,
+            tokenNetwork: t.network_address,
             channels: t.channels.length,
             nodes: 0,
             userChannels: 0,
@@ -891,9 +891,9 @@ function getLuminoNetworkData (tokenAddress) {
     return new Promise((resolve, reject) => {
       const emptyNetwork = {
         symbol: '???',
-        networkTokenAddress: '0x',
+        tokenAddress: '0x',
         name: '???',
-        networkAddress: '0x',
+        tokenNetwork: '0x',
         channels: 0,
         nodes: 0,
         userChannels: 0,
@@ -909,9 +909,9 @@ function getLuminoNetworkData (tokenAddress) {
           })
           const network = {
             symbol: data.symbol,
-            networkTokenAddress: data.address,
+            tokenAddress: data.address,
             name: data.name,
-            networkAddress: data.network_address,
+            tokenNetwork: data.network_address,
             channels: data.channels.length,
             nodes: Object.keys(nodesMap).length,
           }
@@ -952,8 +952,11 @@ function getUserChannelsInNetwork (tokenAddress) {
         dispatch(niftyActions.displayWarning(error));
         return reject(error);
       }
+      debugger;
+
       if (channels) {
         // We get only the values, since these are the ones we care about
+        debugger;
         const channelsArr = Object.values(channels).filter(ch => ch.token_address.toLowerCase() === tokenAddress);
         return resolve(channelsArr);
       }
