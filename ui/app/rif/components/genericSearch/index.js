@@ -12,11 +12,10 @@ import PropTypes from 'prop-types';
 class GenericSearch extends Component {
 
   static propTypes = {
-    filterFunction: PropTypes.func,
+    customFilterFunction: PropTypes.func,
     resultSetFunction: PropTypes.func,
     filterProperty: PropTypes.string,
     data: PropTypes.array,
-    criteria: PropTypes.any,
     placeholder: PropTypes.string,
   }
 
@@ -30,24 +29,24 @@ class GenericSearch extends Component {
   handleKeyDown = async (e) => {
     if (e.key === 'Enter') {
       const {value} = e.target;
-      const {resultSetFunction, criteria, filterProperty, data} = this.props;
+      const {customFilterFunction, resultSetFunction} = this.props;
+
+      if (customFilterFunction) {
+        const result = await customFilterFunction(value);
+        if (resultSetFunction) await resultSetFunction(result);
+        return;
+      }
+
+      const {filterProperty, data} = this.props;
 
       // Simple filter in elements of array (no objects)
-      if (criteria && !filterProperty) {
-        const result = data.filter(element => this.includesCriteria(element, criteria));
+      if (!filterProperty) {
+        const result = data.filter(element => this.includesCriteria(element, value));
         return resultSetFunction(result);
       }
       // Filter of 1st level, with the property to check
-      if (criteria && filterProperty) {
-        const result = data.filter(element => this.includesCriteria(element[filterProperty], criteria));
-        return resultSetFunction(result);
-      }
-      // In other cases, we just perform the function passed down
-      // We have a second function to set the values, or any other side effect
-      const {filterFunction} = this.props
-      const result = await filterFunction(value);
-      if (resultSetFunction) resultSetFunction(result);
-
+      const result = data.filter(element => this.includesCriteria(element[filterProperty], value));
+      return resultSetFunction(result);
     }
   }
 
