@@ -9,7 +9,6 @@ class GenericSearch extends Component {
     placeholder: PropTypes.string,
   }
 
-
   handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       const {value} = e.target;
