@@ -38,7 +38,8 @@ class GenericSearch extends Component {
       }
 
       const {filterProperty, data} = this.props;
-
+      // If we don't have a criteria, return the original data.
+      if (!value) return resultSetFunction(data);
       // Simple filter in elements of array (no objects)
       if (!filterProperty) {
         const result = data.filter(element => this.includesCriteria(element, value));
