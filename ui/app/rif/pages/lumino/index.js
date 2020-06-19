@@ -6,7 +6,6 @@ import LuminoNetworkItem from '../../components/LuminoNetworkItem';
 import {pageNames} from '../names';
 import {GenericTable} from '../../components';
 import SearchLuminoNetworks from '../../components/searchLuminoNetworks';
-import '../index.css';
 
 class LuminoHome extends Component {
 
