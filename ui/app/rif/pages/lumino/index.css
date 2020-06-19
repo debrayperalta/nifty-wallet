@@ -1,3 +1,8 @@
+.rif-home-body {
+  overflow-y: auto;
+  width: 100%;
+}
+
 .lumino-list-container {
   padding: 0 20px;
 }
@@ -33,7 +38,7 @@
 }
 
 .lumino-list-container img + .lumino-text-data,
-.lumino-network-detail-container img + .lumino-text-data{
+.lumino-network-detail-container img + .lumino-text-data {
   margin-left: 3px;
 }
 
