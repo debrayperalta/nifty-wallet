@@ -7,6 +7,22 @@ import {pageNames} from '../names';
 import {GenericTable} from '../../components';
 import SearchLuminoNetworks from '../../components/searchLuminoNetworks';
 
+const styles = {
+  myLuminoNetwork: {
+    title: 'lumino-table-title',
+    table: 'n-table',
+    tbodyTd: 'n-table-td',
+    pagination: {
+      body: 'n-table-pagination',
+      buttonBack: 'n-table-pagination-back',
+      indexes: '',
+      activePageButton: 'n-table-pagination-active',
+      inactivePageButton: 'n-table-pagination-inactive',
+      buttonNext: 'n-table-pagination-next',
+    },
+  },
+}
+
 class LuminoHome extends Component {
 
   static propTypes = {
@@ -59,12 +75,12 @@ class LuminoHome extends Component {
   }
 
   getNetworkItems = networkArr => {
-    return networkArr.map(n => {
+    return networkArr.map(network => {
       return {
-        content: <LuminoNetworkItem key={n.symbol} userChannels={n.userChannels}
-                                    symbol={n.symbol} nodes={n.nodes}
-                                    channels={n.channels}
-                                    onRightChevronClick={() => this.navigateToNetworkDetail(n)}/>,
+        content: <LuminoNetworkItem key={network.symbol} userChannels={network.userChannels}
+                                    symbol={network.symbol} nodes={network.nodes}
+                                    channels={network.channels}
+                                    onRightChevronClick={() => this.navigateToNetworkDetail(network)}/>,
       }
     });
   }
@@ -87,21 +103,26 @@ class LuminoHome extends Component {
         <SearchLuminoNetworks data={combinedNetworks} setFilteredNetworks={this.setFilteredNetworks}/>
         {!itemsWereFiltered && <h2 className="page-title">Lumino networks directory</h2>}
         {itemsWereFiltered &&
-        <GenericTable
-          title={'Network Results'}
-          columns={columns}
-          data={[...myNetworks, ...otherNetworks]}
-          paginationSize={3}/>
+        <div className="lumino-list-container">
+          <GenericTable
+            title={'Network Results'}
+            classes={styles.myLuminoNetwork}
+            columns={columns}
+            data={[...myNetworks, ...otherNetworks]}
+            paginationSize={3}/>
+        </div>
         }
         {!itemsWereFiltered &&
-        <div>
+        <div className="lumino-list-container">
           <GenericTable
             title={'My Lumino Networks'}
+            classes={styles.myLuminoNetwork}
             columns={columns}
             data={myNetworks}
             paginationSize={3}/>
           <GenericTable
             title={'Lumino networks available'}
+            classes={styles.myLuminoNetwork}
             columns={columns}
             data={otherNetworks}
             paginationSize={3}/>
@@ -114,8 +135,6 @@ class LuminoHome extends Component {
 }
 
 function mapStateToProps (state) {
-  // params is the params value or object passed to rifActions.navigateTo('pageName', params)
-  // const params = state.appState.currentView.params;
   return {
     currentAddress: state.metamask.selectedAddress.toLowerCase(),
   }
