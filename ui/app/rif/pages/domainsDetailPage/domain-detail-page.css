@@ -17,7 +17,7 @@
   font-size: 16px;
   display: block;
   border-bottom: 1px solid var(--gray-soft);
-  padding-bottom: 12px;
+  padding: 0 10px 12px;
   margin-bottom: 0;
 }
 

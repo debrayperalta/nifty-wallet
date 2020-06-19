@@ -6,6 +6,22 @@ import LuminoNetworkItem from '../../components/LuminoNetworkItem';
 import {pageNames} from '../names';
 import {GenericTable} from '../../components';
 
+const styles = {
+  myLuminoNetwork: {
+    title: 'lumino-table-title',
+    table: 'n-table',
+    tbodyTd: 'n-table-td',
+    pagination: {
+      body: 'n-table-pagination',
+      buttonBack: 'n-table-pagination-back',
+      indexes: '',
+      activePageButton: 'n-table-pagination-active',
+      inactivePageButton: 'n-table-pagination-inactive',
+      buttonNext: 'n-table-pagination-next',
+    },
+  }
+}
+
 class LuminoHome extends Component {
 
   static propTypes = {
@@ -56,14 +72,16 @@ class LuminoHome extends Component {
       accessor: 'content',
     }];
     return (
-      <div className="body">
+      <div className="lumino-list-container">
         <GenericTable
           title={'My Lumino Networks'}
+          classes={styles.myLuminoNetwork}
           columns={columns}
           data={myNetworks}
           paginationSize={3}/>
         <GenericTable
           title={'Lumino networks available'}
+          classes={styles.myLuminoNetwork}
           columns={columns}
           data={otherNetworks}
           paginationSize={3}/>
