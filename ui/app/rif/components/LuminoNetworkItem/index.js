@@ -19,7 +19,7 @@ class LuminoNetworkItem extends Component {
     return (<div className="row-data-container">
       {icon && <FontAwesomeIcon icon={icon} className={className.icon}/>}
       <span className="lumino-text-symbol">{symbol}</span>
-      {userChannels && <div className="d-flex mx-auto align-items-center">
+      {!!userChannels && <div className="d-flex mx-auto align-items-center">
         <img height={15} width={15} src="images/rif/channels-circle.svg"/>
         <span className="lumino-text-data">{userChannels} <small>owned channels</small> </span>
       </div>

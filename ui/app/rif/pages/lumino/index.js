@@ -103,11 +103,14 @@ class LuminoHome extends Component {
         <SearchLuminoNetworks data={combinedNetworks} setFilteredNetworks={this.setFilteredNetworks}/>
         {!itemsWereFiltered && <h2 className="page-title">Lumino networks directory</h2>}
         {itemsWereFiltered &&
-        <GenericTable
-          title={'Network Results'}
-          columns={columns}
-          data={myNetworks}
-          paginationSize={3}/>
+        <div className="lumino-list-container">
+          <GenericTable
+            title={'Network Results'}
+            classes={styles.myLuminoNetwork}
+            columns={columns}
+            data={[...myNetworks, ...otherNetworks]}
+            paginationSize={3}/>
+        </div>
         }
         {!itemsWereFiltered &&
         <div className="lumino-list-container">
