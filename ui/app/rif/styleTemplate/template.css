@@ -85,6 +85,11 @@
   margin-left: 0;
 }
 
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .mr-auto {
   margin-right: auto;
 }
@@ -93,8 +98,28 @@
   margin-left: auto;
 }
 
+.mr-1 {
+  margin-right: 10px;
+}
+
+.mb-4 {
+  margin-bottom: 40px;
+}
+
+.d-block {
+  display: block;
+}
+
 .d-flex {
   display: flex;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.c-pointer {
+  cursor: pointer;
 }
 
 /* BTN */

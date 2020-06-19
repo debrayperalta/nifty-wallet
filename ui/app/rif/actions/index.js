@@ -52,6 +52,9 @@ const rifActions = {
   getChannelsGroupedByNetwork,
   getAvailableCallbacks,
   getTokensWithJoinedCheck,
+  getLuminoNetworks,
+  getLuminoNetworkData,
+  getUserChannelsInNetwork,
   listenCallback,
   createPayment,
   createDeposit,
@@ -90,10 +93,12 @@ function showModal (opts, modalName = 'generic-modal') {
     confirmLabel: 'Confirm',
     cancelLabel: 'Cancel',
     confirmButtonClass: 'btn-confirm',
-    confirmCallback: () => {},
+    confirmCallback: () => {
+    },
     closeAfterConfirmCallback: true,
     cancelButtonClass: 'btn-cancel',
-    cancelCallback: () => {},
+    cancelCallback: () => {
+    },
     closeAfterCancelCallback: true,
     validateConfirm: null,
     hideConfirm: false,
@@ -146,15 +151,15 @@ function getDomainDetails (domainName) {
   return (dispatch) => {
     dispatch(niftyActions.showLoadingIndication());
     return new Promise((resolve, reject) => {
-        background.rif.rns.resolver.getDomainDetails(domainName, (error, details) => {
-          console.debug('This are the details bringed', details);
-          dispatch(niftyActions.hideLoadingIndication());
-          if (error) {
-            dispatch(niftyActions.displayWarning(error));
-            return reject(error);
-          }
-          return resolve(details);
-        });
+      background.rif.rns.resolver.getDomainDetails(domainName, (error, details) => {
+        console.debug('This are the details bringed', details);
+        dispatch(niftyActions.hideLoadingIndication());
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error);
+        }
+        return resolve(details);
+      });
     })
   }
 }
@@ -163,7 +168,7 @@ function getDomainDetails (domainName) {
   TODO: rorolopetegui
    This action isn't used for now, but it resolves an address using reverse lookup
  */
-function getDomainByAddress(address) {
+function getDomainByAddress (address) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       background.rif.rns.resolver.getAddressDomain(address, (error, domain) => {
@@ -399,7 +404,7 @@ function navigateTo (screenName, params, resetNavigation = false) {
     params,
   }
   const alreadyNavigatedTo = navigationStack.find(navigation => navigation.params.tabOptions.screenName === screenName);
-  if (!alreadyNavigatedTo && !resetNavigation) {
+  if (!alreadyNavigatedTo) {
     navigationStack.push(currentNavigation);
   }
   backNavigated = false;
@@ -478,7 +483,7 @@ function goToConfirmPageForLastTransaction (afterApproval) {
             unapprovedTransactions: latestTransaction,
             afterApproval,
           }));
-      });
+        });
     });
   }
 }
@@ -739,13 +744,13 @@ function createPayment (partner, tokenAddress, netAmount, callbackHandlers = new
 function getChannels () {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-        background.rif.lumino.getChannels((error, channels) => {
-          if (error) {
-            dispatch(niftyActions.displayWarning(error));
-            return reject(error);
-          }
-          return resolve(channels);
-        });
+      background.rif.lumino.getChannels((error, channels) => {
+        if (error) {
+          dispatch(niftyActions.displayWarning(error));
+          return reject(error)
+        }
+        return resolve(channels);
+      });
     });
   };
 }
@@ -797,7 +802,7 @@ function getTokensWithJoinedCheck () {
           tokens.map(token => {
             const tokenJoined = token;
             tokenJoined.openedChannels = channels.filter(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address) &&
-                channel.sdk_status === 'CHANNEL_OPENED');
+              channel.sdk_status === 'CHANNEL_OPENED');
             tokenJoined.joined = !!channels.find(channel => ethUtils.toChecksumAddress(channel.token_address) === ethUtils.toChecksumAddress(token.address));
             tokenJoined.userBalance = sumValuesOfArray(tokenJoined.openedChannels, 'balance');
             tokensJoined.push(tokenJoined);
@@ -805,7 +810,7 @@ function getTokensWithJoinedCheck () {
           resolve(tokensJoined);
         }).catch(err => {
           // If you have 0 channels opened, it will go here, so we need to resolve with only the tokens
-          console.debug("Couldn't get channels", err);
+          console.debug('Couldn\'t get channels', err);
           resolve(tokens);
         })
       }).catch(err => {
@@ -813,6 +818,111 @@ function getTokensWithJoinedCheck () {
       })
     });
   };
+}
+
+function getLuminoNetworks (userAddress) {
+  return (dispatch) => {
+
+    return new Promise((resolve, reject) => {
+      dispatch(this.getTokens()).then(tokens => {
+        const networks = {
+          withChannels: [],
+          withoutChannels: [],
+        }
+        tokens.forEach(token => {
+          const network = {
+            symbol: token.symbol,
+            tokenAddress: token.address,
+            name: token.name,
+            tokenNetwork: token.network_address,
+            channels: token.channels.length,
+            nodes: 0,
+            userChannels: 0,
+          }
+          if (network.channels) {
+            const nodesMap = {};
+            // We check for the unique nodes in the channels
+            token.channels.forEach(channel => {
+              const {from_address: from, to_address: to} = channel;
+              nodesMap[from] = true
+              // If the user is one of the participants, this is one of their channels
+              const toLower = value => value.toLowerCase();
+              const lowerUserAddress = toLower(userAddress);
+              if (toLower(from) === lowerUserAddress || toLower(to) === lowerUserAddress) {
+                network.userChannels += 1
+              }
+            })
+            network.nodes = Object.keys(nodesMap).length;
+          }
+          // Here we put it in the has channel or not key
+          if (network.userChannels) return networks.withChannels.push(network);
+          return networks.withoutChannels.push(network)
+        })
+        return resolve(networks);
+      }).catch(err => {
+        reject(err);
+      })
+    });
+  };
+}
+
+function getLuminoNetworkData (tokenAddress) {
+  return dispatch => {
+    return new Promise((resolve, reject) => {
+      const emptyNetwork = {
+        symbol: '???',
+        tokenAddress: '0x',
+        name: '???',
+        tokenNetwork: '0x',
+        channels: 0,
+        nodes: 0,
+        userChannels: 0,
+      }
+      dispatch(this.getTokens()).then(tokens => {
+        const data = tokens.find(n => n.address === tokenAddress);
+        if (data) {
+          const nodesMap = {};
+          data.channels.forEach(c => {
+            const {from_address: from, to_address: to} = c;
+            nodesMap[from] = true;
+            nodesMap[to] = true;
+          })
+          const network = {
+            symbol: data.symbol,
+            tokenAddress: data.address,
+            name: data.name,
+            tokenNetwork: data.network_address,
+            channels: data.channels.length,
+            nodes: Object.keys(nodesMap).length,
+          }
+          return resolve(network);
+        }
+        resolve(emptyNetwork)
+      }).catch(err => reject(err))
+    })
+  }
+
+}
+
+
+function getUserChannelsInNetwork (tokenAddress) {
+  return (dispatch) => new Promise((resolve, reject) => {
+    background.rif.lumino.getChannels((error, channels) => {
+      if (error) {
+        dispatch(niftyActions.displayWarning(error));
+        return reject(error);
+      }
+      debugger;
+
+      if (channels) {
+        // We get only the values, since these are the ones we care about
+        debugger;
+        const channelsArr = Object.values(channels).filter(ch => ch.token_address.toLowerCase() === tokenAddress);
+        return resolve(channelsArr);
+      }
+      return resolve([])
+    });
+  });
 }
 
 function cleanStore () {
@@ -891,6 +1001,7 @@ function createNetworkPayment (network, destination, amountInWei) {
     });
   };
 }
+
 
 function subscribeToCloseChannel (channelId, tokenAddress) {
   return (dispatch) => {
