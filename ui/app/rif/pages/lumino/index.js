@@ -19,7 +19,7 @@ const styles = {
       inactivePageButton: 'n-table-pagination-inactive',
       buttonNext: 'n-table-pagination-next',
     },
-  }
+  },
 }
 
 class LuminoHome extends Component {
@@ -53,12 +53,12 @@ class LuminoHome extends Component {
   }
 
   getNetworkItems = networkArr => {
-    return networkArr.map(n => {
+    return networkArr.map(network => {
       return {
-        content: <LuminoNetworkItem key={n.symbol} userChannels={n.userChannels}
-                                    symbol={n.symbol} nodes={n.nodes}
-                                    channels={n.channels}
-                                    onRightChevronClick={() => this.navigateToNetworkDetail(n)}/>,
+        content: <LuminoNetworkItem key={network.symbol} userChannels={network.userChannels}
+                                    symbol={network.symbol} nodes={network.nodes}
+                                    channels={network.channels}
+                                    onRightChevronClick={() => this.navigateToNetworkDetail(network)}/>,
       }
     });
   }
@@ -91,8 +91,6 @@ class LuminoHome extends Component {
 }
 
 function mapStateToProps (state) {
-  // params is the params value or object passed to rifActions.navigateTo('pageName', params)
-  // const params = state.appState.currentView.params;
   return {
     currentAddress: state.metamask.selectedAddress.toLowerCase(),
   }
